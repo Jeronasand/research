@@ -12,14 +12,14 @@ npm run dev
 
 打开 `http://127.0.0.1:5173/`。
 
-`npm run sync:data` 会把待上传数据写到 `web/research-data/`。不要把调研数据放到 `web/public/`，因为 `web/public/` 会被打包进公开预览页面。
+`npm run sync:data` 会把待上传数据写到 `web/research-data/`。它不会进入公开静态包。不要把调研数据放到 `web/public/`。
 
 ## 数据源 Manifest
 
-预览桶是 `research-preview`，地域 endpoint 为 `oss-cn-shenzhen.aliyuncs.com`。
+预览桶是 `research-preview`，地域 endpoint 为 `oss-cn-shenzhen.aliyuncs.com`，只用于公开静态网页托管。
 数据源 OSS 桶是 `research-datas`，地域 endpoint 为 `oss-cn-beijing.aliyuncs.com`。它保持 private ACL，并向签名 OSS 请求暴露类似下面的 JSON manifest：
 
-首屏只保留登录功能。登录桶 HEAD 校验成功后，应用使用同一组 OSS AK 或 STS token 签名读取数据源桶。
+首屏只保留登录功能。这里没有后端服务。用户输入 OSS AK 或 STS 后，浏览器会签名 `GET` 数据源 manifest；这个请求成功后，应用继续用同一组凭证签名读取选中的调研文档 key。
 
 ```json
 {
@@ -44,7 +44,7 @@ npm run dev
 
 浏览器访问数据源桶需要 CORS 允许：
 
-- methods: `GET`, `HEAD`
+- methods: `GET`
 - request headers: `Authorization`, `x-oss-date`, `x-oss-security-token`
 - origin: 实际预览页面 origin
 

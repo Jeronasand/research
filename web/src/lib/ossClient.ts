@@ -26,6 +26,12 @@ export type ResearchManifest = {
 
 const encoder = new TextEncoder();
 
+function requireCredential(credential: OssCredential) {
+  if (!credential.accessKeyId.trim() || !credential.accessKeySecret.trim()) {
+    throw new Error("AccessKeyId and AccessKeySecret are required.");
+  }
+}
+
 function normalizeEndpoint(endpoint: string) {
   return endpoint.trim().replace(/^https?:\/\//, "").replace(/\/+$/, "");
 }
@@ -59,7 +65,9 @@ async function hmacSha1Base64(secret: string, payload: string) {
   return btoa(binary);
 }
 
-async function signedHeaders(method: "GET" | "HEAD", bucket: string, key: string, credential: OssCredential) {
+async function signedHeaders(method: "GET", bucket: string, key: string, credential: OssCredential) {
+  requireCredential(credential);
+
   const ossDate = new Date().toUTCString();
   const ossHeaders: Record<string, string> = {
     "x-oss-date": ossDate,
@@ -82,12 +90,29 @@ async function signedHeaders(method: "GET" | "HEAD", bucket: string, key: string
   };
 }
 
+function xmlTag(payload: string, tag: string) {
+  return payload.match(new RegExp(`<${tag}>([^<]*)</${tag}>`))?.[1]?.trim();
+}
+
+function ossErrorDetail(payload: string) {
+  const code = xmlTag(payload, "Code");
+  const message = xmlTag(payload, "Message");
+  const requestId = xmlTag(payload, "RequestId");
+  return [code, message, requestId ? `RequestId ${requestId}` : ""].filter(Boolean).join(": ");
+}
+
+async function responseErrorMessage(method: "GET", key: string, response: Response) {
+  const payload = await response.text().catch(() => "");
+  const detail = payload ? ossErrorDetail(payload) : "";
+  return `${method} ${key} failed: ${response.status} ${response.statusText}${detail ? ` (${detail})` : ""}`;
+}
+
 export function objectUrl(config: OssBucketConfig, key: string) {
   return `https://${config.bucket}.${normalizeEndpoint(config.endpoint)}/${encodeObjectKey(key.replace(/^\/+/, ""))}`;
 }
 
 export async function requestSignedObject(
-  method: "GET" | "HEAD",
+  method: "GET",
   config: OssBucketConfig,
   key: string,
   credential: OssCredential,
@@ -100,7 +125,7 @@ export async function requestSignedObject(
   });
 
   if (!response.ok) {
-    throw new Error(`${method} ${cleanKey} failed: ${response.status} ${response.statusText}`);
+    throw new Error(await responseErrorMessage(method, cleanKey, response));
   }
 
   return response;

@@ -12,14 +12,14 @@ npm run dev
 
 Open `http://127.0.0.1:5173/`.
 
-`npm run sync:data` writes upload-ready data to `web/research-data/`. Do not place research data under `web/public/`, because `web/public/` is copied into the public preview bundle.
+`npm run sync:data` writes upload-ready data to `web/research-data/`. It is not copied into the public static bundle. Do not place research data under `web/public/`.
 
 ## Data Source Manifest
 
-The preview bucket is `research-preview` on `oss-cn-shenzhen.aliyuncs.com`.
+The preview bucket is `research-preview` on `oss-cn-shenzhen.aliyuncs.com`. It only hosts the public static web page.
 The data-source OSS bucket is `research-datas` on `oss-cn-beijing.aliyuncs.com`. It stays private and should expose a JSON manifest to signed OSS requests like:
 
-The first screen is login-only. After the login bucket HEAD validation succeeds, the same OSS AK or STS token is used to sign reads from the data-source bucket.
+The first screen is login-only. There is no backend. After the user enters OSS AK or STS credentials, the browser signs a `GET` request to the data-source manifest. If that request succeeds, the same credentials sign reads for the selected research document keys.
 
 ```json
 {
@@ -44,7 +44,7 @@ The preview reads known keys from the manifest. It does not require bucket listi
 
 Browser access needs CORS on the data-source bucket for:
 
-- methods: `GET`, `HEAD`
+- methods: `GET`
 - request headers: `Authorization`, `x-oss-date`, `x-oss-security-token`
 - origin: the actual preview origin
 

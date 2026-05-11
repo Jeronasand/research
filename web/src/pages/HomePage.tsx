@@ -4,7 +4,6 @@ import { renderMarkdown } from "../lib/markdown";
 import {
   getSignedObjectText,
   parseManifest,
-  requestSignedObject,
   type OssBucketConfig,
   type OssCredential,
   type ResearchDocumentItem,
@@ -12,9 +11,6 @@ import {
 } from "../lib/ossClient";
 
 type FormState = {
-  loginBucket: string;
-  loginEndpoint: string;
-  loginProbeKey: string;
   dataBucket: string;
   dataEndpoint: string;
   manifestKey: string;
@@ -24,9 +20,6 @@ type FormState = {
 };
 
 const initialForm: FormState = {
-  loginBucket: "research-preview",
-  loginEndpoint: "oss-cn-shenzhen.aliyuncs.com",
-  loginProbeKey: "auth/session.json",
   dataBucket: "research-datas",
   dataEndpoint: "oss-cn-beijing.aliyuncs.com",
   manifestKey: "research-data/manifest.json",
@@ -35,10 +28,10 @@ const initialForm: FormState = {
   securityToken: "",
 };
 
-const loginFieldNames = new Set<keyof FormState>([
-  "loginBucket",
-  "loginEndpoint",
-  "loginProbeKey",
+const authorizationFieldNames = new Set<keyof FormState>([
+  "dataBucket",
+  "dataEndpoint",
+  "manifestKey",
   "accessKeyId",
   "accessKeySecret",
   "securityToken",
@@ -48,7 +41,7 @@ function fieldValue(value: string) {
   return value.trim();
 }
 
-function credentialFromLogin(form: FormState): OssCredential {
+function credentialFromForm(form: FormState): OssCredential {
   return {
     accessKeyId: fieldValue(form.accessKeyId),
     accessKeySecret: fieldValue(form.accessKeySecret),
@@ -136,7 +129,7 @@ export function HomePage() {
   const [manifest, setManifest] = useState<ResearchManifest | null>(null);
   const [selectedId, setSelectedId] = useState("");
   const [markdown, setMarkdown] = useState("");
-  const [status, setStatus] = useState("Validate the login bucket to continue.");
+  const [status, setStatus] = useState("Enter OSS AK or STS credentials that can read the private data bucket.");
   const [busy, setBusy] = useState(false);
 
   const selectedItem = useMemo(
@@ -156,12 +149,12 @@ export function HomePage() {
 
   function updateForm(key: keyof FormState, value: string) {
     setForm((current) => ({ ...current, [key]: value }));
-    if (loginFieldNames.has(key) && authenticated) {
-      clearPreview("Login settings changed. Validate the login bucket again.");
+    if (authorizationFieldNames.has(key) && authenticated) {
+      clearPreview("Access settings changed. Validate the data bucket again.");
     }
   }
 
-  async function loadManifest(credential = credentialFromLogin(form)) {
+  async function loadManifest(credential = credentialFromForm(form)) {
     const payload = await getSignedObjectText(
       bucketConfig(form.dataBucket, form.dataEndpoint),
       fieldValue(form.manifestKey),
@@ -173,21 +166,15 @@ export function HomePage() {
     setMarkdown("");
   }
 
-  async function validateLoginBucket() {
+  async function validateDataBucketAccess() {
     setBusy(true);
     try {
-      const credential = credentialFromLogin(form);
-      await requestSignedObject(
-        "HEAD",
-        bucketConfig(form.loginBucket, form.loginEndpoint),
-        fieldValue(form.loginProbeKey),
-        credential,
-      );
-      setAuthenticated(true);
+      const credential = credentialFromForm(form);
       await loadManifest(credential);
-      setStatus("Login bucket validated. Loaded data source.");
+      setAuthenticated(true);
+      setStatus("Data bucket authorized. Loaded research manifest.");
     } catch (error) {
-      clearPreview(error instanceof Error ? error.message : "Login validation failed.");
+      clearPreview(error instanceof Error ? error.message : "Data bucket authorization failed.");
     } finally {
       setBusy(false);
     }
@@ -195,7 +182,7 @@ export function HomePage() {
 
   async function reloadManifest() {
     if (!authenticated) {
-      setStatus("Validate the login bucket before loading the data source.");
+      setStatus("Validate data bucket access before loading documents.");
       return;
     }
 
@@ -220,7 +207,7 @@ export function HomePage() {
       const payload = await getSignedObjectText(
         bucketConfig(form.dataBucket, form.dataEndpoint),
         item.key,
-        credentialFromLogin(form),
+        credentialFromForm(form),
       );
       setSelectedId(item.id);
       setMarkdown(payload);
@@ -238,19 +225,19 @@ export function HomePage() {
         <div className="rounded-md border border-zinc-200 bg-white p-4">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <h1 className="text-lg font-semibold text-zinc-950">Login Bucket</h1>
-              <p className="text-xs text-zinc-500">OSS AK/STS session validation</p>
+              <h1 className="text-lg font-semibold text-zinc-950">Data Bucket Access</h1>
+              <p className="text-xs text-zinc-500">OSS AK/STS access to private research data</p>
             </div>
             <KeyRound className="text-emerald-700" size={22} aria-hidden="true" />
           </div>
           <div className="grid gap-3">
-            <TextField label="Bucket" value={form.loginBucket} onChange={(value) => updateForm("loginBucket", value)} />
-            <TextField label="Endpoint" value={form.loginEndpoint} onChange={(value) => updateForm("loginEndpoint", value)} />
-            <TextField label="Probe object key" value={form.loginProbeKey} onChange={(value) => updateForm("loginProbeKey", value)} />
+            <TextField label="Data bucket" value={form.dataBucket} onChange={(value) => updateForm("dataBucket", value)} />
+            <TextField label="Endpoint" value={form.dataEndpoint} onChange={(value) => updateForm("dataEndpoint", value)} />
+            <TextField label="Manifest key" value={form.manifestKey} onChange={(value) => updateForm("manifestKey", value)} />
             <TextField label="AccessKeyId" value={form.accessKeyId} onChange={(value) => updateForm("accessKeyId", value)} />
             <TextField label="AccessKeySecret" type="password" value={form.accessKeySecret} onChange={(value) => updateForm("accessKeySecret", value)} />
             <TextField label="STS SecurityToken" type="password" value={form.securityToken} onChange={(value) => updateForm("securityToken", value)} />
-            <ActionButton icon={<ShieldCheck size={16} aria-hidden="true" />} onClick={validateLoginBucket} disabled={busy}>
+            <ActionButton icon={<ShieldCheck size={16} aria-hidden="true" />} onClick={validateDataBucketAccess} disabled={busy}>
               Validate
             </ActionButton>
           </div>
@@ -267,7 +254,7 @@ export function HomePage() {
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h1 className="text-lg font-semibold text-zinc-950">Research Preview</h1>
-              <p className="text-xs text-zinc-500">{form.loginBucket} authorized</p>
+              <p className="text-xs text-zinc-500">{form.dataBucket} authorized</p>
             </div>
             <ShieldCheck className="text-emerald-700" size={22} aria-hidden="true" />
           </div>
@@ -277,7 +264,7 @@ export function HomePage() {
             </ActionButton>
             <ActionButton
               icon={<KeyRound size={16} aria-hidden="true" />}
-              onClick={() => clearPreview("Logged out. Validate the login bucket to continue.")}
+              onClick={() => clearPreview("Logged out. Validate data bucket access to continue.")}
               disabled={busy}
               variant="secondary"
             >
