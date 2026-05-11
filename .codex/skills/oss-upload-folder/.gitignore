@@ -1,0 +1,6 @@
+.env.oss-upload-folder
+tmp/
+temp/
+.cache/
+node_modules/
+*.log

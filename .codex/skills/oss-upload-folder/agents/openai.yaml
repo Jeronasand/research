@@ -1,0 +1,4 @@
+interface:
+  display_name: "OSS Upload Folder"
+  short_description: "Upload folders to Alibaba Cloud OSS with CLI-first safety checks."
+  default_prompt: "Help me upload a local folder to Alibaba Cloud OSS using the CLI-first OSS upload skill."

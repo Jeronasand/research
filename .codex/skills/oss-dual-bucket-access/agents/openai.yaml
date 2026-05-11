@@ -1,0 +1,4 @@
+interface:
+  display_name: "OSS Dual Bucket Access"
+  short_description: "Plan safe dual-bucket OSS access workflows."
+  default_prompt: "Use $oss-dual-bucket-access to plan a login bucket plus data-source bucket OSS access flow."

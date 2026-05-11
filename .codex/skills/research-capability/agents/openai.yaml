@@ -1,0 +1,4 @@
+interface:
+  display_name: "调研能力"
+  short_description: "Bilingual product and technical research"
+  default_prompt: "Use $research-capability to create or update separated product and technical research in this repository."

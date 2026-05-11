@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bucket Upload Policy"
+  short_description: "Decide when skill artifacts should live in OSS/S3 instead of git."
+  default_prompt: "Help me decide whether skill-related files should be uploaded to object storage and produce the correct artifact manifest."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Commit Convention"
+  short_description: "Generate repository-compliant git commit messages."
+  default_prompt: "Help me inspect the current repository changes and write a git commit message that follows the repository convention."

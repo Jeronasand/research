@@ -1,0 +1,4 @@
+interface:
+  display_name: "React TS Web Init"
+  short_description: "Initialize React TS apps with routing and Tailwind."
+  default_prompt: "Use $react-ts-web-init to initialize a React + TypeScript web project with routing and Tailwind CSS."
