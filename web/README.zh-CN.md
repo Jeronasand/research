@@ -19,7 +19,7 @@ npm run dev
 预览桶是 `research-preview`，地域 endpoint 为 `oss-cn-shenzhen.aliyuncs.com`，只用于公开静态网页托管。
 数据源 OSS 桶是 `research-datas`，地域 endpoint 为 `oss-cn-beijing.aliyuncs.com`。它保持 private ACL，并向签名 OSS 请求暴露类似下面的 JSON manifest：
 
-首屏只保留登录功能。这里没有后端服务。用户输入 OSS AK 或 STS 后，浏览器会签名 `GET` 数据源 manifest；这个请求成功后，应用继续用同一组凭证签名读取选中的调研文档 key。
+首屏只保留登录功能。这里没有后端服务。用户输入 OSS AK 或 STS 后，浏览器会为数据源 manifest 生成短期有效的签名 `GET` URL；这个请求成功后，应用继续用同一组凭证为选中的调研文档 key 生成签名 URL。
 
 ```json
 {
@@ -45,7 +45,6 @@ npm run dev
 浏览器访问数据源桶需要 CORS 允许：
 
 - methods: `GET`
-- request headers: `Authorization`, `x-oss-date`, `x-oss-security-token`
 - origin: 实际预览页面 origin
 
 这个 CORS 规则不会把 `research-datas` 变成公开桶。桶 ACL 可以继续保持 private，读取仍然必须是有效的 OSS 签名请求。

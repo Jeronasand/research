@@ -25,6 +25,8 @@ export type ResearchManifest = {
 };
 
 const encoder = new TextEncoder();
+const SIGNED_URL_EXPIRES_SECONDS = 300;
+const SIGNABLE_SUBRESOURCES = new Set(["security-token"]);
 
 function requireCredential(credential: OssCredential) {
   if (!credential.accessKeyId.trim() || !credential.accessKeySecret.trim()) {
@@ -43,9 +45,22 @@ function encodeObjectKey(key: string) {
     .join("/");
 }
 
-function canonicalResource(bucket: string, key: string) {
+function canonicalSubresourceString(params: Record<string, string>) {
+  const entries = Object.entries(params)
+    .filter(([key]) => SIGNABLE_SUBRESOURCES.has(key))
+    .sort(([left], [right]) => left.localeCompare(right));
+
+  if (!entries.length) {
+    return "";
+  }
+
+  return `?${entries.map(([key, value]) => (value ? `${key}=${value}` : key)).join("&")}`;
+}
+
+function canonicalResource(bucket: string, key: string, params: Record<string, string> = {}) {
   const cleanKey = key.replace(/^\/+/, "");
-  return cleanKey ? `/${bucket}/${cleanKey}` : `/${bucket}/`;
+  const resource = cleanKey ? `/${bucket}/${cleanKey}` : `/${bucket}/`;
+  return `${resource}${canonicalSubresourceString(params)}`;
 }
 
 async function hmacSha1Base64(secret: string, payload: string) {
@@ -65,29 +80,31 @@ async function hmacSha1Base64(secret: string, payload: string) {
   return btoa(binary);
 }
 
-async function signedHeaders(method: "GET", bucket: string, key: string, credential: OssCredential) {
+async function signedObjectUrl(config: OssBucketConfig, key: string, credential: OssCredential) {
   requireCredential(credential);
 
-  const ossDate = new Date().toUTCString();
-  const ossHeaders: Record<string, string> = {
-    "x-oss-date": ossDate,
-  };
+  const cleanKey = key.replace(/^\/+/, "");
+  const bucket = config.bucket.trim();
+  const expires = String(Math.floor(Date.now() / 1000) + SIGNED_URL_EXPIRES_SECONDS);
+  const signedParams: Record<string, string> = {};
+  const securityToken = credential.securityToken?.trim();
 
-  if (credential.securityToken?.trim()) {
-    ossHeaders["x-oss-security-token"] = credential.securityToken.trim();
+  if (securityToken) {
+    signedParams["security-token"] = securityToken;
   }
 
-  const canonicalOssHeaders = Object.entries(ossHeaders)
-    .sort(([left], [right]) => left.localeCompare(right))
-    .map(([name, value]) => `${name}:${value}\n`)
-    .join("");
-  const stringToSign = [method, "", "", "", `${canonicalOssHeaders}${canonicalResource(bucket, key)}`].join("\n");
+  const stringToSign = ["GET", "", "", expires, canonicalResource(bucket, cleanKey, signedParams)].join("\n");
   const signature = await hmacSha1Base64(credential.accessKeySecret, stringToSign);
+  const url = new URL(objectUrl(config, cleanKey));
 
-  return {
-    ...ossHeaders,
-    Authorization: `OSS ${credential.accessKeyId}:${signature}`,
-  };
+  if (securityToken) {
+    url.searchParams.set("security-token", securityToken);
+  }
+  url.searchParams.set("OSSAccessKeyId", credential.accessKeyId.trim());
+  url.searchParams.set("Expires", expires);
+  url.searchParams.set("Signature", signature);
+
+  return url.toString();
 }
 
 function xmlTag(payload: string, tag: string) {
@@ -118,11 +135,7 @@ export async function requestSignedObject(
   credential: OssCredential,
 ) {
   const cleanKey = key.replace(/^\/+/, "");
-  const headers = await signedHeaders(method, config.bucket.trim(), cleanKey, credential);
-  const response = await fetch(objectUrl(config, cleanKey), {
-    method,
-    headers,
-  });
+  const response = await fetch(await signedObjectUrl(config, cleanKey, credential), { method });
 
   if (!response.ok) {
     throw new Error(await responseErrorMessage(method, cleanKey, response));

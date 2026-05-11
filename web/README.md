@@ -19,7 +19,7 @@ Open `http://127.0.0.1:5173/`.
 The preview bucket is `research-preview` on `oss-cn-shenzhen.aliyuncs.com`. It only hosts the public static web page.
 The data-source OSS bucket is `research-datas` on `oss-cn-beijing.aliyuncs.com`. It stays private and should expose a JSON manifest to signed OSS requests like:
 
-The first screen is login-only. There is no backend. After the user enters OSS AK or STS credentials, the browser signs a `GET` request to the data-source manifest. If that request succeeds, the same credentials sign reads for the selected research document keys.
+The first screen is login-only. There is no backend. After the user enters OSS AK or STS credentials, the browser generates a short-lived signed `GET` URL for the data-source manifest. If that request succeeds, the same credentials generate signed URLs for the selected research document keys.
 
 ```json
 {
@@ -45,7 +45,6 @@ The preview reads known keys from the manifest. It does not require bucket listi
 Browser access needs CORS on the data-source bucket for:
 
 - methods: `GET`
-- request headers: `Authorization`, `x-oss-date`, `x-oss-security-token`
 - origin: the actual preview origin
 
 This CORS rule does not make `research-datas` public. The bucket ACL can stay private; reads still require a valid signed OSS request.

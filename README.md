@@ -44,6 +44,6 @@ The preview uses two OSS buckets:
 - preview bucket: `research-preview` on `oss-cn-shenzhen.aliyuncs.com`, public-read static hosting for the web page only.
 - data-source bucket: `research-datas` on `oss-cn-beijing.aliyuncs.com`, private ACL, read by browser-side signed OSS requests after the user enters OSS AK or STS credentials.
 
-The preview opens as a login-only page. There is no backend. The browser validates access by signing a `GET` request to the private data-source manifest, then signs reads for the selected research documents.
+The preview opens as a login-only page. There is no backend. The browser validates access by generating a short-lived signed `GET` URL for the private data-source manifest, then generates signed URLs for the selected research documents.
 
-No real credentials are committed. The data bucket does not use public ACL; browser OSS reads still require CORS for `GET` and request headers `Authorization`, `x-oss-date`, and `x-oss-security-token`.
+No real credentials are committed. The data bucket does not use public ACL; browser OSS reads still require CORS for `GET` from the preview origin.
