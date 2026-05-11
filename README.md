@@ -31,16 +31,19 @@ The preview app lives in `web/`.
 ```bash
 cd web
 npm install
+npm run sync:data
 npm run dev
 ```
 
 Open `http://127.0.0.1:5173/`.
 
+`npm run sync:data` writes generated upload data to `web/research-data/`. That folder is not part of the public static preview bundle; upload it to `research-datas`, not to `research-preview`.
+
 The preview uses two OSS buckets:
 
 - login bucket: `research-preview` on `oss-cn-shenzhen.aliyuncs.com`, validates a user session with OSS AK or STS token through a signed HEAD request to a probe object.
-- data-source bucket: `research-datas` on `oss-cn-beijing.aliyuncs.com`, reads `research-data/manifest.json`, then reads markdown objects listed in that manifest.
+- data-source bucket: `research-datas` on `oss-cn-beijing.aliyuncs.com`, stays private and is read by browser-side signed OSS requests after login.
 
-The preview opens as a login-only page. Data-source controls and document previews are hidden until the login bucket validation succeeds.
+The preview opens as a login-only page. After the login bucket validation succeeds, the same OSS AK or STS token signs reads against the private data-source bucket.
 
-No real credentials are committed. Browser OSS reads require CORS for `GET`/`HEAD` and request headers `Authorization`, `x-oss-date`, and `x-oss-security-token`.
+No real credentials are committed. The data bucket does not use public ACL; browser OSS reads still require CORS for `GET`/`HEAD` and request headers `Authorization`, `x-oss-date`, and `x-oss-security-token`.

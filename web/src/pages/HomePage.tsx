@@ -1,8 +1,7 @@
-import { AlertTriangle, Database, Eye, KeyRound, RefreshCw, ShieldCheck } from "lucide-react";
+import { Database, Eye, KeyRound, RefreshCw, ShieldCheck } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import { renderMarkdown } from "../lib/markdown";
 import {
-  getPublicObjectText,
   getSignedObjectText,
   parseManifest,
   requestSignedObject,
@@ -11,8 +10,6 @@ import {
   type ResearchDocumentItem,
   type ResearchManifest,
 } from "../lib/ossClient";
-
-type DataMode = "signed-same" | "signed-separate" | "public";
 
 type FormState = {
   loginBucket: string;
@@ -24,9 +21,6 @@ type FormState = {
   accessKeyId: string;
   accessKeySecret: string;
   securityToken: string;
-  dataAccessKeyId: string;
-  dataAccessKeySecret: string;
-  dataSecurityToken: string;
 };
 
 const initialForm: FormState = {
@@ -39,9 +33,6 @@ const initialForm: FormState = {
   accessKeyId: "",
   accessKeySecret: "",
   securityToken: "",
-  dataAccessKeyId: "",
-  dataAccessKeySecret: "",
-  dataSecurityToken: "",
 };
 
 const loginFieldNames = new Set<keyof FormState>([
@@ -62,14 +53,6 @@ function credentialFromLogin(form: FormState): OssCredential {
     accessKeyId: fieldValue(form.accessKeyId),
     accessKeySecret: fieldValue(form.accessKeySecret),
     securityToken: fieldValue(form.securityToken) || undefined,
-  };
-}
-
-function credentialFromData(form: FormState): OssCredential {
-  return {
-    accessKeyId: fieldValue(form.dataAccessKeyId),
-    accessKeySecret: fieldValue(form.dataAccessKeySecret),
-    securityToken: fieldValue(form.dataSecurityToken) || undefined,
   };
 }
 
@@ -149,7 +132,6 @@ function ActionButton({
 
 export function HomePage() {
   const [form, setForm] = useState<FormState>(initialForm);
-  const [mode, setMode] = useState<DataMode>("signed-same");
   const [authenticated, setAuthenticated] = useState(false);
   const [manifest, setManifest] = useState<ResearchManifest | null>(null);
   const [selectedId, setSelectedId] = useState("");
@@ -162,50 +144,56 @@ export function HomePage() {
     [manifest, selectedId],
   );
 
+  function clearPreview(nextStatus?: string) {
+    setAuthenticated(false);
+    setManifest(null);
+    setSelectedId("");
+    setMarkdown("");
+    if (nextStatus) {
+      setStatus(nextStatus);
+    }
+  }
+
   function updateForm(key: keyof FormState, value: string) {
     setForm((current) => ({ ...current, [key]: value }));
-    if (loginFieldNames.has(key)) {
-      setAuthenticated(false);
-      setManifest(null);
-      setSelectedId("");
-      setMarkdown("");
-      if (authenticated) {
-        setStatus("Login settings changed. Validate the login bucket again.");
-      }
+    if (loginFieldNames.has(key) && authenticated) {
+      clearPreview("Login settings changed. Validate the login bucket again.");
     }
+  }
+
+  async function loadManifest(credential = credentialFromLogin(form)) {
+    const payload = await getSignedObjectText(
+      bucketConfig(form.dataBucket, form.dataEndpoint),
+      fieldValue(form.manifestKey),
+      credential,
+    );
+    const nextManifest = parseManifest(payload);
+    setManifest(nextManifest);
+    setSelectedId(nextManifest.items[0]?.id ?? "");
+    setMarkdown("");
   }
 
   async function validateLoginBucket() {
     setBusy(true);
     try {
+      const credential = credentialFromLogin(form);
       await requestSignedObject(
         "HEAD",
         bucketConfig(form.loginBucket, form.loginEndpoint),
         fieldValue(form.loginProbeKey),
-        credentialFromLogin(form),
+        credential,
       );
       setAuthenticated(true);
-      setManifest(null);
-      setSelectedId("");
-      setMarkdown("");
-      setStatus("Login bucket validated. Data source access is now available.");
+      await loadManifest(credential);
+      setStatus("Login bucket validated. Loaded data source.");
     } catch (error) {
-      setAuthenticated(false);
-      setStatus(error instanceof Error ? error.message : "Login validation failed.");
+      clearPreview(error instanceof Error ? error.message : "Login validation failed.");
     } finally {
       setBusy(false);
     }
   }
 
-  function logout() {
-    setAuthenticated(false);
-    setManifest(null);
-    setSelectedId("");
-    setMarkdown("");
-    setStatus("Logged out. Validate the login bucket to continue.");
-  }
-
-  async function loadOssManifest() {
+  async function reloadManifest() {
     if (!authenticated) {
       setStatus("Validate the login bucket before loading the data source.");
       return;
@@ -213,21 +201,8 @@ export function HomePage() {
 
     setBusy(true);
     try {
-      const dataConfig = bucketConfig(form.dataBucket, form.dataEndpoint);
-      let payload = "";
-
-      if (mode === "public") {
-        payload = await getPublicObjectText(dataConfig, fieldValue(form.manifestKey));
-      } else {
-        const credential = mode === "signed-separate" ? credentialFromData(form) : credentialFromLogin(form);
-        payload = await getSignedObjectText(dataConfig, fieldValue(form.manifestKey), credential);
-      }
-
-      const nextManifest = parseManifest(payload);
-      setManifest(nextManifest);
-      setSelectedId(nextManifest.items[0]?.id ?? "");
-      setMarkdown("");
-      setStatus("Loaded data bucket manifest.");
+      await loadManifest();
+      setStatus("Reloaded data source.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Data bucket manifest failed.");
     } finally {
@@ -236,24 +211,17 @@ export function HomePage() {
   }
 
   async function loadDocument(item: ResearchDocumentItem | undefined) {
-    if (!item) {
-      return;
-    }
-    if (!authenticated) {
-      setStatus("Validate the login bucket before loading documents.");
+    if (!item || !authenticated) {
       return;
     }
 
     setBusy(true);
     try {
-      let payload = "";
-      const dataConfig = bucketConfig(form.dataBucket, form.dataEndpoint);
-      if (mode === "public") {
-        payload = await getPublicObjectText(dataConfig, item.key);
-      } else {
-        const credential = mode === "signed-separate" ? credentialFromData(form) : credentialFromLogin(form);
-        payload = await getSignedObjectText(dataConfig, item.key, credential);
-      }
+      const payload = await getSignedObjectText(
+        bucketConfig(form.dataBucket, form.dataEndpoint),
+        item.key,
+        credentialFromLogin(form),
+      );
       setSelectedId(item.id);
       setMarkdown(payload);
       setStatus(`Loaded ${item.title}.`);
@@ -293,36 +261,27 @@ export function HomePage() {
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[420px_minmax(0,1fr)]">
+    <div className="grid gap-5 lg:grid-cols-[360px_minmax(0,1fr)]">
       <section className="space-y-4">
         <div className="rounded-md border border-zinc-200 bg-white p-4">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <h1 className="text-lg font-semibold text-zinc-950">Dual Bucket Access</h1>
-              <p className="text-xs text-zinc-500">{form.loginBucket} session validated</p>
+              <h1 className="text-lg font-semibold text-zinc-950">Research Preview</h1>
+              <p className="text-xs text-zinc-500">{form.loginBucket} authorized</p>
             </div>
             <ShieldCheck className="text-emerald-700" size={22} aria-hidden="true" />
           </div>
-          <ActionButton icon={<KeyRound size={16} aria-hidden="true" />} onClick={logout} disabled={busy} variant="secondary">
-            Log out
-          </ActionButton>
-        </div>
-
-        <div className="rounded-md border border-zinc-200 bg-white p-4">
-          <div className="mb-3 flex items-center gap-2">
-            <KeyRound size={18} className="text-emerald-700" aria-hidden="true" />
-            <h2 className="text-sm font-semibold text-zinc-950">Login Bucket</h2>
-          </div>
-          <div className="grid gap-3">
-            <TextField label="Bucket" value={form.loginBucket} onChange={(value) => updateForm("loginBucket", value)} />
-            <TextField label="Endpoint" value={form.loginEndpoint} onChange={(value) => updateForm("loginEndpoint", value)} />
-            <TextField label="Probe object key" value={form.loginProbeKey} onChange={(value) => updateForm("loginProbeKey", value)} />
+          <div className="grid grid-cols-2 gap-2">
+            <ActionButton icon={<RefreshCw size={16} aria-hidden="true" />} onClick={reloadManifest} disabled={busy}>
+              Reload
+            </ActionButton>
             <ActionButton
-              icon={<ShieldCheck size={16} aria-hidden="true" />}
-              onClick={validateLoginBucket}
+              icon={<KeyRound size={16} aria-hidden="true" />}
+              onClick={() => clearPreview("Logged out. Validate the login bucket to continue.")}
               disabled={busy}
+              variant="secondary"
             >
-              Revalidate
+              Log out
             </ActionButton>
           </div>
         </div>
@@ -333,86 +292,46 @@ export function HomePage() {
             <h2 className="text-sm font-semibold text-zinc-950">Data Source Bucket</h2>
           </div>
           <div className="grid gap-3">
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                ["signed-same", "Same AK"],
-                ["signed-separate", "Data AK"],
-                ["public", "Public"],
-              ].map(([nextMode, label]) => (
-                <button
-                  key={nextMode}
-                  type="button"
-                  onClick={() => setMode(nextMode as DataMode)}
-                  disabled={busy}
-                  className={[
-                    "h-9 rounded-md border px-2 text-xs font-semibold transition disabled:opacity-45",
-                    mode === nextMode
-                      ? "border-emerald-700 bg-emerald-50 text-emerald-800"
-                      : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50",
-                  ].join(" ")}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
             <TextField label="Bucket" value={form.dataBucket} onChange={(value) => updateForm("dataBucket", value)} />
             <TextField label="Endpoint" value={form.dataEndpoint} onChange={(value) => updateForm("dataEndpoint", value)} />
             <TextField label="Manifest key" value={form.manifestKey} onChange={(value) => updateForm("manifestKey", value)} />
-            {mode === "signed-separate" ? (
-              <div className="grid gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-3">
-                <TextField label="Data AccessKeyId" value={form.dataAccessKeyId} onChange={(value) => updateForm("dataAccessKeyId", value)} />
-                <TextField label="Data AccessKeySecret" type="password" value={form.dataAccessKeySecret} onChange={(value) => updateForm("dataAccessKeySecret", value)} />
-                <TextField label="Data STS SecurityToken" type="password" value={form.dataSecurityToken} onChange={(value) => updateForm("dataSecurityToken", value)} />
-              </div>
-            ) : null}
-            <ActionButton
-              icon={<RefreshCw size={16} aria-hidden="true" />}
-              onClick={loadOssManifest}
-              disabled={busy}
-            >
-              Load
-            </ActionButton>
           </div>
         </div>
 
         <StatusLine status={status} />
-
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
-          <div className="mb-1 flex items-center gap-2 font-semibold">
-            <AlertTriangle size={15} aria-hidden="true" />
-            CORS
-          </div>
-          Browser reads require GET/HEAD and headers: Authorization, x-oss-date, x-oss-security-token.
-        </div>
       </section>
 
       <section className="grid min-w-0 gap-4 xl:grid-cols-[280px_minmax(0,1fr)]">
         <div className="rounded-md border border-zinc-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-zinc-950">Documents</h2>
           <div className="grid gap-2">
-            {manifest?.items.length ? manifest.items.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => void loadDocument(item)}
-                className={[
-                  "rounded-md border p-3 text-left transition",
-                  selectedItem?.id === item.id
-                    ? "border-emerald-700 bg-emerald-50"
-                    : "border-zinc-200 bg-white hover:bg-zinc-50",
-                ].join(" ")}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-semibold text-zinc-950">{item.title}</span>
-                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] text-zinc-600">
-                    {item.language}
-                  </span>
-                </div>
-                <div className="mt-1 text-xs text-zinc-500">
-                  {item.type} · {item.version}
-                </div>
-              </button>
-            )) : <p className="text-sm text-zinc-500">No manifest loaded.</p>}
+            {manifest?.items.length ? (
+              manifest.items.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => void loadDocument(item)}
+                  className={[
+                    "rounded-md border p-3 text-left transition",
+                    selectedItem?.id === item.id
+                      ? "border-emerald-700 bg-emerald-50"
+                      : "border-zinc-200 bg-white hover:bg-zinc-50",
+                  ].join(" ")}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold text-zinc-950">{item.title}</span>
+                    <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] text-zinc-600">
+                      {item.language}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-xs text-zinc-500">
+                    {item.type} / {item.version}
+                  </div>
+                </button>
+              ))
+            ) : (
+              <p className="text-sm text-zinc-500">No manifest loaded.</p>
+            )}
           </div>
         </div>
 

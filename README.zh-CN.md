@@ -31,16 +31,19 @@ English version: `README.md`
 ```bash
 cd web
 npm install
+npm run sync:data
 npm run dev
 ```
 
 打开 `http://127.0.0.1:5173/`。
 
+`npm run sync:data` 会把待上传数据生成到 `web/research-data/`。这个目录不会进入公开的静态预览包；它只能上传到 `research-datas`，不要上传到 `research-preview`。
+
 预览使用两个 OSS 桶：
 
 - 登录桶：`research-preview`，地域 endpoint 为 `oss-cn-shenzhen.aliyuncs.com`，使用用户 OSS AK 或 STS token，对探测对象发起签名 HEAD 请求来校验会话。
-- 数据源桶：`research-datas`，地域 endpoint 为 `oss-cn-beijing.aliyuncs.com`，读取 `research-data/manifest.json`，再读取 manifest 中列出的 Markdown 对象。
+- 数据源桶：`research-datas`，地域 endpoint 为 `oss-cn-beijing.aliyuncs.com`，保持 private ACL，登录后由浏览器端签名 OSS 请求读取。
 
-预览打开后是只包含登录功能的页面。只有登录桶校验成功后，才显示数据源桶配置和调研内容预览。
+预览打开后只显示登录页。登录桶校验成功后，使用同一组 OSS AK 或 STS token 对私有数据源桶发起签名读取。
 
-仓库不会提交真实密钥。浏览器端 OSS 读取需要 CORS 允许 `GET`/`HEAD`，并允许请求头 `Authorization`、`x-oss-date`、`x-oss-security-token`。
+仓库不会提交真实密钥。数据桶不使用公开 ACL；浏览器端 OSS 读取仍需要 CORS 允许 `GET`/`HEAD`，并允许请求头 `Authorization`、`x-oss-date`、`x-oss-security-token`。

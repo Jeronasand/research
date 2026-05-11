@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 const researchDir = path.join(repoRoot, "research");
-const outputDir = path.join(repoRoot, "web/public/research-data");
+const outputDir = path.join(repoRoot, "web/research-data");
 
 const documentSpecs = [
   { file: "product.md", type: "product", language: "en" },
