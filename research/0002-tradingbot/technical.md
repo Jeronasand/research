@@ -1,0 +1,146 @@
+# TradingBot Data Source Technical Research
+
+Current version: v0.2.0
+Status: active
+Last updated: 2026-05-11
+
+中文版本: `technical.zh-CN.md`
+
+## Scope
+
+This document organizes TradingBot candidate data sources from a technical perspective: access methods, data shapes, system layering, validation plans, licensing boundaries, and risks. Product positioning and prioritization are maintained in `product.md`.
+
+This version records the user-provided catalog plus the `0.2` supplement and corrections. The catalog marks `last_verified_at` as 2026-05-11. This pass focused on China-market supplement sources, their connector type, licensing risk, and production-fit boundaries.
+
+## Technical Layers
+
+| Layer | Representative providers | Technical responsibility |
+| --- | --- | --- |
+| Agent / aggregation layer | OpenBB, Surf / AskSurf, Alpha Vantage MCP, EODHD MCP | Expose multiple sources to agents, workflows, and internal tools |
+| Real-time / historical market data | Massive / Polygon, FMP, Finnhub, Twelve Data, EODHD, Alpha Vantage | REST, WebSocket, and file-based data for equities, options, FX, indices, and crypto |
+| Official baseline sources | SEC EDGAR, FRED | US filings, XBRL company facts, and macro time series |
+| Crypto on-chain and fundamentals | Dune, DefiLlama, Messari, CoinGecko | On-chain SQL, DeFi metrics, token metadata, DEX data, and research data |
+| Crypto intelligence enhancement | Nansen, Arkham, Kaito, Santiment | Wallet labels, entity attribution, social narrative, sentiment, and developer activity |
+| China-market supplements | TuShare Pro / ths_hot, AKShare, SuperMind query_iwencai, JoinQuant / JQData | A-shares, funds, futures, macro, local quant data, Tonghuashun hot rankings, and natural-language screening |
+| China-market research connectors | mootdx, Tencent Finance pages / unofficial endpoints, pywencai | TDX protocol / local data reads, Tencent quote-page cross-checks, and iWenCai community access |
+| Institutional access | FactSet, LSEG, Bloomberg / BLPAPI | Enterprise contracts, exchange feeds, terminal ecosystems, and compliant data |
+
+## Suggested System Design
+
+- Build a provider registry for provider id, priority, asset coverage, entitlements, freshness, cost, and fallback order.
+- Build connector adapters so each provider owns authentication, pagination, rate limits, retries, field mapping, and latency declarations.
+- Build a normalized data model for symbols, exchanges, chains, tokens, wallets, entities, filings, macro series, and news events.
+- Build an entitlement guard for display rights, redistribution, derived data, full-text news, exchange fees, and user permissions.
+- Keep raw-to-curated storage so raw responses remain auditable while normalized tables feed strategies and agents.
+- Build freshness monitors with different SLAs for market data, news, on-chain data, social data, macro data, and filings.
+- Do not treat these structured sources as general web search. If TradingBot needs web search, add a separate search provider.
+
+## Access Method Matrix
+
+| Provider | Access methods | Main assets | Technical notes |
+| --- | --- | --- | --- |
+| OpenBB | Python SDK, REST API, MCP Server, Workspace, Excel | Stocks, ETF, options, macro, forex, crypto, custom data | Good aggregation and agent layer; main risks are provider licensing and MCP production stability |
+| Surf / AskSurf | REST API, OpenAPI, CLI, MCP, Agent skill | Crypto, tokens, wallets, on-chain, prediction markets | Crypto competitor baseline and agent data API; verify the 200+ sources |
+| Massive.com / Polygon.io | REST API, WebSocket, Flat Files | Stocks, options, futures, indices, forex, crypto, economy, alternative data | Strong market-data core; validate exchange fees, latency, and redistribution |
+| Financial Modeling Prep | REST API, WebSocket, Bulk / endpoint APIs | Stocks, indices, forex, crypto, ETF, fundamentals, news | Equity fundamentals and news supplement; verify consistency with SEC data |
+| Finnhub | REST API, WebSocket | Stocks, forex, crypto, economic data, alternative data | General finance API candidate; validate global coverage and WebSocket stability |
+| Twelve Data | REST API, WebSocket, SDK, CSV, JSON, Spreadsheet add-ins | Stocks, ETF, forex, crypto, indices, fundamentals | Cross-market source; validate target exchanges and enterprise terms |
+| Alpha Vantage | REST API, CSV, JSON, Excel, MCP Server | Stocks, ETF, funds, indices, options, forex, crypto, commodities, economic indicators | Developer-friendly prototype source; validate free quota and MCP granularity |
+| EODHD | REST API, WebSocket, SDK, OpenAPI, MCP Server | Stocks, ETF, funds, forex, indices, bonds, options, crypto | Cost-controlled candidate; validate US options depth and MCP authentication |
+| Intrinio | REST API, SDK, Data marketplace | Stocks, options, ETF, fundamentals, news | Enterprise-style data packages; evaluate each package price and field quality |
+| Nasdaq Data Link | Streaming API, REST API, Tables API, Python SDK, Excel Add-in | Stocks, indices, economic data, alternative data, financial data | Dataset marketplace; validate price, licensing, and freshness per dataset |
+| SEC EDGAR | REST API, JSON | US company submissions, filings, XBRL company facts | Free baseline source; requires XBRL cleaning, taxonomy mapping, and User-Agent compliance |
+| FRED | REST API, Excel Add-in, Web interface | Macro indicators, rates, inflation, GDP, employment | Macro baseline; decide whether ALFRED vintage data is in scope |
+| Benzinga | REST API, WebSocket API | Equity news, analyst ratings, price targets, market events | Event-driven candidate; validate display rights and historical archive pricing |
+| Dune | Web app, SQL, API, Datashare | Raw, decoded, and curated blockchain datasets | On-chain SQL warehouse; validate query cost, freshness, and export limits |
+| DefiLlama | Free API, Pro API, Web dashboard | TVL, fees, revenue, volume, yields, stablecoins, bridges | DeFi metrics candidate; evaluate Free vs Pro scope and adapter quality |
+| Messari | REST API, Bulk API, Terminal | Crypto prices, on-chain metrics, research, news, token unlocks, fundraising | Crypto fundamentals candidate; validate content display rights and bulk history |
+| CoinGecko | REST API, WebSocket, Webhook | Crypto prices, metadata, historical charts, exchange, DEX, on-chain pools | Crypto market data candidate; validate refresh frequency, rate limits, and DEX coverage |
+| Nansen | API, Platform | Wallets, tokens, on-chain, Smart Money, labels | Wallet profiling and Smart Money; validate label accuracy and credit model |
+| Arkham | API, Platform | Addresses, entities, labels, fund flows | Entity-attribution candidate; validate compliance limits and target-chain coverage |
+| Kaito | Platform, API availability to be verified | Crypto social data, narratives, projects, tokens | Social/mindshare candidate; API openness is the first validation point |
+| Santiment | API, GraphQL, Platform, MCP availability to be verified | Social sentiment, developer activity, on-chain metrics, market signals | Crypto factor candidate; validate metric definitions and GraphQL query cost |
+| TuShare Pro / ths_hot | TuShare Pro API | Tonghuashun hot stocks, concept boards, ETF, convertible bonds, industry boards, futures, HK stocks, hot funds, US stocks | `ths_hot` is a structured Tonghuashun hot-ranking entry point; validate TuShare points, call limit, refresh cadence, and Tonghuashun commercial authorization |
+| AKShare | Python package, AKTools HTTP API / Docker | Stocks, A-shares, HK stocks, US stocks, futures, options, funds, forex, bonds, indices, crypto | Open-source collection and cleaning connector, not a licensed data vendor; useful for research, prototypes, and cross-source checks |
+| SuperMind query_iwencai | SuperMind / Tonghuashun quant research function | A-shares, funds, indices, NEEQ, HK stocks, US stocks | Official research-environment natural-language screening function; suitable for live screening validation, not a direct backtesting base |
+| mootdx | Python package, CLI, TDX protocol-style quote client, local TDX reader | A-shares, indices, TDX extended markets, TDX financial files | TDX data reader wrapper; project states non-commercial use, so keep it to personal research and prototypes |
+| Tencent Finance | Web pages, community-used unofficial HTTP endpoints, third-party wrappers | A-shares, HK stocks, US stocks, indices, funds, forex, futures, gold | Page source and unofficial endpoint source; this pass did not confirm public official stock API documentation, so avoid primary production use |
+| pywencai | Python package, cookie-based web access emulation | A-shares, indices, funds, HK stocks, US stocks, NEEQ, convertible bonds, insurance, futures, wealth management, forex | Unofficial Tonghuashun iWenCai tool; currently cookie-dependent and should be low-frequency with compliance review |
+| JoinQuant / JQData | JQData SDK, Platform API | Stocks, futures, funds, options, bonds, macro | A-share quant candidate; validate minute data, adjustment logic, and commercial restrictions |
+| FactSet | APIs, FQL, Screening formulas, enterprise integrations | Stocks, fundamentals, estimates, ownership, fixed income, portfolio, market data | Institutional option; requires contract and content-set entitlements |
+| LSEG Data & Analytics | Enterprise APIs, Feeds, Workspace, Data platform | Stocks, fixed income, FX, commodities, indices, news, analytics | Enterprise feeds and workflow; validate licensing and news rights by product |
+| Bloomberg / BLPAPI | BLPAPI SDK, Server API, B-Pipe, licensed Desktop API | Stocks, bonds, FX, commodities, derivatives, indices, news, analytics | Bloomberg ecosystem access; depends on existing contract and API entitlement |
+
+## Validation Plan
+
+| Phase | Goal | Output |
+| --- | --- | --- |
+| V0 catalog verification | Check P0/P1 docs, pricing, licensing, rate limits, and MCP/API status | Updated source matrix and risk fields |
+| V1 interface smoke test | Fetch representative symbols, tokens, series, wallets, and queries from P0 providers | Connector availability report and sample responses |
+| V2 normalization validation | Map symbols, chains, tokens, financial statements, macro series, and news events | Draft normalized schema |
+| V3 entitlement validation | Confirm display, caching, redistribution, derived data, full-text news, and exchange fees | Entitlement policy |
+| V4 production candidate | Load-test rate limits, cache behavior, retries, freshness monitoring, and cost | Default source, fallback source, and paid-source decisions |
+
+## Key Technical Risks
+
+- Licensing risk: market data and news often restrict display, export, caching, and redistribution.
+- Latency risk: research APIs, delayed feeds, and trading-grade real-time data must not be mixed.
+- Normalization risk: equities, crypto, on-chain data, macro data, and news events have very different schemas.
+- MCP risk: having an MCP server does not mean production readiness. Authentication, tool granularity, timeouts, audit logs, and error handling still need validation.
+- Vendor lock-in: crypto labels, mindshare, and Smart Money metrics are hard to migrate.
+- Cost risk: institutional feeds, real-time exchange data, news archives, and on-chain queries can scale cost quickly.
+- A-share connector risk: mootdx, AKShare, pywencai, and Tencent Finance unofficial endpoints can be useful without being commercially licensed. The connector registry must track `provider_type`, `commercial_use_status`, `risk_level`, original data source, rate limits, cookie/login-state requirements, and licensed replacement options.
+
+## A-Share / China-Market Supplement Verification
+
+| Source | Technical conclusion | Production recommendation |
+| --- | --- | --- |
+| mootdx | Reads TDX offline data, online quotes, bars, indices, minute data, and financial files; technically a TDX protocol/file connector | Mark as `open_source_connector` and `research_only`; replace with a licensed quote source for production market data |
+| Tencent Finance | Quote center and symbol pages can support page-level cross-checking; community `qt.gtimg.cn` style endpoints are not confirmed as public official APIs | Mark as `web_page_source_and_unofficial_endpoint`; use only for low-risk research observation |
+| AKShare | Broad public-data collection and cleaning across many asset classes, usable from Python or AKTools | Mark as `open_source_data_connector`; track original source and entitlement boundary per sub-interface |
+| SuperMind query_iwencai | Official research-environment function that supports natural-language screening across several domains; has call limits and is better suited to live screening validation | Mark as `official_platform_function`; use for candidate generation, not core backtesting |
+| pywencai | Community package that depends on cookie and page/login behavior, suitable for low-frequency personal research | Mark as `unofficial_open_source_connector`; disable in production or keep as a manual research tool |
+| TuShare Pro ths_hot | Provides structured Tonghuashun hot-ranking data across hot stocks, boards, ETF, convertible bonds, futures, HK stocks, funds, and US stocks | Candidate for a hot-topic module; confirm Tonghuashun authorization and TuShare entitlement before commercial display |
+
+## Official Source Index
+
+| Provider | URLs |
+| --- | --- |
+| OpenBB | https://docs.openbb.co/odp/python/extensions/providers, https://docs.openbb.co/odp/python/extensions/interface/openbb-mcp, https://github.com/OpenBB-finance/OpenBB |
+| Surf / AskSurf | https://docs.asksurf.ai/overview, https://github.com/asksurf-ai/surf-skills, https://agents.asksurf.ai/llms.txt |
+| Massive.com / Polygon.io | https://massive.com/docs, https://massive.com/docs/rest/options/overview, https://massive.com/docs/rest/stocks/tickers/all-tickers |
+| Financial Modeling Prep | https://site.financialmodelingprep.com/developer/docs, https://site.financialmodelingprep.com/, https://site.financialmodelingprep.com/datasets/market-news |
+| Finnhub | https://finnhub.io/docs/api, https://finnhub.io/, https://finnhub.io/docs/api/quote |
+| Twelve Data | https://twelvedata.com/, https://twelvedata.com/docs, https://twelvedata.com/fundamentals |
+| Alpha Vantage | https://www.alphavantage.co/documentation/, https://www.alphavantage.co/, https://mcp.alphavantage.co/ |
+| EODHD | https://eodhd.com/, https://eodhd.com/financial-apis/quick-start-with-our-financial-data-apis, https://eodhd.com/financial-apis/mcp-server-for-financial-data-by-eodhd |
+| Intrinio | https://intrinio.com/, https://docs.intrinio.com/documentation/api_v2/getting_started, https://github.com/intrinio/python-sdk |
+| Nasdaq Data Link | https://docs.data.nasdaq.com/, https://docs.data.nasdaq.com/docs/getting-started, https://www.nasdaq.com/solutions/data/nasdaq-data-link/api |
+| SEC EDGAR | https://www.sec.gov/search-filings/edgar-application-programming-interfaces |
+| FRED | https://fred.stlouisfed.org/docs/api/fred/, https://fredhelp.stlouisfed.org/fred/about/about-fred/what-is-fred/ |
+| Benzinga | https://www.benzinga.com/apis/, https://www.benzinga.com/apis/cloud-product/analyst-ratings-api/, https://docs.benzinga.com/ws-reference/introduction |
+| Dune | https://docs.dune.com/data-catalog/overview, https://docs.dune.com/data-catalog/curated/overview, https://docs.dune.com/ |
+| DefiLlama | https://api-docs.defillama.com/, https://defillama.com/, https://docs.llama.fi/ |
+| Messari | https://messari.io/api, https://docs.messari.io/introduction, https://docs.messari.io/api-reference/endpoints/token-unlocks/token-unlocks-api |
+| CoinGecko | https://docs.coingecko.com/, https://www.coingecko.com/en/api, https://www.coingecko.com/en/api/dex |
+| Nansen | https://nansen.ai/api, https://docs.nansen.ai/, https://docs.nansen.ai/api/smart-money, https://docs.nansen.ai/api/profiler/address-labels |
+| Arkham | https://intel.arkm.com/api/, https://intel.arkm.com/api/docs, https://info.arkm.com/announcements/the-new-arkham-api |
+| Kaito | https://docs.kaito.ai/kaito-pro-ai-platform, https://kaito-ai.gitbook.io/product-docs/overview/use-cases-project-teams |
+| Santiment | https://academy.santiment.net/metrics/, https://academy.santiment.net/for-developers/, https://app.santiment.net/ |
+| TuShare Pro | https://tushare.pro/, https://tushare.pro/document/2, https://tushare.pro/document/2?doc_id=25, https://tushare.pro/document/2?doc_id=320, https://tushare.pro/wctapi/documents/320.md |
+| AKShare | https://akshare.akfamily.xyz/, https://akshare.akfamily.xyz/introduction.html, https://akshare.akfamily.xyz/data/stock/stock.html, https://github.com/akfamily/akshare |
+| SuperMind query_iwencai | https://quant.10jqka.com.cn/view/help/4, https://quant.10jqka.com.cn/view/dataplatform/detail/398, https://www.iwencai.com/ |
+| mootdx | https://github.com/mootdx/mootdx, https://gitee.com/ibopo/mootdx, https://mootdx.readthedocs.io/ |
+| Tencent Finance | https://stockapp.finance.qq.com/, https://gu.qq.com/ |
+| pywencai | https://github.com/zsrl/pywencai |
+| JoinQuant / JQData | https://www.joinquant.com/help/api/doc?name=JQDatadoc, https://www.joinquant.com/help/api/doc?id=10292&name=JQDatadoc |
+| FactSet | https://developer.factset.com/, https://developer.factset.com/api-catalog, https://developer.factset.com/api-catalog/factset-fundamentals-api |
+| LSEG Data & Analytics | https://www.lseg.com/en/data-analytics |
+| Bloomberg / BLPAPI | https://www.bloomberg.com/professional/support/api-library/ |
+
+## Next Technical Research
+
+- Build connector smoke tests for P0 providers across symbols, tokens, filings, macro series, on-chain queries, and news events.
+- Design fields for the provider registry and entitlement policy.
+- Validate MCP providers for production use: authentication, timeouts, error structure, tool granularity, and audit logging.
+- Separately verify commercial display and redistribution terms for real-time market data and news sources.
