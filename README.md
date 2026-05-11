@@ -41,4 +41,6 @@ The preview uses two OSS buckets:
 - login bucket: `research-preview` on `oss-cn-shenzhen.aliyuncs.com`, validates a user session with OSS AK or STS token through a signed HEAD request to a probe object.
 - data-source bucket: `research-datas` on `oss-cn-beijing.aliyuncs.com`, reads `research-data/manifest.json`, then reads markdown objects listed in that manifest.
 
+The preview opens as a login-only page. Data-source controls and document previews are hidden until the login bucket validation succeeds.
+
 No real credentials are committed. Browser OSS reads require CORS for `GET`/`HEAD` and request headers `Authorization`, `x-oss-date`, and `x-oss-security-token`.

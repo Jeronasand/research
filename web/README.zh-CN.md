@@ -16,6 +16,8 @@ npm run dev
 预览桶是 `research-preview`，地域 endpoint 为 `oss-cn-shenzhen.aliyuncs.com`。
 数据源 OSS 桶是 `research-datas`，地域 endpoint 为 `oss-cn-beijing.aliyuncs.com`，需要暴露类似下面的 JSON manifest：
 
+首屏只保留登录功能。只有登录桶 HEAD 校验成功后，应用才显示数据源桶表单和文档预览。
+
 ```json
 {
   "title": "Research Repository",

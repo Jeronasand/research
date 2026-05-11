@@ -41,4 +41,6 @@ npm run dev
 - 登录桶：`research-preview`，地域 endpoint 为 `oss-cn-shenzhen.aliyuncs.com`，使用用户 OSS AK 或 STS token，对探测对象发起签名 HEAD 请求来校验会话。
 - 数据源桶：`research-datas`，地域 endpoint 为 `oss-cn-beijing.aliyuncs.com`，读取 `research-data/manifest.json`，再读取 manifest 中列出的 Markdown 对象。
 
+预览打开后是只包含登录功能的页面。只有登录桶校验成功后，才显示数据源桶配置和调研内容预览。
+
 仓库不会提交真实密钥。浏览器端 OSS 读取需要 CORS 允许 `GET`/`HEAD`，并允许请求头 `Authorization`、`x-oss-date`、`x-oss-security-token`。

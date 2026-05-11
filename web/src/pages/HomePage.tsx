@@ -1,5 +1,5 @@
-import { AlertTriangle, Database, Eye, FileText, KeyRound, RefreshCw, ShieldCheck } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { AlertTriangle, Database, Eye, KeyRound, RefreshCw, ShieldCheck } from "lucide-react";
+import { useMemo, useState, type ReactNode } from "react";
 import { renderMarkdown } from "../lib/markdown";
 import {
   getPublicObjectText,
@@ -12,7 +12,7 @@ import {
   type ResearchManifest,
 } from "../lib/ossClient";
 
-type DataMode = "local" | "signed-same" | "signed-separate" | "public";
+type DataMode = "signed-same" | "signed-separate" | "public";
 
 type FormState = {
   loginBucket: string;
@@ -43,6 +43,15 @@ const initialForm: FormState = {
   dataAccessKeySecret: "",
   dataSecurityToken: "",
 };
+
+const loginFieldNames = new Set<keyof FormState>([
+  "loginBucket",
+  "loginEndpoint",
+  "loginProbeKey",
+  "accessKeyId",
+  "accessKeySecret",
+  "securityToken",
+]);
 
 function fieldValue(value: string) {
   return value.trim();
@@ -140,11 +149,12 @@ function ActionButton({
 
 export function HomePage() {
   const [form, setForm] = useState<FormState>(initialForm);
-  const [mode, setMode] = useState<DataMode>("local");
+  const [mode, setMode] = useState<DataMode>("signed-same");
+  const [authenticated, setAuthenticated] = useState(false);
   const [manifest, setManifest] = useState<ResearchManifest | null>(null);
   const [selectedId, setSelectedId] = useState("");
   const [markdown, setMarkdown] = useState("");
-  const [status, setStatus] = useState("Local sample is ready.");
+  const [status, setStatus] = useState("Validate the login bucket to continue.");
   const [busy, setBusy] = useState(false);
 
   const selectedItem = useMemo(
@@ -154,30 +164,14 @@ export function HomePage() {
 
   function updateForm(key: keyof FormState, value: string) {
     setForm((current) => ({ ...current, [key]: value }));
-  }
-
-  async function loadLocalSample() {
-    setBusy(true);
-    try {
-      const manifestPayload = await fetch("/research-data/manifest.json").then((response) => {
-        if (!response.ok) {
-          throw new Error(`Local manifest failed: ${response.status}`);
-        }
-        return response.text();
-      });
-      const nextManifest = parseManifest(manifestPayload);
-      const firstItem = nextManifest.items[0];
-      const firstMarkdown = firstItem
-        ? await fetch(`/${firstItem.key}`).then((response) => response.text())
-        : "";
-      setManifest(nextManifest);
-      setSelectedId(firstItem?.id ?? "");
-      setMarkdown(firstMarkdown);
-      setStatus("Loaded local research sample.");
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Local sample failed.");
-    } finally {
-      setBusy(false);
+    if (loginFieldNames.has(key)) {
+      setAuthenticated(false);
+      setManifest(null);
+      setSelectedId("");
+      setMarkdown("");
+      if (authenticated) {
+        setStatus("Login settings changed. Validate the login bucket again.");
+      }
     }
   }
 
@@ -190,15 +184,33 @@ export function HomePage() {
         fieldValue(form.loginProbeKey),
         credentialFromLogin(form),
       );
-      setStatus("Login bucket session validated.");
+      setAuthenticated(true);
+      setManifest(null);
+      setSelectedId("");
+      setMarkdown("");
+      setStatus("Login bucket validated. Data source access is now available.");
     } catch (error) {
+      setAuthenticated(false);
       setStatus(error instanceof Error ? error.message : "Login validation failed.");
     } finally {
       setBusy(false);
     }
   }
 
+  function logout() {
+    setAuthenticated(false);
+    setManifest(null);
+    setSelectedId("");
+    setMarkdown("");
+    setStatus("Logged out. Validate the login bucket to continue.");
+  }
+
   async function loadOssManifest() {
+    if (!authenticated) {
+      setStatus("Validate the login bucket before loading the data source.");
+      return;
+    }
+
     setBusy(true);
     try {
       const dataConfig = bucketConfig(form.dataBucket, form.dataEndpoint);
@@ -227,25 +239,20 @@ export function HomePage() {
     if (!item) {
       return;
     }
+    if (!authenticated) {
+      setStatus("Validate the login bucket before loading documents.");
+      return;
+    }
 
     setBusy(true);
     try {
       let payload = "";
-      if (mode === "local") {
-        payload = await fetch(`/${item.key}`).then((response) => {
-          if (!response.ok) {
-            throw new Error(`Local document failed: ${response.status}`);
-          }
-          return response.text();
-        });
+      const dataConfig = bucketConfig(form.dataBucket, form.dataEndpoint);
+      if (mode === "public") {
+        payload = await getPublicObjectText(dataConfig, item.key);
       } else {
-        const dataConfig = bucketConfig(form.dataBucket, form.dataEndpoint);
-        if (mode === "public") {
-          payload = await getPublicObjectText(dataConfig, item.key);
-        } else {
-          const credential = mode === "signed-separate" ? credentialFromData(form) : credentialFromLogin(form);
-          payload = await getSignedObjectText(dataConfig, item.key, credential);
-        }
+        const credential = mode === "signed-separate" ? credentialFromData(form) : credentialFromLogin(form);
+        payload = await getSignedObjectText(dataConfig, item.key, credential);
       }
       setSelectedId(item.id);
       setMarkdown(payload);
@@ -257,12 +264,33 @@ export function HomePage() {
     }
   }
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void loadLocalSample();
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, []);
+  if (!authenticated) {
+    return (
+      <div className="mx-auto grid max-w-[440px] gap-4">
+        <div className="rounded-md border border-zinc-200 bg-white p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <h1 className="text-lg font-semibold text-zinc-950">Login Bucket</h1>
+              <p className="text-xs text-zinc-500">OSS AK/STS session validation</p>
+            </div>
+            <KeyRound className="text-emerald-700" size={22} aria-hidden="true" />
+          </div>
+          <div className="grid gap-3">
+            <TextField label="Bucket" value={form.loginBucket} onChange={(value) => updateForm("loginBucket", value)} />
+            <TextField label="Endpoint" value={form.loginEndpoint} onChange={(value) => updateForm("loginEndpoint", value)} />
+            <TextField label="Probe object key" value={form.loginProbeKey} onChange={(value) => updateForm("loginProbeKey", value)} />
+            <TextField label="AccessKeyId" value={form.accessKeyId} onChange={(value) => updateForm("accessKeyId", value)} />
+            <TextField label="AccessKeySecret" type="password" value={form.accessKeySecret} onChange={(value) => updateForm("accessKeySecret", value)} />
+            <TextField label="STS SecurityToken" type="password" value={form.securityToken} onChange={(value) => updateForm("securityToken", value)} />
+            <ActionButton icon={<ShieldCheck size={16} aria-hidden="true" />} onClick={validateLoginBucket} disabled={busy}>
+              Validate
+            </ActionButton>
+          </div>
+        </div>
+        <StatusLine status={status} />
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-5 lg:grid-cols-[420px_minmax(0,1fr)]">
@@ -271,31 +299,13 @@ export function HomePage() {
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h1 className="text-lg font-semibold text-zinc-950">Dual Bucket Access</h1>
-              <p className="text-xs text-zinc-500">AK/STS session check + data-source preview</p>
+              <p className="text-xs text-zinc-500">{form.loginBucket} session validated</p>
             </div>
             <ShieldCheck className="text-emerald-700" size={22} aria-hidden="true" />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <ActionButton
-              icon={<FileText size={16} aria-hidden="true" />}
-              onClick={() => {
-                setMode("local");
-                void loadLocalSample();
-              }}
-              disabled={busy}
-              variant={mode === "local" ? "primary" : "secondary"}
-            >
-              Local
-            </ActionButton>
-            <ActionButton
-              icon={<Database size={16} aria-hidden="true" />}
-              onClick={() => setMode("signed-same")}
-              disabled={busy}
-              variant={mode !== "local" ? "primary" : "secondary"}
-            >
-              OSS
-            </ActionButton>
-          </div>
+          <ActionButton icon={<KeyRound size={16} aria-hidden="true" />} onClick={logout} disabled={busy} variant="secondary">
+            Log out
+          </ActionButton>
         </div>
 
         <div className="rounded-md border border-zinc-200 bg-white p-4">
@@ -307,15 +317,12 @@ export function HomePage() {
             <TextField label="Bucket" value={form.loginBucket} onChange={(value) => updateForm("loginBucket", value)} />
             <TextField label="Endpoint" value={form.loginEndpoint} onChange={(value) => updateForm("loginEndpoint", value)} />
             <TextField label="Probe object key" value={form.loginProbeKey} onChange={(value) => updateForm("loginProbeKey", value)} />
-            <TextField label="AccessKeyId" value={form.accessKeyId} onChange={(value) => updateForm("accessKeyId", value)} />
-            <TextField label="AccessKeySecret" type="password" value={form.accessKeySecret} onChange={(value) => updateForm("accessKeySecret", value)} />
-            <TextField label="STS SecurityToken" type="password" value={form.securityToken} onChange={(value) => updateForm("securityToken", value)} />
             <ActionButton
               icon={<ShieldCheck size={16} aria-hidden="true" />}
               onClick={validateLoginBucket}
-              disabled={busy || mode === "local"}
+              disabled={busy}
             >
-              Validate
+              Revalidate
             </ActionButton>
           </div>
         </div>
@@ -336,7 +343,7 @@ export function HomePage() {
                   key={nextMode}
                   type="button"
                   onClick={() => setMode(nextMode as DataMode)}
-                  disabled={busy || mode === "local"}
+                  disabled={busy}
                   className={[
                     "h-9 rounded-md border px-2 text-xs font-semibold transition disabled:opacity-45",
                     mode === nextMode
@@ -361,7 +368,7 @@ export function HomePage() {
             <ActionButton
               icon={<RefreshCw size={16} aria-hidden="true" />}
               onClick={loadOssManifest}
-              disabled={busy || mode === "local"}
+              disabled={busy}
             >
               Load
             </ActionButton>
@@ -383,7 +390,7 @@ export function HomePage() {
         <div className="rounded-md border border-zinc-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-zinc-950">Documents</h2>
           <div className="grid gap-2">
-            {manifest?.items.map((item) => (
+            {manifest?.items.length ? manifest.items.map((item) => (
               <button
                 key={item.id}
                 type="button"
@@ -405,7 +412,7 @@ export function HomePage() {
                   {item.type} · {item.version}
                 </div>
               </button>
-            ))}
+            )) : <p className="text-sm text-zinc-500">No manifest loaded.</p>}
           </div>
         </div>
 
@@ -417,7 +424,7 @@ export function HomePage() {
             </div>
             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-xs text-zinc-600">
               <Eye size={14} aria-hidden="true" />
-              {selectedItem?.version ?? "local"}
+              {selectedItem?.version ?? "data source"}
             </span>
           </div>
           <div className="grid max-h-[calc(100vh-150px)] gap-4 overflow-auto px-4 py-4">

@@ -16,6 +16,8 @@ Open `http://127.0.0.1:5173/`.
 The preview bucket is `research-preview` on `oss-cn-shenzhen.aliyuncs.com`.
 The data-source OSS bucket is `research-datas` on `oss-cn-beijing.aliyuncs.com` and should expose a JSON manifest like:
 
+The first screen is login-only. The app only exposes the data-source bucket form and document preview after the login bucket HEAD validation succeeds.
+
 ```json
 {
   "title": "Research Repository",
