@@ -45,7 +45,7 @@ function renderInline(text: string) {
           href={match[3]}
           target="_blank"
           rel="noreferrer"
-          className="text-emerald-700 underline decoration-emerald-300 underline-offset-2"
+          className="font-medium text-zinc-950 underline decoration-zinc-400 underline-offset-2"
         >
           {match[2]}
         </a>,

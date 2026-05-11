@@ -3,11 +3,11 @@ import { Outlet } from "react-router";
 
 export function AppShell() {
   return (
-    <div className="min-h-screen bg-[#f7f5ef] text-zinc-950">
+    <div className="min-h-screen bg-zinc-50 text-zinc-950">
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-emerald-700 text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-950 text-white">
               <PanelsTopLeft size={19} aria-hidden="true" />
             </div>
             <div>
