@@ -12,19 +12,19 @@ export function AppShell() {
             </div>
             <div>
               <div className="text-sm font-semibold text-zinc-950">
-                Research Preview
+                调研预览
               </div>
-              <div className="text-xs text-zinc-500">OSS signed document preview</div>
+              <div className="text-xs text-zinc-500">OSS 授权文档预览</div>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-600">
             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5">
               <KeyRound size={14} aria-hidden="true" />
-              Browser AK/STS login
+              浏览器 AK/STS 授权
             </span>
             <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5">
               <Database size={14} aria-hidden="true" />
-              Private data bucket
+              私有数据桶
             </span>
           </div>
         </div>

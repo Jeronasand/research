@@ -1,6 +1,5 @@
 import {
   ChevronRight,
-  Database,
   Eye,
   FileText,
   Folder,
@@ -301,7 +300,7 @@ export function HomePage() {
   const [selectedId, setSelectedId] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
-  const [status, setStatus] = useState("Enter OSS AK or STS credentials that can read the private data bucket.");
+  const [status, setStatus] = useState("请输入可读取私有数据桶的 OSS AK 或 STS 凭证。");
   const [busy, setBusy] = useState(false);
 
   const selectedItem = useMemo(
@@ -324,7 +323,7 @@ export function HomePage() {
   function updateForm(key: keyof FormState, value: string) {
     setForm((current) => ({ ...current, [key]: value }));
     if (authorizationFieldNames.has(key) && authenticated) {
-      clearPreview("Access settings changed. Validate the data bucket again.");
+      clearPreview("访问凭证已变更，请重新授权后继续预览。");
     }
   }
 
@@ -363,12 +362,12 @@ export function HomePage() {
       setAuthenticated(true);
       if (nextManifest.items[0]) {
         await loadDocumentContent(nextManifest.items[0], credential);
-        setStatus(`Data bucket authorized. Previewing ${nextManifest.items[0].title}.`);
+        setStatus(`授权成功，正在预览：${nextManifest.items[0].title}`);
       } else {
-        setStatus("Data bucket authorized. Manifest has no documents.");
+        setStatus("授权成功，但目录清单里没有可预览文档。");
       }
     } catch (error) {
-      clearPreview(error instanceof Error ? error.message : "Data bucket authorization failed.");
+      clearPreview(error instanceof Error ? error.message : "数据桶授权失败。");
     } finally {
       setBusy(false);
     }
@@ -376,7 +375,7 @@ export function HomePage() {
 
   async function reloadManifest() {
     if (!authenticated) {
-      setStatus("Validate data bucket access before loading documents.");
+      setStatus("请先完成授权，再加载文档目录。");
       return;
     }
 
@@ -388,12 +387,12 @@ export function HomePage() {
 
       if (nextItem) {
         await loadDocumentContent(nextItem, credential);
-        setStatus(`Reloaded data source. Previewing ${nextItem.title}.`);
+        setStatus(`目录已刷新，正在预览：${nextItem.title}`);
       } else {
-        setStatus("Reloaded data source. Manifest has no documents.");
+        setStatus("目录已刷新，但没有可预览文档。");
       }
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Data bucket manifest failed.");
+      setStatus(error instanceof Error ? error.message : "加载文档目录失败。");
     } finally {
       setBusy(false);
     }
@@ -407,9 +406,9 @@ export function HomePage() {
     setBusy(true);
     try {
       await loadDocumentContent(item);
-      setStatus(`Previewing ${item.title}.`);
+      setStatus(`正在预览：${item.title}`);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Document load failed.");
+      setStatus(error instanceof Error ? error.message : "文档加载失败。");
     } finally {
       setBusy(false);
     }
@@ -433,20 +432,17 @@ export function HomePage() {
         <div className="rounded-md border border-zinc-200 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <h1 className="text-lg font-semibold text-zinc-950">Data Bucket Access</h1>
-              <p className="text-xs text-zinc-500">OSS AK/STS access to private research data</p>
+              <h1 className="text-lg font-semibold text-zinc-950">访问授权</h1>
+              <p className="text-xs text-zinc-500">使用 OSS AK/STS 读取私有调研文档</p>
             </div>
             <KeyRound className="text-zinc-950" size={22} aria-hidden="true" />
           </div>
           <div className="grid gap-3">
-            <TextField label="Data bucket" value={form.dataBucket} onChange={(value) => updateForm("dataBucket", value)} />
-            <TextField label="Endpoint" value={form.dataEndpoint} onChange={(value) => updateForm("dataEndpoint", value)} />
-            <TextField label="Manifest key" value={form.manifestKey} onChange={(value) => updateForm("manifestKey", value)} />
             <TextField label="AccessKeyId" value={form.accessKeyId} onChange={(value) => updateForm("accessKeyId", value)} />
             <TextField label="AccessKeySecret" type="password" value={form.accessKeySecret} onChange={(value) => updateForm("accessKeySecret", value)} />
             <TextField label="STS SecurityToken" type="password" value={form.securityToken} onChange={(value) => updateForm("securityToken", value)} />
             <ActionButton icon={<ShieldCheck size={16} aria-hidden="true" />} onClick={validateDataBucketAccess} disabled={busy}>
-              Validate
+              授权并进入预览
             </ActionButton>
           </div>
         </div>
@@ -461,22 +457,22 @@ export function HomePage() {
         <div className="rounded-md border border-zinc-200 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <h1 className="text-lg font-semibold text-zinc-950">Research Preview</h1>
-              <p className="text-xs text-zinc-500">{form.dataBucket} authorized</p>
+              <h1 className="text-lg font-semibold text-zinc-950">调研预览</h1>
+              <p className="text-xs text-zinc-500">已授权读取私有文档</p>
             </div>
             <ShieldCheck className="text-zinc-950" size={22} aria-hidden="true" />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <ActionButton icon={<RefreshCw size={16} aria-hidden="true" />} onClick={reloadManifest} disabled={busy}>
-              Reload
+              刷新目录
             </ActionButton>
             <ActionButton
               icon={<KeyRound size={16} aria-hidden="true" />}
-              onClick={() => clearPreview("Logged out. Validate data bucket access to continue.")}
+              onClick={() => clearPreview("已退出授权，请重新授权后继续预览。")}
               disabled={busy}
               variant="secondary"
             >
-              Log out
+              退出
             </ActionButton>
           </div>
         </div>
@@ -484,8 +480,8 @@ export function HomePage() {
         <div className="rounded-md border border-zinc-200 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold text-zinc-950">Directory</h2>
-              <p className="text-xs text-zinc-500">{manifest?.items.length ?? 0} documents</p>
+              <h2 className="text-sm font-semibold text-zinc-950">目录</h2>
+              <p className="text-xs text-zinc-500">{manifest?.items.length ?? 0} 个文档</p>
             </div>
             <FolderOpen size={18} className="text-zinc-800" aria-hidden="true" />
           </div>
@@ -506,20 +502,8 @@ export function HomePage() {
                 ))}
               </div>
             ) : (
-              <p className="p-2 text-sm text-zinc-500">No directory loaded.</p>
+              <p className="p-2 text-sm text-zinc-500">暂无目录。</p>
             )}
-          </div>
-        </div>
-
-        <div className="rounded-md border border-zinc-200 bg-white p-4 shadow-sm">
-          <div className="mb-3 flex items-center gap-2">
-            <Database size={18} className="text-zinc-800" aria-hidden="true" />
-            <h2 className="text-sm font-semibold text-zinc-950">Data Source Bucket</h2>
-          </div>
-          <div className="grid gap-3">
-            <TextField label="Bucket" value={form.dataBucket} onChange={(value) => updateForm("dataBucket", value)} />
-            <TextField label="Endpoint" value={form.dataEndpoint} onChange={(value) => updateForm("dataEndpoint", value)} />
-            <TextField label="Manifest key" value={form.manifestKey} onChange={(value) => updateForm("manifestKey", value)} />
           </div>
         </div>
 
@@ -545,7 +529,7 @@ export function HomePage() {
               <div className="grid max-w-4xl gap-4">{renderMarkdown(markdown)}</div>
             ) : (
               <div className="flex min-h-[360px] items-center justify-center rounded-md border border-dashed border-zinc-300 bg-zinc-50 text-sm text-zinc-500">
-                Select a file from the directory to preview.
+                从左侧目录选择一个文档进行预览。
               </div>
             )}
           </div>
