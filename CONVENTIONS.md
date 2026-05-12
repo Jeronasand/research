@@ -12,10 +12,24 @@ temptodo/
     assets/
 research/
   private-index.json
-  financial_crypto_equity_data_sources_supplement_0.2.html
   pending/
+    README.md
+    tasks.json
+    tasks.schema.json
     topic-slug/
-      README.md
+      notes-or-inputs.*
+  in-progress/
+    topic-slug/
+      index.html
+      assets/
+      data/
+      research.json
+  completed/
+    topic-slug/
+      index.html
+      assets/
+      data/
+      research.json
 skills/
   research-html-private-index/
     index.html
@@ -40,29 +54,41 @@ scripts/
 
 When syncing `temptodo/`, classify each file by content:
 
-- research report or finished analysis: `research/<topic-and-version>.html`
-- research report with local assets: `research/<topic-slug>/index.html` plus its assets
-- rough request, source dump, or task brief: `research/pending/<topic>/`
+- completed research report or finished analysis: `research/completed/<topic-slug>/index.html` plus its assets
+- active research report that is not final yet: `research/in-progress/<topic-slug>/index.html` plus its assets
+- rough request or task brief: one item in `research/pending/tasks.json`
+- source dump or local task materials: `research/pending/<topic>/`, referenced from the matching `tasks.json` item
 - reusable workflow or skill page: `skills/<skill-id>/index.html` plus its assets
 - assets used by a classified HTML page: place beside that target page or under its target folder
 
 After classification, refresh the generated index and data payload.
 
-## Research Documents
+## Research Catalog
 
-- Completed single-file research lives as `research/*.html`.
-- Completed packaged research with local assets lives as `research/<topic-slug>/index.html`.
-- Keep each HTML file self-contained enough to render in the private preview.
+- The private preview is a card catalog with exactly three main sections: `待调研`, `调研中`, and `已完结调研`.
+- `待调研` is generated from `research/pending/tasks.json`.
+- `调研中` is generated from direct child directories under `research/in-progress/`.
+- `已完结调研` is generated from direct child directories under `research/completed/`.
+- The frontend opens a research package by loading its `index.html` and shows a return-to-catalog button.
+- The frontend must not expand every HTML file inside a package into separate cards.
+
+## Research Packages
+
+- Active research packages live as `research/in-progress/<topic-slug>/index.html`.
+- Completed research packages live as `research/completed/<topic-slug>/index.html`.
+- Keep each package self-contained enough to render in the private preview.
 - Prefer simple, readable HTML. Use minimal monochrome styling by default.
-- Use names that make topic and version clear, for example `financial_crypto_equity_data_sources_supplement_0.2.html`.
-- Do not create topic category folders for completed HTML unless the user changes the repository model.
+- Use directory names that make the topic clear, for example `asksurf-ai-data-api-research`.
+- Optional package metadata lives in `research.json` beside `index.html`.
+- `research.json` may include `id`, `title`, `summary`, `tags`, `language`, `version`, `updatedAt`, and `entry`.
 
 ## Pending Research
 
-- Pending work lives under `research/pending/<topic>/`.
-- Each pending directory should contain a `README.md`.
-- Use the pending directory for collection, notes, source links, and request context before an HTML deliverable exists.
-- When the research is complete, add the final HTML file under `research/` and refresh the private index.
+- Pending card data lives in `research/pending/tasks.json`.
+- The field contract lives in `research/pending/tasks.schema.json`.
+- Use `research/pending/<topic>/` only for local notes, source files, or task materials that should be referenced from a task's `inputs`.
+- When work starts, create or copy the Web package to `research/in-progress/<topic>/`.
+- When the research is complete, move or copy the Web package to `research/completed/<topic>/` and refresh the private index.
 
 ## HTML Skills
 
@@ -75,9 +101,10 @@ After classification, refresh the generated index and data payload.
 
 `research/private-index.json` is generated from the repo tree and should contain:
 
-- completed research HTML entries
+- pending task entries from `research/pending/tasks.json`
+- in-progress research package entries
+- completed research package entries
 - HTML skill entries
-- pending research directories
 - dual-bucket access metadata
 - object keys for upload to `research-pages`
 
@@ -101,7 +128,7 @@ The generated upload root is `web/research-data/`.
 ## Dual Bucket Rules
 
 - `research-preview`: public preview/auth bucket, app shell and authorization UI only.
-- `research-pages`: private content/data bucket, indexed HTML and manifest only.
+- `research-pages`: private content/data bucket, sectioned manifest, pending task JSON, research packages, and private index only.
 - `research-data/manifest.json`: private data manifest consumed by the preview app.
 - Browser access uses OSS AK/SK or STS to create signed `GET` requests directly against the private data bucket.
 - Do not add backend gateway code unless explicitly requested.
@@ -140,7 +167,7 @@ Upload rules:
 - Follow the repository git commit convention.
 - Use `type: subject` style when the installed git convention does not require a more specific template.
 - Split commits by purpose:
-  - research HTML content
+  - research package content
   - private index or data-sync tooling
   - web preview behavior
   - skill page updates

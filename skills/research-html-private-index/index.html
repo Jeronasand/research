@@ -12,8 +12,8 @@
       {
         "id": "research-html-private-index",
         "title": "Research HTML Private Index",
-        "version": "0.1.3",
-        "updatedAt": "2026-05-12T18:52:00+08:00",
+        "version": "0.2.0",
+        "updatedAt": "2026-05-13T00:00:00+08:00",
         "contentType": "skill",
         "category": "research-workflow",
         "entry": "skills/research-html-private-index/index.html",
@@ -22,7 +22,9 @@
           "path": "/Users/Jeronasand/Project/Jeronasand/research"
         },
         "triggers": [
-          "新增或更新 research/*.html 调研文档",
+          "新增或更新 research/in-progress/<topic>/index.html 调研包",
+          "新增或更新 research/completed/<topic>/index.html 调研包",
+          "维护 research/pending/tasks.json 待调研卡片",
           "需要处理 temptodo/ 中外部来源的 Web、HTML 文件或完整网页文件夹",
           "新增或更新 skills/<skill-id>/index.html HTML skill",
           "需要维护 research/private-index.json",
@@ -33,10 +35,11 @@
         "workflow": [
           "外部来源的 Web、HTML 或完整网页文件夹先放在 temptodo/，默认不进入索引、不进入 OSS payload。",
           "只有用户明确说同步时，才检查 temptodo/ 并按内容分类。",
-          "同步分类：单文件完成调研进 research/*.html；带资源的完成调研进 research/<topic>/index.html；待调研或素材进 research/pending/<topic>/；可复用技能进 skills/<skill-id>/index.html。",
+          "同步分类：待调研任务写入 research/pending/tasks.json；调研中 Web 包进入 research/in-progress/<topic>/index.html；已完结 Web 包进入 research/completed/<topic>/index.html；可复用技能进 skills/<skill-id>/index.html。",
           "同步网页文件夹时保留 entry HTML 与 CSS、JS、图片、JSON、CSV 等本地资源的相对路径。",
-          "把完成的单文件调研交付物放到 research/*.html，把带资源的调研包放到 research/<topic>/index.html。",
-          "把待调研事项放到 research/pending/<topic>/README.md。",
+          "把待调研卡片字段按 research/pending/tasks.schema.json 维护。",
+          "把正在产出的调研静态包放到 research/in-progress/<topic>/index.html。",
+          "把已完结调研静态包放到 research/completed/<topic>/index.html。",
           "把网页化 skill 放到 skills/<skill-id>/index.html。",
           "运行 node scripts/private-index.mjs 刷新 research/private-index.json。",
           "运行 cd web && npm run sync:data 生成 web/research-data/manifest.json 和上传数据。",
@@ -55,10 +58,10 @@
         "checks": [
           "没有把 temptodo/ 直接写入 research/private-index.json 或 web/research-data/manifest.json。",
           "同步时已说明每个 inbox 文件被归到 research、research/pending、skills 或继续留在 temptodo 的原因。",
-          "research/private-index.json 包含新增 research HTML、HTML skill 和 pending 目录。",
+          "research/private-index.json 包含待调研任务、调研中包、已完结包和 HTML skill 元数据。",
           "web/research-data/manifest.json 的 key 指向 research-data/ 前缀。",
           "dist/oss/auth-bucket 只包含公开授权页和应用壳。",
-          "dist/oss/content-bucket/research-data 包含 private manifest、research HTML、skill HTML 和 private index。",
+          "dist/oss/content-bucket/research-data 包含 sectioned manifest、pending tasks、research package payload 和 private index。",
           "web 预览默认数据桶是 research-pages / oss-cn-shenzhen.aliyuncs.com。",
           "没有新增后端网关、AK/SK、STS token 或签名 URL。"
         ]
@@ -126,7 +129,7 @@
   </head>
   <body>
     <main>
-      <p class="meta">skill: research-html-private-index | version: 0.1.3 | updated: 2026-05-12</p>
+      <p class="meta">skill: research-html-private-index | version: 0.2.0 | updated: 2026-05-13</p>
       <h1>Research HTML Private Index</h1>
       <p>
         本 skill 约束 research 私有仓库的 HTML 调研文档、HTML skill、私有索引 JSON 和 OSS 双桶预览流程。
@@ -135,15 +138,16 @@
       <h2>目录规则</h2>
       <ul>
         <li>外部来源的 Web、HTML 或完整网页文件夹先放到 <code>temptodo/</code>，它是临时收件区，不是正式内容目录。</li>
-        <li>单文件调研文档放到 <code>research/*.html</code>。</li>
-        <li>带 CSS、JS、图片、JSON、CSV 等资源的调研包放到 <code>research/&lt;topic&gt;/index.html</code>，资源保留在同一个目录树内。</li>
-        <li>待调研事项放到 <code>research/pending/&lt;topic&gt;/</code>，每个目录保留自己的 <code>README.md</code>。</li>
+        <li>待调研卡片维护在 <code>research/pending/tasks.json</code>，字段规范维护在 <code>research/pending/tasks.schema.json</code>。</li>
+        <li>调研中 Web 静态包放到 <code>research/in-progress/&lt;topic&gt;/index.html</code>，资源保留在同一个目录树内。</li>
+        <li>已完结调研 Web 静态包放到 <code>research/completed/&lt;topic&gt;/index.html</code>，资源保留在同一个目录树内。</li>
+        <li>前端目录只展示 <code>待调研</code>、<code>调研中</code>、<code>已完结调研</code> 三类卡片，不展开包内所有 HTML。</li>
         <li>skill 可以是 HTML；单页或带资源的 skill 都放到 <code>skills/&lt;skill-id&gt;/index.html</code> 所在目录内。</li>
       </ul>
 
       <h2>索引规则</h2>
       <p>
-        私有索引文件是 <code>research/private-index.json</code>，必须根据真实目录结构生成，不维护虚假的手写条目。
+        私有索引文件是 <code>research/private-index.json</code>，必须根据真实目录结构和 <code>tasks.json</code> 生成，不维护虚假的手写条目。
         <code>temptodo/</code> 不进入索引；只有用户明确要求同步时，才把其中的单文件或文件夹分类到正式目录后再生成索引。
       </p>
       <pre>node scripts/private-index.mjs
@@ -153,7 +157,7 @@ npm run sync:data</pre>
       <h2>双桶边界</h2>
       <ul>
         <li><code>research-preview</code> 只承载公开授权页和应用壳。</li>
-        <li><code>research-pages</code> 承载 private manifest、research HTML、skill HTML 和 private index。</li>
+        <li><code>research-pages</code> 承载 private manifest、pending task JSON、research package payload 和 private index。</li>
         <li>保持纯静态浏览器 AK/STS 访问，不引入后端网关。</li>
       </ul>
 

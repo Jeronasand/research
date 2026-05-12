@@ -16,8 +16,8 @@
       {
   "id": "oss-dual-bucket-access",
   "title": "OSS Dual Bucket Access",
-  "version": "0.8.1",
-  "updatedAt": "2026-05-12T18:11:04+08:00",
+  "version": "0.8.2",
+  "updatedAt": "2026-05-13T00:00:00+08:00",
   "entry": "skills/oss-dual-bucket-access/index.html",
   "repository": {
     "provider": "GitHub",
@@ -50,6 +50,11 @@
   },
   "versionHistory": [
     {
+      "version": "0.8.2",
+      "date": "2026-05-13",
+      "summary": "本仓库本地适配：公开预览桶使用 research-preview，private 数据桶使用 research-pages / oss-cn-shenzhen.aliyuncs.com，并承载三段式调研目录 manifest、pending tasks 和 research package payload。"
+    },
+    {
       "version": "0.8.1",
       "date": "2026-05-12",
       "summary": "本仓库本地适配：公开预览桶使用 research-preview，private 数据桶使用 research-pages / oss-cn-shenzhen.aliyuncs.com，并把 research HTML 与 HTML skill 纳入 private manifest。"
@@ -66,9 +71,9 @@
     }
   ],
   "install": {
-    "latestVersion": "0.8.1",
-    "updatedAt": "2026-05-12T18:11:04+08:00",
-    "text": "本页当前用于 research 调研仓库，采用公开登录桶 research-preview + private 数据桶 research-pages 的双桶方案进行展示。内容模板源于 https://github.com/Jeronasand/skillgenome-pages，并已做本仓库本地适配。Web 更新时间：2026-05-12 18:11 +08:00。推荐把 SkillGenome Pages 作为上游参考；本仓库正式复用时引用 skills/oss-dual-bucket-access/index.html，并按 loginBucket、assetBuckets、credentialModes、corsRules、ramPolicy、checks 和 provenance 执行。"
+    "latestVersion": "0.8.2",
+    "updatedAt": "2026-05-13T00:00:00+08:00",
+    "text": "本页当前用于 research 调研仓库，采用公开登录桶 research-preview + private 数据桶 research-pages 的双桶方案进行展示。内容模板源于 https://github.com/Jeronasand/skillgenome-pages，并已做本仓库本地适配。Web 更新时间：2026-05-13 +08:00。推荐把 SkillGenome Pages 作为上游参考；本仓库正式复用时引用 skills/oss-dual-bucket-access/index.html，并按 loginBucket、assetBuckets、credentialModes、corsRules、ramPolicy、checks 和 provenance 执行。"
   },
   "popularity": {
     "score": 93,
@@ -213,7 +218,7 @@
     {
       "bucket": "research-pages",
       "visibility": "private",
-      "purpose": "Store private JSON manifest, research HTML, skill HTML, media, exports, or project assets. A project can use one private asset bucket or multiple private asset prefixes.",
+      "purpose": "Store private sectioned JSON manifest, pending task JSON, research package payloads, media, exports, or project assets. A project can use one private asset bucket or multiple private asset prefixes.",
       "accessedBy": [
         "browser OSS SDK with user-provided AK/SK",
         "STS temporary token",
