@@ -1,49 +1,69 @@
 # Research
 
-中文版本: `README.zh-CN.md`
+This private repository stores HTML research documents, HTML skills, and a generated private index for OSS dual-bucket preview.
 
-This repository stores many independent research items. Items are sorted by numeric prefix and versioned over time.
+## Layout
 
-Start with:
+- `temptodo/`: temporary inbox for external Web/HTML files or complete webpage folders before explicit sync
+- `research/*.html`: completed research deliverables
+- `research/<topic>/index.html`: completed research packages that need local assets
+- `research/pending/<topic>/`: pending research requests and working notes
+- `research/private-index.json`: generated private repository index
+- `skills/<skill-id>/index.html`: HTML skill pages
+- `web/`: static preview app that reads private data through signed OSS requests
+- `scripts/private-index.mjs`: index generator
+- `scripts/package-oss.mjs`: builds separate auth/content OSS payloads
+- `scripts/upload-oss.mjs`: uploads the separate payloads with `ossutil`
+- `docs/oss-deployment.md`: OSS packaging, upload, and verification runbook
 
-- `AGENTS.md` for repository instructions
-- `AGENTS.zh-CN.md` for Chinese repository instructions
-- `CONVENTIONS.md` for repository rules
-- `CONVENTIONS.zh-CN.md` for Chinese repository rules
-- `research/INDEX.md` for the ordered English research list
-- `research/INDEX.zh-CN.md` for the ordered Chinese research list
-- `.codex/skills/research-capability` for creating or updating research
-- `.codex/skills/research-repo-conventions` for maintaining repo structure
+## Workflow
 
-Research items are not grouped into categories. Create each item directly under `research/` as `0001-topic-slug/`, `0002-topic-slug/`, and keep product/technical history in paired version files under `versions/product/` and `versions/technical/`.
+```bash
+npm run index:private
+npm run package:oss
+npm run upload:oss:dry-run
+```
 
-Within each research item, keep product research and technical research separate:
-
-- product research: `product.md` and `product.zh-CN.md`
-- technical research: `technical.md` and `technical.zh-CN.md`
-- product snapshots: `versions/product/vMAJOR.MINOR.PATCH.md`
-- technical snapshots: `versions/technical/vMAJOR.MINOR.PATCH.md`
-
-## Dual Bucket Preview
-
-The preview app lives in `web/`.
+For local preview:
 
 ```bash
 cd web
-npm install
-npm run sync:data
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173/`.
+`temptodo/` is not scanned by this workflow. It is processed only after an explicit sync request, then files or webpage folders are classified into `research/`, `research/pending/`, or `skills/`. When an inbox folder has CSS, JS, images, or data files, keep those assets with the target package.
 
-`npm run sync:data` writes generated upload data to `web/research-data/`. That folder is not part of the public static preview bundle; upload it to `research-datas`, not to `research-preview`.
+## Access Model
 
-The preview uses two OSS buckets:
+The preview uses a dual-bucket model:
 
-- preview bucket: `research-preview` on `oss-cn-shenzhen.aliyuncs.com`, public-read static hosting for the web page only.
-- data-source bucket: `research-datas` on `oss-cn-beijing.aliyuncs.com`, private ACL, read by browser-side signed OSS requests after the user enters OSS AK or STS credentials.
+- `research-preview`: public authorization bucket for app shell only
+- `research-datas`: private content bucket for `research-data/manifest.json`, research HTML, skill HTML, and `research/private-index.json`
 
-The preview opens as a login-only page. There is no backend. The browser validates access by generating a short-lived signed `GET` URL for the private data-source manifest, then generates signed URLs for the selected research documents.
+There is no backend. The browser signs OSS `GET` requests using user-provided AK/SK or STS credentials.
 
-No real credentials are committed. The data bucket does not use public ACL; browser OSS reads still require CORS for `GET` from the preview origin.
+## OSS Upload
+
+```bash
+npm run package:oss
+npm run upload:oss:dry-run
+npm run upload:oss
+```
+
+Target only one bucket when needed:
+
+```bash
+npm run upload:oss -- --target auth
+npm run upload:oss -- --target content
+```
+
+The upload script uses:
+
+- `dist/oss/auth-bucket/` -> `oss://research-preview/`
+- `dist/oss/content-bucket/research-data/` -> `oss://research-datas/research-data/`
+
+Use `npm run verify:oss` after upload. Remote deletion is off by default; use `--delete --yes` only after a dry-run and an explicit cleanup decision.
+
+## Rules
+
+Read `AGENTS.md` and `CONVENTIONS.md` before changing structure, skills, sync logic, or commit scope.

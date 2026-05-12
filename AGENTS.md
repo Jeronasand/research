@@ -1,82 +1,91 @@
 # AGENTS.md
 
-中文版本: `AGENTS.zh-CN.md`
-
 ## Scope
 
 These instructions apply to the whole repository.
 
 ## Repository Purpose
 
-This repository stores multiple independent research items. Research items are sorted, versioned, and maintained over time. Do not classify them into topic folders unless the user explicitly changes this rule.
+This is a private research repository. Project-related research deliverables are maintained as standalone HTML files, indexed from the directory structure, and previewed through the OSS dual-bucket flow.
 
-## Research Structure
+## Content Structure
 
-- Keep the single ordered entry point at `research/INDEX.md`.
-- Keep the Chinese mirror index at `research/INDEX.zh-CN.md`.
-- Put every research item directly under `research/` with a four-digit sortable prefix: `0001-topic-slug/`, `0002-topic-slug/`.
-- Do not create category folders such as `ai/`, `market/`, `product/`, or `tech/`.
-- Each research item owns its own version history under `versions/`.
-- Keep the latest readable summary in both `README.md` and `README.zh-CN.md`.
+- Put external Web or HTML files from other sources in `temptodo/` first. Treat `temptodo/` as an inbox, not as publishable content.
+- An inbox item can be a single `.html` file or a full webpage folder containing HTML, CSS, JS, images, JSON, CSV, or other local assets.
+- Put completed research HTML documents directly under `research/`.
+- Put pending research requests in their own directories under `research/pending/<topic>/`.
+- Do not introduce category folders unless the user explicitly changes this rule.
+- Skills may be HTML pages. Store HTML skills at `skills/<skill-id>/index.html`.
+- Keep imported or reusable skill pages traceable through their page-local metadata when available, especially `skillgenome-ai-context`.
 
-Expected shape:
+## Inbox And Sync
 
-```text
-research/
-  INDEX.md
-  INDEX.zh-CN.md
-  0001-topic-slug/
-    README.md
-    README.zh-CN.md
-    product.md
-    product.zh-CN.md
-    technical.md
-    technical.zh-CN.md
-    versions/
-      product/
-        v0.1.0.md
-        v0.1.0.zh-CN.md
-      technical/
-        v0.1.0.md
-        v0.1.0.zh-CN.md
-    assets/
-```
+- Do not sync, index, move, or publish files from `temptodo/` just because they exist.
+- Only process `temptodo/` when the user explicitly asks to sync.
+- During sync, inspect each inbox HTML file and classify it yourself:
+  - completed research deliverable: move or copy to `research/<topic-and-version>.html`
+  - pending research request or source collection: create/update `research/pending/<topic>/`
+  - reusable or workflow skill: create/update `skills/<skill-id>/index.html`
+- During sync, inspect each inbox folder as one webpage package. Identify the entry HTML file, preserve relative asset paths, and move/copy the needed assets with the classified target.
+- For a completed research package with local assets, use `research/<topic-slug>/index.html` plus assets inside that folder instead of flattening everything into `research/*.html`.
+- For an HTML skill package with local assets, use `skills/<skill-id>/index.html` plus assets inside that skill folder.
+- Supporting assets must stay beside their classified target, not loose at repo root.
+- After classification, refresh `research/private-index.json` and `web/research-data/manifest.json`.
+- Leave unclassified inbox files in `temptodo/` and state why they were left there.
 
-## Research Types
+## Private Index
 
-- Product research and technical research must be maintained separately.
-- Product research uses `product.md` and `product.zh-CN.md`.
-- Technical research uses `technical.md` and `technical.zh-CN.md`.
-- `README.md` and `README.zh-CN.md` are entry summaries only; do not put full product and technical analysis back into README.
-- Product version snapshots live under `versions/product/`.
-- Technical version snapshots live under `versions/technical/`.
-- Keep top-level research ordering flat; this split is inside each research item, not a category folder under `research/`.
+- Maintain `research/private-index.json` from the real directory structure.
+- Run `node scripts/private-index.mjs` after adding, removing, or renaming research HTML, pending research directories, or HTML skills.
+- Run `cd web && npm run sync:data` before packaging private OSS data; this refreshes the index and writes `web/research-data/manifest.json`.
+- Do not hand-write divergent manifest entries that do not exist in the repo tree.
+- `temptodo/` is intentionally excluded from the private index and private bucket payload.
 
-## Documentation Languages
+## Dual Bucket Access
 
-- Maintain English and Chinese documentation as paired files.
-- English files use the base filename: `README.md`, `product.md`, `technical.md`, `CONVENTIONS.md`, `research/INDEX.md`, `versions/product/v0.1.0.md`.
-- Chinese files use the `.zh-CN.md` suffix: `README.zh-CN.md`, `product.zh-CN.md`, `technical.zh-CN.md`, `CONVENTIONS.zh-CN.md`, `research/INDEX.zh-CN.md`, `versions/product/v0.1.0.zh-CN.md`.
-- Keep paired documents semantically aligned. A conclusion, version, status, source, or path update in one language must be reflected in the other language.
-- Do not create category folders for language separation.
+- Use the existing dual-bucket scheme.
+- Public preview/auth bucket: `research-preview` on `oss-cn-shenzhen.aliyuncs.com`; it only hosts the authorization page and web app shell.
+- Private content/data bucket: `research-datas` on `oss-cn-beijing.aliyuncs.com`; it stores `research-data/manifest.json`, research HTML, skill HTML, and private index data.
+- Keep the flow pure static browser AK/STS. Do not add a backend gateway unless the user explicitly asks for one.
+- The authorization page can directly reuse the dual-bucket access skill/page.
+- Never commit AK/SK, STS tokens, signed URLs with secrets, or session dumps.
 
-## Versioning
+## OSS Package And Upload
 
-- Use `vMAJOR.MINOR.PATCH` filenames for research versions.
-- Use `v0.x.y` while the research is exploratory or unstable.
-- Bump `MAJOR` when conclusions, scope, or assumptions change incompatibly.
-- Bump `MINOR` when new sources, comparisons, or meaningful findings are added.
-- Bump `PATCH` for wording fixes, formatting fixes, or citation repairs that do not change conclusions.
-- Never overwrite an old version file to represent a new state. Add paired product and/or technical version files, then update the item current files, `README.md`, `README.zh-CN.md`, `research/INDEX.md`, and `research/INDEX.zh-CN.md`.
+- The repository owns its OSS packaging and upload workflow.
+- Run `npm run package:oss` from the repo root to build two local payloads:
+  - `dist/oss/auth-bucket/` -> `oss://research-preview/`
+  - `dist/oss/content-bucket/research-data/` -> `oss://research-datas/research-data/`
+- Run `npm run upload:oss:dry-run` before the first real upload or before any risky change.
+- Run `npm run upload:oss -- --target auth` to upload only the public authorization/app shell bucket.
+- Run `npm run upload:oss -- --target content` to upload only the private content bucket.
+- Run `npm run upload:oss` to upload both targets, then verify `index.html` and `research-data/manifest.json`.
+- Do not use `--delete` unless the user explicitly asks for remote cleanup; the script requires `--delete --yes`.
+- Keep public preview asset verification separate from private content bucket verification.
 
-## Local Skills
+## Research HTML
 
-- Use `.codex/skills/research-capability` when creating, updating, or reviewing research content.
-- Use `.codex/skills/research-repo-conventions` when checking repository structure, naming, version rules, or skill maintenance.
-- Keep these repo-local skills alive: if a repeated research workflow gap appears, update the relevant skill instead of only fixing the current document.
+- New research deliverables should be simple HTML files.
+- Prefer minimal black-and-white presentation unless the user asks for richer styling.
+- Include a meaningful `<title>`.
+- If possible, include machine-readable or semi-structured metadata in the page body, such as scope, language, version, status, and last verified date.
+
+## Pending Research
+
+- Each pending item gets a directory under `research/pending/`.
+- Use a short lowercase slug or date-prefixed slug.
+- Add a concise `README.md` with the topic, status, requested output, and known inputs.
+- Move the result into `research/*.html` when the research is complete, then refresh the private index.
+
+## Skill Maintenance
+
+- Update skills when a recurring workflow rule changes.
+- A skill can be a Codex skill folder or an HTML page; in this repository, HTML skill pages under `skills/` are first-class.
+- Keep `skills/research-html-private-index/index.html` aligned with this repository's actual HTML, private-index, and dual-bucket workflow.
+- Keep `skills/oss-dual-bucket-access/index.html` aligned with the current bucket names and access boundary when the OSS flow changes.
 
 ## Git
 
 - Write git commit messages according to the repository git commit convention.
-- Use `.codex/skills/git-commit-convention` for commit message generation and commit splitting decisions.
-- Split unrelated purposes into separate commits. In particular, keep research-content changes separate from repo-local skill or tooling maintenance unless the user asks for one combined commit.
+- Use the `git-commit-convention` skill when generating commit messages or deciding commit splits.
+- Split unrelated purposes into separate commits. Keep research HTML changes separate from tooling, index, or skill maintenance unless the user asks for one combined commit.
