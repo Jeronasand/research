@@ -1,0 +1,104 @@
+{
+  "version": "0.3",
+  "title": "金融 / Crypto / 股票数据源待调研清单",
+  "categories": [
+    {
+      "name": "全球金融行情 / 基本面",
+      "items": [
+        { "priority": "P0", "name": "OpenBB", "type": "聚合层", "coverage": ["股票", "ETF", "期权", "宏观", "Crypto"], "access": ["Python", "REST", "MCP"], "risk": "依赖第三方 provider 授权" },
+        { "priority": "P0", "name": "Polygon / Massive", "type": "行情 API", "coverage": ["美股", "期权", "期货", "外汇", "Crypto"], "access": ["REST", "WebSocket", "Flat Files"], "risk": "实时数据和再分发需确认交易所授权" },
+        { "priority": "P0", "name": "Financial Modeling Prep", "type": "行情 + 基本面", "coverage": ["美股", "ETF", "Forex", "Crypto", "财报"], "access": ["REST", "WebSocket"], "risk": "需验证财报准确性和商用授权" },
+        { "priority": "P0", "name": "Finnhub", "type": "综合金融 API", "coverage": ["全球股票", "经济数据", "另类数据", "Forex", "Crypto"], "access": ["REST", "WebSocket"], "risk": "不同市场实时权限不同" },
+        { "priority": "P0", "name": "Twelve Data", "type": "全球行情 API", "coverage": ["股票", "ETF", "指数", "Forex", "Crypto"], "access": ["REST", "WebSocket", "SDK"], "risk": "实时行情授权需确认" },
+        { "priority": "P0", "name": "Alpha Vantage", "type": "开发者金融 API", "coverage": ["股票", "ETF", "期权", "技术指标", "宏观", "Crypto"], "access": ["REST", "CSV", "MCP"], "risk": "免费额度较低" },
+        { "priority": "P1", "name": "EODHD", "type": "行情 + 新闻 + MCP", "coverage": ["股票", "ETF", "基金", "Forex", "期权", "Crypto"], "access": ["REST", "WebSocket", "MCP"], "risk": "交易所授权和套餐边界需验证" },
+        { "priority": "P1", "name": "Intrinio", "type": "基本面 / 期权数据", "coverage": ["美股", "财报", "期权", "机构持仓", "新闻"], "access": ["REST", "SDK"], "risk": "数据包成本和再分发条款需确认" },
+        { "priority": "P1", "name": "Nasdaq Data Link", "type": "数据市场", "coverage": ["金融数据", "经济数据", "另类数据", "实时交易所数据"], "access": ["REST", "Streaming", "Python", "Excel"], "risk": "具体 dataset 单独定价和授权" },
+        { "priority": "P2", "name": "FactSet", "type": "机构级金融数据", "coverage": ["全球股票", "基本面", "估值", "持仓", "组合"], "access": ["Enterprise API", "FQL"], "risk": "成本高，合同复杂" },
+        { "priority": "P2", "name": "LSEG / Refinitiv", "type": "机构级市场数据", "coverage": ["全球股票", "债券", "外汇", "商品", "新闻"], "access": ["Enterprise API", "Feeds", "Workspace"], "risk": "授权和再分发限制严格" },
+        { "priority": "P2", "name": "Bloomberg / BLPAPI", "type": "机构终端数据", "coverage": ["全球金融市场", "新闻", "衍生品", "固定收益"], "access": ["BLPAPI", "Server API", "B-Pipe"], "risk": "需要 Bloomberg 合同" }
+      ]
+    },
+    {
+      "name": "A股 / 港股 / 中国市场",
+      "items": [
+        { "priority": "P0", "name": "TuShare Pro", "type": "A股结构化 API", "coverage": ["A股", "基金", "期货", "指数", "宏观", "同花顺热榜"], "access": ["Python API"], "risk": "积分权限和商用授权需确认" },
+        { "priority": "P1", "name": "AKShare", "type": "开源数据连接器", "coverage": ["A股", "港股", "美股", "基金", "期货", "外汇", "债券", "Crypto"], "access": ["Python", "AKTools HTTP"], "risk": "非授权数据供应商，不适合直接商用再分发" },
+        { "priority": "P1", "name": "mootdx", "type": "通达信协议连接器", "coverage": ["A股", "指数", "通达信本地数据", "K线", "财务文件"], "access": ["Python", "CLI"], "risk": "项目声明不适合商业用途" },
+        { "priority": "P1", "name": "JoinQuant / JQData", "type": "A股量化数据", "coverage": ["股票", "基金", "期货", "期权", "债券", "宏观"], "access": ["Python SDK", "平台 API"], "risk": "套餐和商用限制需确认" },
+        { "priority": "P1", "name": "RiceQuant / RQData", "type": "金融数据 API", "coverage": ["股票", "ETF", "指数", "期货", "期权", "可转债"], "access": ["Python API", "HTTP API"], "risk": "授权、费用和商用场景需确认" },
+        { "priority": "P1", "name": "掘金量化 / GM API", "type": "量化平台", "coverage": ["A股", "期货", "ETF", "指数"], "access": ["Python SDK"], "risk": "实时权限、交易权限和商用限制需确认" },
+        { "priority": "P1", "name": "Wind", "type": "机构级中国金融数据", "coverage": ["A股", "港股", "债券", "基金", "宏观", "行业", "ESG"], "access": ["Client API", "Excel", "Terminal"], "risk": "机构合同和终端授权成本高" },
+        { "priority": "P1", "name": "Choice 东方财富", "type": "机构级中国金融数据", "coverage": ["A股", "基金", "债券", "宏观", "研报"], "access": ["终端", "API 待确认"], "risk": "需要采购授权" },
+        { "priority": "P1", "name": "同花顺 i问财 / SuperMind", "type": "自然语言选股", "coverage": ["A股", "基金", "指数", "港股", "美股"], "access": ["query_iwencai"], "risk": "调用次数、问句稳定性和商用授权需确认" },
+        { "priority": "P1", "name": "同花顺热点 / ths_hot", "type": "热点热榜", "coverage": ["热股", "概念板块", "ETF", "可转债", "行业", "港股", "美股"], "access": ["TuShare Pro"], "risk": "商业用途需同花顺授权" },
+        { "priority": "P2", "name": "pywencai", "type": "i问财非官方连接器", "coverage": ["A股", "港股", "美股", "基金"], "access": ["Python", "Cookie"], "risk": "非官方，反爬和登录态风险高" },
+        { "priority": "P2", "name": "腾讯财经", "type": "行情页面 / 非官方接口", "coverage": ["A股", "港股", "美股", "指数", "新闻"], "access": ["Web 页面", "非官方接口"], "risk": "未确认公开官方 API" },
+        { "priority": "P2", "name": "东方财富页面源", "type": "页面 / 非官方接口", "coverage": ["A股", "资金流", "人气榜", "公告", "研报"], "access": ["Web 页面", "AKShare 封装"], "risk": "反爬和授权风险" },
+        { "priority": "P2", "name": "新浪财经", "type": "行情页面 / 非官方接口", "coverage": ["A股", "港股", "美股", "期货", "外汇"], "access": ["Web 页面", "非官方接口"], "risk": "字段变更和授权不明确" },
+        { "priority": "P2", "name": "雪球", "type": "社区 / 组合 / 舆情", "coverage": ["股票讨论", "组合", "关注度"], "access": ["Web 页面", "非官方接口"], "risk": "反爬、授权和噪音风险" },
+        { "priority": "P2", "name": "QMT / miniQMT / xtquant", "type": "券商量化终端", "coverage": ["A股实时行情", "历史 K线", "交易", "板块"], "access": ["Windows 客户端", "xtquant", "本地桥接服务"], "risk": "依赖券商账户和 Windows 环境" }
+      ]
+    },
+    {
+      "name": "Crypto / On-chain / Web3",
+      "items": [
+        { "priority": "P0", "name": "Surf / AskSurf", "type": "Crypto Agent 数据层", "coverage": ["Token", "Wallet", "Market", "Social", "Prediction Market"], "access": ["REST", "MCP", "OpenAPI"], "risk": "TradFi 覆盖不足" },
+        { "priority": "P0", "name": "Dune", "type": "链上 SQL 数据仓库", "coverage": ["Raw Chain Data", "Decoded Events", "DEX", "Stablecoin", "Bridge"], "access": ["SQL", "API", "Datashare"], "risk": "查询成本和商业授权需确认" },
+        { "priority": "P0", "name": "DefiLlama", "type": "DeFi 基本面", "coverage": ["TVL", "Fees", "Revenue", "Yields", "Stablecoins", "Bridges"], "access": ["Free API", "Pro API"], "risk": "SLA 和商用边界需确认" },
+        { "priority": "P0", "name": "Messari", "type": "Crypto 市场 / 研究", "coverage": ["Assets", "Research", "News", "Unlocks", "Fundraising"], "access": ["REST", "Bulk API"], "risk": "价格和内容展示授权需确认" },
+        { "priority": "P0", "name": "CoinGecko", "type": "Crypto 市场数据", "coverage": ["价格", "交易所", "Token Metadata", "DEX"], "access": ["REST", "WebSocket"], "risk": "高频限制和商业套餐" },
+        { "priority": "P1", "name": "Nansen", "type": "Smart Money / 钱包画像", "coverage": ["Wallet", "Labels", "Smart Money", "Token Holder"], "access": ["API", "平台"], "risk": "价格较高" },
+        { "priority": "P1", "name": "Arkham", "type": "实体归因", "coverage": ["Wallet", "Entity", "Labels", "Fund Flow"], "access": ["API", "平台"], "risk": "合规和归因准确性需验证" },
+        { "priority": "P1", "name": "Kaito", "type": "Crypto 社交 / Mindshare", "coverage": ["KOL", "Narrative", "Sentiment", "Social"], "access": ["平台", "API 待确认"], "risk": "API 开放度和价格需确认" },
+        { "priority": "P1", "name": "Santiment", "type": "Crypto 情绪 / 开发活跃度", "coverage": ["Social", "Sentiment", "Dev Activity", "On-chain"], "access": ["GraphQL", "API"], "risk": "指标定义和查询成本需验证" },
+        { "priority": "P1", "name": "Token Terminal", "type": "协议财务数据", "coverage": ["Revenue", "Fees", "Protocol Metrics", "Top Holders"], "access": ["API", "Data Room"], "risk": "企业授权成本" },
+        { "priority": "P1", "name": "Artemis", "type": "链 / 协议基本面", "coverage": ["DAU", "Fees", "Revenue", "Stablecoins", "Prediction Markets"], "access": ["API", "Snowflake"], "risk": "数据深度和授权需确认" },
+        { "priority": "P1", "name": "Glassnode", "type": "链上宏观指标", "coverage": ["BTC", "ETH", "On-chain Metrics", "Derivatives"], "access": ["API"], "risk": "企业版价格较高" },
+        { "priority": "P1", "name": "CryptoQuant", "type": "链上交易所流向", "coverage": ["Exchange Flow", "Miner", "Derivatives", "Stablecoin"], "access": ["API"], "risk": "价格和指标口径需验证" },
+        { "priority": "P1", "name": "CoinMarketCap", "type": "Crypto 市场排名", "coverage": ["价格", "市值", "交易所", "Metadata"], "access": ["API"], "risk": "商用和调用限制" },
+        { "priority": "P1", "name": "DexScreener", "type": "DEX 池子数据", "coverage": ["Meme", "DEX Pairs", "Liquidity", "Volume"], "access": ["API/非正式接口"], "risk": "稳定性和授权需确认" },
+        { "priority": "P1", "name": "GeckoTerminal", "type": "DEX 数据", "coverage": ["Pools", "Liquidity", "Networks", "Token"], "access": ["API"], "risk": "刷新频率和商用条款" },
+        { "priority": "P1", "name": "Birdeye", "type": "Solana/EVM DEX 数据", "coverage": ["Token", "Wallet", "DEX", "Meme"], "access": ["API"], "risk": "套餐和商用限制" },
+        { "priority": "P1", "name": "Moralis", "type": "Web3 API", "coverage": ["Wallet", "NFT", "Token", "Transfers"], "access": ["REST", "Streams"], "risk": "偏基础设施，成本需核算" },
+        { "priority": "P1", "name": "Alchemy", "type": "RPC + Indexing", "coverage": ["EVM", "NFT", "Token", "Transfers", "Webhooks"], "access": ["RPC", "REST", "Webhooks"], "risk": "不是金融指标源，偏底层设施" },
+        { "priority": "P1", "name": "QuickNode", "type": "RPC + Marketplace", "coverage": ["多链 RPC", "NFT", "Token", "Streams"], "access": ["RPC", "Add-ons"], "risk": "数据能力依赖插件" }
+      ]
+    },
+    {
+      "name": "新闻 / 舆情 / 另类数据",
+      "items": [
+        { "priority": "P1", "name": "Benzinga", "type": "财经新闻 / 评级", "coverage": ["美股新闻", "分析师评级", "Price Target"], "access": ["REST", "WebSocket"], "risk": "新闻展示授权需确认" },
+        { "priority": "P1", "name": "NewsAPI", "type": "新闻聚合", "coverage": ["全球新闻"], "access": ["REST"], "risk": "财经深度有限，商业限制需看套餐" },
+        { "priority": "P1", "name": "GDELT", "type": "全球新闻事件数据库", "coverage": ["全球新闻", "事件", "情绪"], "access": ["API", "BigQuery"], "risk": "噪音较大，需要清洗" },
+        { "priority": "P2", "name": "RavenPack", "type": "机构级新闻情绪", "coverage": ["新闻 NLP", "情绪", "事件"], "access": ["Enterprise API"], "risk": "价格高" },
+        { "priority": "P1", "name": "Quiver Quant", "type": "另类数据", "coverage": ["国会议员交易", "游说", "社交热度"], "access": ["API"], "risk": "数据解释性需验证" },
+        { "priority": "P1", "name": "StockTwits", "type": "美股/Crypto 社交", "coverage": ["社区讨论", "情绪"], "access": ["API/平台"], "risk": "噪音大" },
+        { "priority": "P1", "name": "X / Twitter API", "type": "实时社交舆情", "coverage": ["KOL", "热点", "转发", "情绪"], "access": ["API"], "risk": "价格高，限制多" },
+        { "priority": "P1", "name": "Reddit API", "type": "社区讨论", "coverage": ["WSB", "Crypto", "股票讨论"], "access": ["API"], "risk": "内容噪音和合规需处理" }
+      ]
+    },
+    {
+      "name": "Web Search / AI Research",
+      "items": [
+        { "priority": "P0", "name": "Tavily", "type": "AI Search", "coverage": ["Web", "News", "Finance"], "access": ["API"], "risk": "金融垂直精度需实测" },
+        { "priority": "P0", "name": "Exa", "type": "语义搜索", "coverage": ["Web", "Research", "Company"], "access": ["API"], "risk": "中文和金融覆盖需测试" },
+        { "priority": "P0", "name": "Brave Search API", "type": "搜索 API", "coverage": ["Web", "News", "Images", "Videos"], "access": ["API"], "risk": "结果质量和授权需确认" },
+        { "priority": "P0", "name": "Perplexity Sonar", "type": "AI Search", "coverage": ["Web-grounded Answer"], "access": ["API"], "risk": "可控性和引用质量需验证" },
+        { "priority": "P1", "name": "OpenAI Web Search", "type": "LLM 搜索工具", "coverage": ["Web"], "access": ["Responses API"], "risk": "成本和搜索可控性需验证" },
+        { "priority": "P1", "name": "Firecrawl", "type": "网页抓取 / Markdown", "coverage": ["Web Pages", "Docs"], "access": ["API"], "risk": "反爬和版权风险" },
+        { "priority": "P1", "name": "Jina Reader", "type": "页面结构化抽取", "coverage": ["Web Pages"], "access": ["API"], "risk": "大规模成本和反爬" },
+        { "priority": "P2", "name": "Diffbot", "type": "Knowledge Graph / Entity Extraction", "coverage": ["Company", "Article", "Entity"], "access": ["API"], "risk": "企业级价格" }
+      ]
+    },
+    {
+      "name": "高频 / Tick / 专业量化",
+      "items": [
+        { "priority": "P1", "name": "Databento", "type": "Tick / Order Book 数据", "coverage": ["美股", "期货", "期权", "OPRA", "CME"], "access": ["API", "Python", "Rust", "C++"], "risk": "高频数据成本和交易所授权" },
+        { "priority": "P2", "name": "dxFeed", "type": "实时行情 / 期权", "coverage": ["美股", "期权", "期货"], "access": ["API", "Feeds"], "risk": "授权复杂" },
+        { "priority": "P2", "name": "QuantQuote", "type": "历史 Tick 数据", "coverage": ["美股 Tick", "分钟线"], "access": ["文件交付"], "risk": "数据时效和授权" },
+        { "priority": "P2", "name": "Nanex", "type": "高频历史行情", "coverage": ["美股", "期权", "期货"], "access": ["文件/API 待确认"], "risk": "专业数据采购成本" }
+      ]
+    }
+  ]
+}

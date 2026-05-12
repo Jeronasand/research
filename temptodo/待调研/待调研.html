@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>金融 / Crypto / 股票数据源待调研清单</title>
+  <style>
+    body {
+      margin: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f7f8fa;
+      color: #1f2937;
+    }
+    h1 { margin-bottom: 6px; font-size: 26px; }
+    .desc { color: #6b7280; margin-bottom: 20px; }
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    input, select {
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+    th {
+      background: #111827;
+      color: #fff;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+    tr:hover { background: #f9fafb; }
+    .p0 { color: #dc2626; font-weight: 700; }
+    .p1 { color: #d97706; font-weight: 700; }
+    .p2 { color: #2563eb; font-weight: 700; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      margin: 2px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      color: #374151;
+      font-size: 12px;
+    }
+    .error {
+      padding: 16px;
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">金融 / Crypto / 股票数据源待调研清单</h1>
+  <div id="desc" class="desc">Loading data-sources.json...</div>
+
+  <div class="toolbar">
+    <input id="searchInput" placeholder="搜索数据源 / 覆盖 / 风险..." />
+    <select id="priorityFilter">
+      <option value="">全部优先级</option>
+    </select>
+    <select id="categoryFilter">
+      <option value="">全部分类</option>
+    </select>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>优先级</th>
+        <th>分类</th>
+        <th>数据源</th>
+        <th>类型</th>
+        <th>覆盖</th>
+        <th>接入方式</th>
+        <th>授权 / 风险</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script>
+    let researchData = null;
+
+    const titleEl = document.getElementById("title");
+    const descEl = document.getElementById("desc");
+    const tableBody = document.getElementById("tableBody");
+    const searchInput = document.getElementById("searchInput");
+    const priorityFilter = document.getElementById("priorityFilter");
+    const categoryFilter = document.getElementById("categoryFilter");
+
+    async function loadData() {
+      try {
+        const res = await fetch("./data-sources.json");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        researchData = await res.json();
+
+        titleEl.textContent = researchData.title || "数据源待调研清单";
+        descEl.textContent = `版本：${researchData.version || "-"} ｜ 分类数：${researchData.categories?.length || 0}`;
+
+        initFilters();
+        renderTable();
+      } catch (err) {
+        descEl.innerHTML = `<div class="error">读取 data-sources.json 失败：${err.message}<br/>注意：本地直接双击 file:// 可能被浏览器拦截，请用本地服务器打开，例如：python3 -m http.server 8080</div>`;
+      }
+    }
+
+    function initFilters() {
+      const priorities = new Set();
+      const categories = new Set();
+
+      researchData.categories.forEach(group => {
+        categories.add(group.name);
+        group.items.forEach(item => priorities.add(item.priority));
+      });
+
+      [...priorities].sort().forEach(p => {
+        const option = document.createElement("option");
+        option.value = p;
+        option.textContent = p;
+        priorityFilter.appendChild(option);
+      });
+
+      [...categories].forEach(c => {
+        const option = document.createElement("option");
+        option.value = c;
+        option.textContent = c;
+        categoryFilter.appendChild(option);
+      });
+    }
+
+    function renderTable() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const priority = priorityFilter.value;
+      const category = categoryFilter.value;
+
+      tableBody.innerHTML = "";
+
+      researchData.categories.forEach(group => {
+        if (category && group.name !== category) return;
+
+        group.items.forEach(item => {
+          if (priority && item.priority !== priority) return;
+
+          const text = [
+            group.name,
+            item.priority,
+            item.name,
+            item.type,
+            ...(item.coverage || []),
+            ...(item.access || []),
+            item.risk
+          ].join(" ").toLowerCase();
+
+          if (keyword && !text.includes(keyword)) return;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="${item.priority.toLowerCase()}">${item.priority}</td>
+            <td>${group.name}</td>
+            <td><strong>${item.name}</strong></td>
+            <td>${item.type || ""}</td>
+            <td>${(item.coverage || []).map(x => `<span class="tag">${x}</span>`).join("")}</td>
+            <td>${(item.access || []).map(x => `<span class="tag">${x}</span>`).join("")}</td>
+            <td>${item.risk || ""}</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+      });
+    }
+
+    searchInput.addEventListener("input", renderTable);
+    priorityFilter.addEventListener("change", renderTable);
+    categoryFilter.addEventListener("change", renderTable);
+
+    loadData();
+  </script>
+</body>
+</html>

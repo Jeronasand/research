@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dune 调研总览</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Dune 调研包</h1>
+      <p>数据源提供商 / Web3 链上数据 / API / MCP / Skill / Agent 集成</p>
+    </div>
+    <nav class="nav"><a class="active" href="index.html">总览</a>
+<a class="" href="api.html">API 能力</a>
+<a class="" href="endpoints.html">端点清单</a>
+<a class="" href="mcp.html">MCP / Agent</a>
+<a class="" href="skills.html">CLI & Skills</a>
+<a class="" href="query-engine.html">DuneSQL</a>
+<a class="" href="data-catalog.html">数据目录</a>
+<a class="" href="uploads.html">上传数据</a>
+<a class="" href="materialized-views.html">Materialized Views</a>
+<a class="" href="pipelines-webhooks.html">Pipelines / Webhooks</a>
+<a class="" href="sdks-connectors.html">SDK / Connectors</a>
+<a class="" href="pricing-limits.html">计费 / 限制</a>
+<a class="" href="usecases.html">使用场景</a>
+<a class="" href="architecture.html">集成架构</a>
+<a class="" href="evaluation.html">供应商评分</a>
+<a class="" href="sources.html">资料来源</a></nav>
+  </aside>
+  <main class="content">
+
+<section class="hero">
+  <h1>Dune 数据源提供商调研</h1>
+  <p>Dune 的定位不是“普通行情 API”，而是一个面向 Web3 的链上数据平台：链上数据仓库 + DuneSQL 查询引擎 + Dashboard + Data API + MCP / Agent Skill。对 AI Agent、Codex、Trading Bot、链上监控和 Web3 数据聚合来说，它最有价值的部分是“可被 AI 消费的结构化链上数据层”。</p>
+</section>
+<div class="grid">
+  <div class="kpi"><div class="num">100+</div><div class="label">官方文档描述覆盖 100+ chains / blockchain datasets</div></div>
+  <div class="kpi"><div class="num">API + MCP</div><div class="label">既支持传统 API，也支持 Agent 直接接入</div></div>
+  <div class="kpi"><div class="num">SQL First</div><div class="label">核心能力围绕 DuneSQL 与 Query 资产化</div></div>
+</div>
+<div class="card">
+  <h2>一句话结论</h2>
+  <p><b>Dune 适合作为链上数据研究、指标计算、Agent 数据发现、Webhook 通知和 Dashboard 的数据底座；不适合作为传统股票/外汇行情源，也不适合作为低延迟交易执行或 OrderBook 级实时撮合数据源。</b></p>
+  <div class="callout">对你的方向：如果是 AI Pulse / SkillGenome / Codex Trading Bot，Dune 更适合做“链上数据 Skill + MCP 数据源 + 定时指标计算 + 触发通知”，而不是每次让 Agent 临时扫大表。</div>
+</div>
+<div class="grid2">
+  <div class="card">
+    <h2>核心能力</h2>
+    <ul>
+      <li>查询链上原始表、decoded 表、curated 表。</li>
+      <li>用 DuneSQL 生成指标和分析结果。</li>
+      <li>通过 API 执行 Query、读取结果、管理 Query。</li>
+      <li>通过 MCP 让 AI Agent 发现数据集、写 SQL、执行查询、管理可视化和 Dashboard。</li>
+      <li>上传自己的 CSV/NDJSON 数据，与链上数据做 Join。</li>
+      <li>使用 Materialized Views 和 Pipelines 降低重复计算成本。</li>
+      <li>通过 Schedule + Webhook 触发外部通知。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>优先研究顺序</h2>
+    <ol>
+      <li>Data API：执行 Query / 获取结果。</li>
+      <li>MCP：给 Codex、Claude Code、OpenCode、Cursor 使用。</li>
+      <li>DuneSQL：表结构、性能、成本优化。</li>
+      <li>Materialized Views：降低重复查询成本。</li>
+      <li>Uploads：写入自己的策略/标签/事件数据。</li>
+      <li>Webhooks：连接 AI Pulse / 手机通知 / Slack。</li>
+    </ol>
+  </div>
+</div>
+<div class="card">
+  <h2>本调研包文件说明</h2>
+  <table>
+    <tr><th>页面</th><th>内容</th></tr>
+    <tr><td>api.html</td><td>按能力拆解 Dune API。</td></tr>
+    <tr><td>endpoints.html</td><td>整理主要端点、用途、Agent 适配方式。</td></tr>
+    <tr><td>mcp.html</td><td>Dune 官方 MCP 的用途、认证和工具能力。</td></tr>
+    <tr><td>skills.html</td><td>Dune CLI & Agent Skills 如何给 Codex/Claude/Cursor 使用。</td></tr>
+    <tr><td>query-engine.html</td><td>DuneSQL、查询引擎大小、执行限制。</td></tr>
+    <tr><td>uploads.html</td><td>上传自定义数据，形成可查询表。</td></tr>
+    <tr><td>architecture.html</td><td>推荐接入架构和本地服务设计。</td></tr>
+  </table>
+</div>
+
+    <div class="footer">生成时间：2026-05-12｜本包为中文调研草案，建议以 Dune 官方文档作为最终准绳。</div>
+  </main>
+</div>
+</body>
+</html>

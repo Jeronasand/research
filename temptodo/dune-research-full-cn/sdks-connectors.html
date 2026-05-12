@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dune SDK Connectors</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Dune 调研包</h1>
+      <p>数据源提供商 / Web3 链上数据 / API / MCP / Skill / Agent 集成</p>
+    </div>
+    <nav class="nav"><a class="" href="index.html">总览</a>
+<a class="" href="api.html">API 能力</a>
+<a class="" href="endpoints.html">端点清单</a>
+<a class="" href="mcp.html">MCP / Agent</a>
+<a class="" href="skills.html">CLI & Skills</a>
+<a class="" href="query-engine.html">DuneSQL</a>
+<a class="" href="data-catalog.html">数据目录</a>
+<a class="" href="uploads.html">上传数据</a>
+<a class="" href="materialized-views.html">Materialized Views</a>
+<a class="" href="pipelines-webhooks.html">Pipelines / Webhooks</a>
+<a class="active" href="sdks-connectors.html">SDK / Connectors</a>
+<a class="" href="pricing-limits.html">计费 / 限制</a>
+<a class="" href="usecases.html">使用场景</a>
+<a class="" href="architecture.html">集成架构</a>
+<a class="" href="evaluation.html">供应商评分</a>
+<a class="" href="sources.html">资料来源</a></nav>
+  </aside>
+  <main class="content">
+
+<section class="hero"><h1>SDK / Connectors</h1><p>Dune 不只提供 HTTP API，也提供 SDK、Trino Connector、dbt Connector，以及面向 BI 工具的连接方式。</p></section>
+<div class="card">
+<h2>SDK</h2>
+<table>
+<tr><th>SDK</th><th>用途</th><th>建议</th></tr>
+<tr><td>Python SDK</td><td>研究脚本、数据分析、Notebook、调度任务。</td><td>适合快速验证和量化研究。</td></tr>
+<tr><td>TypeScript / JavaScript SDK</td><td>Web 后端、Node 服务、Agent 工具。</td><td>适合你现有 Web3 / 全栈项目。</td></tr>
+<tr><td>Go SDK</td><td>后端服务、定时任务、AI Pulse 服务。</td><td>适合你当前 Go 后端方向。</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>Trino Connector</h2>
+<p>适合企业把 Dune 当作远程数据仓库，用 Trino/Presto 生态工具直接连接，例如 DBeaver、Metabase、Hex 或自有 BI 系统。</p>
+<ul>
+<li>DBeaver：数据库客户端式查询。</li>
+<li>Metabase：BI Dashboard。</li>
+<li>Hex：Notebook / 分析工作流。</li>
+<li>Trino SDKs：Java/Python/Go 等生态。</li>
+</ul>
+</div>
+<div class="card">
+<h2>dbt Connector</h2>
+<p>适合把 Dune 数据变成正式的数据工程管道，支持 dbt project、incremental models、CI/CD 和数据转换。</p>
+</div>
+<div class="card">
+<h2>你的项目建议</h2>
+<ul>
+<li>Go 服务：优先 HTTP API / Go SDK。</li>
+<li>Codex：优先 MCP + Skill。</li>
+<li>Web 管理后台：直接调用你的后端，不要前端直连 Dune。</li>
+<li>复杂数据工程：再考虑 dbt / Trino Connector。</li>
+</ul>
+</div>
+
+    <div class="footer">生成时间：2026-05-12｜本包为中文调研草案，建议以 Dune 官方文档作为最终准绳。</div>
+  </main>
+</div>
+</body>
+</html>

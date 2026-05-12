@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dune 使用场景</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Dune 调研包</h1>
+      <p>数据源提供商 / Web3 链上数据 / API / MCP / Skill / Agent 集成</p>
+    </div>
+    <nav class="nav"><a class="" href="index.html">总览</a>
+<a class="" href="api.html">API 能力</a>
+<a class="" href="endpoints.html">端点清单</a>
+<a class="" href="mcp.html">MCP / Agent</a>
+<a class="" href="skills.html">CLI & Skills</a>
+<a class="" href="query-engine.html">DuneSQL</a>
+<a class="" href="data-catalog.html">数据目录</a>
+<a class="" href="uploads.html">上传数据</a>
+<a class="" href="materialized-views.html">Materialized Views</a>
+<a class="" href="pipelines-webhooks.html">Pipelines / Webhooks</a>
+<a class="" href="sdks-connectors.html">SDK / Connectors</a>
+<a class="" href="pricing-limits.html">计费 / 限制</a>
+<a class="active" href="usecases.html">使用场景</a>
+<a class="" href="architecture.html">集成架构</a>
+<a class="" href="evaluation.html">供应商评分</a>
+<a class="" href="sources.html">资料来源</a></nav>
+  </aside>
+  <main class="content">
+
+<section class="hero"><h1>使用场景评估</h1><p>下面按你的 AI Agent / Web3 / Trading Bot / AI Pulse 方向做场景拆解。</p></section>
+<div class="card">
+<h2>场景评分</h2>
+<table>
+<tr><th>场景</th><th>适合度</th><th>说明</th></tr>
+<tr><td>链上研究 Agent</td><td class="status-good">★★★★★</td><td>数据发现 + SQL + 结果解释，非常适合。</td></tr>
+<tr><td>钱包画像</td><td class="status-good">★★★★★</td><td>结合 labels、dex、cex flows、balances、NFT 等数据。</td></tr>
+<tr><td>鲸鱼监控</td><td class="status-good">★★★★☆</td><td>适合小时级/日级监控；不适合毫秒级。</td></tr>
+<tr><td>DeFi 指标</td><td class="status-good">★★★★★</td><td>DEX、lending、bridge、gas、protocol events 数据丰富。</td></tr>
+<tr><td>Trading Signal</td><td class="status-warn">★★★☆☆</td><td>适合作为慢变量/链上因子，不适合作为低延迟执行信号。</td></tr>
+<tr><td>高频交易</td><td class="status-bad">★☆☆☆☆</td><td>Dune 不是交易所级实时行情/盘口源。</td></tr>
+<tr><td>股票数据</td><td class="status-bad">☆☆☆☆☆</td><td>不是股票行情数据源。</td></tr>
+<tr><td>AI Pulse 通知</td><td class="status-good">★★★★☆</td><td>通过 schedule + webhook 推送到本地服务。</td></tr>
+<tr><td>SkillGenome</td><td class="status-good">★★★★★</td><td>Dune Skill/CLI/MCP 可变成标准化 Skill 页面。</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>推荐做的 6 个 Skill</h2>
+<ol>
+<li><b>Wallet Analyzer：</b>输入钱包地址，输出资产、交易行为、标签、风险。</li>
+<li><b>Token Flow Monitor：</b>输入 token，监控 DEX/CEX/Bridge 流向。</li>
+<li><b>Whale Alert：</b>检测大额交易和异常流入流出。</li>
+<li><b>DEX Volume Research：</b>分析链/协议/token 的成交量变化。</li>
+<li><b>Protocol Dashboard Builder：</b>输入协议名称，自动查表、写 SQL、建 Dashboard。</li>
+<li><b>Onchain Daily Report：</b>每天生成链上日报并触发 AI Pulse。</li>
+</ol>
+</div>
+
+    <div class="footer">生成时间：2026-05-12｜本包为中文调研草案，建议以 Dune 官方文档作为最终准绳。</div>
+  </main>
+</div>
+</body>
+</html>

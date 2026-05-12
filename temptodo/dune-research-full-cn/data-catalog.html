@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dune 数据目录</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Dune 调研包</h1>
+      <p>数据源提供商 / Web3 链上数据 / API / MCP / Skill / Agent 集成</p>
+    </div>
+    <nav class="nav"><a class="" href="index.html">总览</a>
+<a class="" href="api.html">API 能力</a>
+<a class="" href="endpoints.html">端点清单</a>
+<a class="" href="mcp.html">MCP / Agent</a>
+<a class="" href="skills.html">CLI & Skills</a>
+<a class="" href="query-engine.html">DuneSQL</a>
+<a class="active" href="data-catalog.html">数据目录</a>
+<a class="" href="uploads.html">上传数据</a>
+<a class="" href="materialized-views.html">Materialized Views</a>
+<a class="" href="pipelines-webhooks.html">Pipelines / Webhooks</a>
+<a class="" href="sdks-connectors.html">SDK / Connectors</a>
+<a class="" href="pricing-limits.html">计费 / 限制</a>
+<a class="" href="usecases.html">使用场景</a>
+<a class="" href="architecture.html">集成架构</a>
+<a class="" href="evaluation.html">供应商评分</a>
+<a class="" href="sources.html">资料来源</a></nav>
+  </aside>
+  <main class="content">
+
+<section class="hero"><h1>数据目录与数据类型</h1><p>Dune 的价值主要来自链上数据目录，包括 raw tables、decoded contract tables、curated datasets、community datasets 和自定义上传数据。</p></section>
+<div class="card">
+<h2>数据层级</h2>
+<table>
+<tr><th>类型</th><th>说明</th><th>适合</th></tr>
+<tr><td>Raw Tables</td><td>最底层的 blocks、transactions、logs、traces 等。</td><td>精细事件分析、合约级分析。</td></tr>
+<tr><td>Decoded Tables</td><td>按 ABI 解码后的合约事件和函数调用。</td><td>协议指标、合约事件追踪。</td></tr>
+<tr><td>Curated Tables</td><td>Dune 维护的高层数据集，例如 DEX、NFT、CEX flows、labels、lending、bridges。</td><td>Agent 和业务系统优先使用。</td></tr>
+<tr><td>Community Datasets</td><td>第三方或社区提供数据，例如 Farcaster、Flashbots、Hyperliquid、Snapshot 等。</td><td>社交、mempool、衍生品、治理。</td></tr>
+<tr><td>Uploaded Tables</td><td>你上传的 CSV/NDJSON 数据。</td><td>内部标签、策略结果、用户数据、人工标注。</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>代表性 curated 数据</h2>
+<table>
+<tr><th>数据集</th><th>用途</th></tr>
+<tr><td><code>dex.trades</code></td><td>跨链 DEX 交易数据，适合成交量、热门 token、交易路径分析。</td></tr>
+<tr><td><code>dex_aggregator.trades</code></td><td>聚合器交易行为。</td></tr>
+<tr><td><code>cex.flows</code></td><td>CEX 资金流入/流出。</td></tr>
+<tr><td><code>labels.addresses</code></td><td>地址标签与实体识别。</td></tr>
+<tr><td><code>bridges_evms.flows</code></td><td>跨链桥流向。</td></tr>
+<tr><td><code>lending.supply / lending.borrow</code></td><td>借贷协议供给、借款数据。</td></tr>
+<tr><td><code>nft.trades</code></td><td>NFT 交易数据。</td></tr>
+<tr><td><code>gas.fees</code></td><td>EVM 链 gas 与费用分析。</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>适合做成 Skill 的数据发现流程</h2>
+<pre>输入：用户想分析某个钱包 / token / 协议
+  ↓
+搜索 datasets
+  ↓
+读取 dataset schema
+  ↓
+选择 curated 优先，否则 decoded，再否则 raw logs
+  ↓
+生成 DuneSQL
+  ↓
+执行小样本 SQL
+  ↓
+确认结果字段
+  ↓
+扩大时间范围或固化为 Query / Materialized View</pre>
+</div>
+
+    <div class="footer">生成时间：2026-05-12｜本包为中文调研草案，建议以 Dune 官方文档作为最终准绳。</div>
+  </main>
+</div>
+</body>
+</html>

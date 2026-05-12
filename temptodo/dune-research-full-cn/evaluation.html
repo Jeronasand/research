@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dune 供应商评分</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Dune 调研包</h1>
+      <p>数据源提供商 / Web3 链上数据 / API / MCP / Skill / Agent 集成</p>
+    </div>
+    <nav class="nav"><a class="" href="index.html">总览</a>
+<a class="" href="api.html">API 能力</a>
+<a class="" href="endpoints.html">端点清单</a>
+<a class="" href="mcp.html">MCP / Agent</a>
+<a class="" href="skills.html">CLI & Skills</a>
+<a class="" href="query-engine.html">DuneSQL</a>
+<a class="" href="data-catalog.html">数据目录</a>
+<a class="" href="uploads.html">上传数据</a>
+<a class="" href="materialized-views.html">Materialized Views</a>
+<a class="" href="pipelines-webhooks.html">Pipelines / Webhooks</a>
+<a class="" href="sdks-connectors.html">SDK / Connectors</a>
+<a class="" href="pricing-limits.html">计费 / 限制</a>
+<a class="" href="usecases.html">使用场景</a>
+<a class="" href="architecture.html">集成架构</a>
+<a class="active" href="evaluation.html">供应商评分</a>
+<a class="" href="sources.html">资料来源</a></nav>
+  </aside>
+  <main class="content">
+
+<section class="hero"><h1>供应商评分</h1><p>按数据源提供商调研模板对 Dune 做初步评分。</p></section>
+<div class="card">
+<table>
+<tr><th>维度</th><th>评分</th><th>说明</th></tr>
+<tr><td>链上数据覆盖</td><td class="status-good">5/5</td><td>覆盖多链、raw/decoded/curated/community 数据。</td></tr>
+<tr><td>传统金融覆盖</td><td class="status-bad">0/5</td><td>不是股票、外汇、宏观数据源。</td></tr>
+<tr><td>API 完整度</td><td class="status-good">5/5</td><td>执行、结果、Query 管理、上传、MV、Pipeline、Usage。</td></tr>
+<tr><td>AI Agent 兼容</td><td class="status-good">5/5</td><td>官方 MCP、CLI、Agent Skills。</td></tr>
+<tr><td>实时性</td><td class="status-warn">2/5</td><td>适合分析和定时监控，不适合 tick/orderbook。</td></tr>
+<tr><td>成本可控性</td><td class="status-warn">3/5</td><td>Credit 模型灵活，但 Agent 必须做限制。</td></tr>
+<tr><td>开发体验</td><td class="status-good">4/5</td><td>文档完整，支持 SDK 和 CLI；需要熟悉 SQL/链上表。</td></tr>
+<tr><td>企业化</td><td class="status-good">4/5</td><td>有 Trino、dbt、Datashare、BI 方向能力。</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>最终结论</h2>
+<ul>
+<li><b>推荐等级：</b><span class="status-good">强烈推荐用于 Web3 链上数据与 AI Agent 数据源。</span></li>
+<li><b>不推荐：</b>作为低延迟交易行情源、股票源、盘口源。</li>
+<li><b>最佳接入方式：</b>MCP 用于探索；API + Materialized Views + Webhook 用于生产。</li>
+<li><b>最佳本地架构：</b>Go 服务代理 Dune API，Codex/AI Pulse 调用本地服务，而不是直接暴露 Dune API Key。</li>
+</ul>
+</div>
+
+    <div class="footer">生成时间：2026-05-12｜本包为中文调研草案，建议以 Dune 官方文档作为最终准绳。</div>
+  </main>
+</div>
+</body>
+</html>

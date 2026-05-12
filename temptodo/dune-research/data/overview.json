@@ -1,0 +1,11 @@
+{
+  "name": "Dune",
+  "type": "Web3 Analytics Platform",
+  "core": [
+    "Onchain Data Warehouse",
+    "DuneSQL",
+    "API Platform",
+    "MCP Support",
+    "AI Agent Integration"
+  ]
+}

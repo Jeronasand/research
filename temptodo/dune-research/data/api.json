@@ -1,0 +1,9 @@
+{
+  "apis": [
+    "Query Execution API",
+    "Query Results API",
+    "Materialized Views API",
+    "Uploads API",
+    "Webhooks"
+  ]
+}

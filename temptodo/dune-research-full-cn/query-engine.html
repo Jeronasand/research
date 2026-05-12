@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>DuneSQL 查询引擎</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Dune 调研包</h1>
+      <p>数据源提供商 / Web3 链上数据 / API / MCP / Skill / Agent 集成</p>
+    </div>
+    <nav class="nav"><a class="" href="index.html">总览</a>
+<a class="" href="api.html">API 能力</a>
+<a class="" href="endpoints.html">端点清单</a>
+<a class="" href="mcp.html">MCP / Agent</a>
+<a class="" href="skills.html">CLI & Skills</a>
+<a class="active" href="query-engine.html">DuneSQL</a>
+<a class="" href="data-catalog.html">数据目录</a>
+<a class="" href="uploads.html">上传数据</a>
+<a class="" href="materialized-views.html">Materialized Views</a>
+<a class="" href="pipelines-webhooks.html">Pipelines / Webhooks</a>
+<a class="" href="sdks-connectors.html">SDK / Connectors</a>
+<a class="" href="pricing-limits.html">计费 / 限制</a>
+<a class="" href="usecases.html">使用场景</a>
+<a class="" href="architecture.html">集成架构</a>
+<a class="" href="evaluation.html">供应商评分</a>
+<a class="" href="sources.html">资料来源</a></nav>
+  </aside>
+  <main class="content">
+
+<section class="hero"><h1>DuneSQL 查询引擎</h1><p>DuneSQL 是 Dune 的核心。它基于 Trino，并针对链上数据做了增强，例如 EVM 大整数、varbinary、链上地址/hash 处理、物化视图和大规模数据扫描。</p></section>
+<div class="grid2">
+<div class="card">
+<h2>关键能力</h2>
+<ul>
+<li><code>uint256</code>：适合 EVM 大整数。</li>
+<li><code>varbinary</code>：适合 address、tx hash、event topic 等二进制链上字段。</li>
+<li>Query Views：复用 SQL 逻辑。</li>
+<li>Materialized Views：把查询结果存成可查询表。</li>
+<li>列式存储 + PB 级查询。</li>
+</ul>
+</div>
+<div class="card">
+<h2>查询引擎大小</h2>
+<table>
+<tr><th>Engine</th><th>特点</th><th>适合</th></tr>
+<tr><td>Small</td><td>默认，共享 community cluster；官方文档提到 2 分钟超时、最多 3 个并发执行。</td><td>小查询、测试、LIMIT 样本。</td></tr>
+<tr><td>Medium</td><td>更长 timeout，无并发限制；按实际计算资源消耗 credits。</td><td>标准生产查询、Dashboard。</td></tr>
+<tr><td>Large</td><td>复杂任务，约为 Medium 的 2x capacity，速度更快但消耗更高。</td><td>大 Join、重型分析、历史回溯。</td></tr>
+</table>
+</div>
+</div>
+<div class="card">
+<h2>Agent 写 SQL 的推荐规则</h2>
+<ul>
+<li>所有查询默认加 <code>LIMIT</code>。</li>
+<li>所有时间序列表默认加 <code>block_time &gt; now() - interval 'N' day</code>。</li>
+<li>优先使用 curated tables，例如 <code>dex.trades</code>、<code>labels.addresses</code>、<code>cex.flows</code>，不要直接扫 raw logs。</li>
+<li>多次复用的查询必须转为 Materialized View。</li>
+<li>跨大表 Join 前先做字段裁剪和时间过滤。</li>
+<li>查询失败时先缩小时间范围，不要直接切 Large。</li>
+</ul>
+</div>
+<div class="card">
+<h2>示例：DEX 交易数据</h2>
+<pre>SELECT
+  blockchain,
+  project,
+  date_trunc('hour', block_time) AS hour,
+  sum(amount_usd) AS volume_usd,
+  count(*) AS trades
+FROM dex.trades
+WHERE block_time > now() - interval '1' day
+GROUP BY 1,2,3
+ORDER BY hour DESC
+LIMIT 100;</pre>
+</div>
+
+    <div class="footer">生成时间：2026-05-12｜本包为中文调研草案，建议以 Dune 官方文档作为最终准绳。</div>
+  </main>
+</div>
+</body>
+</html>
