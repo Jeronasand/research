@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "research-private-index/v1",
+  "generatedAt": "2026-05-12T11:04:30.908Z",
+  "repository": {
+    "visibility": "private",
+    "roots": {
+      "externalInbox": "temptodo/",
+      "researchHtml": "research/*.html",
+      "researchPackages": "research/*/index.html",
+      "pendingResearch": "research/pending/*/",
+      "skillHtml": "skills/*/index.html"
+    },
+    "excludedRoots": [
+      "temptodo/"
+    ]
+  },
+  "dualBucketAccess": {
+    "previewBucket": "research-preview",
+    "previewEndpoint": "oss-cn-shenzhen.aliyuncs.com",
+    "dataBucket": "research-datas",
+    "dataEndpoint": "oss-cn-beijing.aliyuncs.com",
+    "manifestKey": "research-data/manifest.json",
+    "mode": "pure-static-browser-ak-sts",
+    "authPage": "Use the OSS dual-bucket access HTML skill or the web/ authorization screen directly."
+  },
+  "rules": [
+    "Research deliverables are HTML files under research/ or packaged pages under research/<topic>/index.html.",
+    "External Web or HTML files and webpage folders stay in temptodo/ until the user explicitly asks to sync.",
+    "When syncing a webpage folder, preserve the entry HTML and local assets together in the classified target folder.",
+    "Pending research topics live in their own directories under research/pending/.",
+    "Skills may be HTML pages under skills/<skill-id>/index.html.",
+    "The public preview bucket only serves the authorization/app shell.",
+    "Private research and skill HTML are indexed and uploaded to the private data bucket."
+  ],
+  "researchDocuments": [
+    {
+      "id": "financial_crypto_equity_data_sources_supplement_0.2",
+      "title": "金融/Crypto/股票数据源待调研补充 0.2",
+      "kind": "research-document",
+      "type": "research",
+      "format": "html",
+      "language": "zh-CN",
+      "version": "html",
+      "status": "published",
+      "scope": "financial_crypto_equity_data_sources",
+      "lastVerifiedAt": "2026-05-11",
+      "sourcePath": "research/financial_crypto_equity_data_sources_supplement_0.2.html",
+      "objectKey": "research-data/research/financial_crypto_equity_data_sources_supplement_0.2.html"
+    }
+  ],
+  "skillPages": [
+    {
+      "id": "oss-dual-bucket-access",
+      "title": "OSS Dual Bucket Access",
+      "kind": "skill-page",
+      "type": "skill",
+      "format": "html",
+      "language": "zh-CN",
+      "version": "0.8.1",
+      "status": "active",
+      "updatedAt": "2026-05-12T18:11:04+08:00",
+      "sourceRepository": {
+        "provider": "GitHub",
+        "owner": "Jeronasand",
+        "name": "skillgenome-pages",
+        "url": "https://github.com/Jeronasand/skillgenome-pages"
+      },
+      "sourcePath": "skills/oss-dual-bucket-access/index.html",
+      "objectKey": "research-data/skills/oss-dual-bucket-access/index.html"
+    },
+    {
+      "id": "ossutil-command-capabilities",
+      "title": "OSSUTIL Command Capabilities",
+      "kind": "skill-page",
+      "type": "skill",
+      "format": "html",
+      "language": "zh-CN",
+      "version": "0.10.0",
+      "status": "active",
+      "updatedAt": "2026-05-12T11:34:47+08:00",
+      "sourceRepository": {
+        "provider": "GitHub",
+        "owner": "Jeronasand",
+        "name": "skillgenome-pages",
+        "url": "https://github.com/Jeronasand/skillgenome-pages"
+      },
+      "sourcePath": "skills/ossutil-command-capabilities/index.html",
+      "objectKey": "research-data/skills/ossutil-command-capabilities/index.html"
+    },
+    {
+      "id": "research-html-private-index",
+      "title": "Research HTML Private Index",
+      "kind": "skill-page",
+      "type": "skill",
+      "format": "html",
+      "language": "zh-CN",
+      "version": "0.1.3",
+      "status": "active",
+      "updatedAt": "2026-05-12T18:52:00+08:00",
+      "sourceRepository": {
+        "visibility": "private",
+        "path": "/Users/Jeronasand/Project/Jeronasand/research"
+      },
+      "sourcePath": "skills/research-html-private-index/index.html",
+      "objectKey": "research-data/skills/research-html-private-index/index.html"
+    }
+  ],
+  "pendingResearch": []
+}

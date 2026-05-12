@@ -1,82 +1,58 @@
-import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  manifestFromPrivateIndex,
+  PRIVATE_INDEX_PATH,
+  writePrivateIndex,
+} from "../../scripts/private-index.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
-const researchDir = path.join(repoRoot, "research");
 const outputDir = path.join(repoRoot, "web/research-data");
+const copiedPackageDirs = new Set();
 
-const documentSpecs = [
-  { file: "product.md", type: "product", language: "en" },
-  { file: "product.zh-CN.md", type: "product", language: "zh-CN" },
-  { file: "technical.md", type: "technical", language: "en" },
-  { file: "technical.zh-CN.md", type: "technical", language: "zh-CN" },
-];
+async function copyIndexedObject(item) {
+  const source = path.join(repoRoot, item.sourcePath);
+  const target = path.join(outputDir, item.objectKey.replace(/^research-data\/?/, ""));
 
-function extractTitle(markdown, fallback) {
-  const match = markdown.match(/^#\s+(.+)$/m);
-  return match?.[1]?.trim() || fallback;
-}
-
-function extractVersion(markdown) {
-  const english = markdown.match(/^Current version:\s*(.+)$/m);
-  const chinese = markdown.match(/^当前版本:\s*(.+)$/m);
-  return english?.[1]?.trim() || chinese?.[1]?.trim() || "unknown";
-}
-
-async function fileExists(file) {
-  try {
-    await readFile(file);
-    return true;
-  } catch {
-    return false;
+  if (item.sourcePath.endsWith("/index.html")) {
+    const sourceDir = path.dirname(source);
+    const targetDir = path.dirname(target);
+    if (!copiedPackageDirs.has(sourceDir)) {
+      copiedPackageDirs.add(sourceDir);
+      await mkdir(path.dirname(targetDir), { recursive: true });
+      await cp(sourceDir, targetDir, {
+        recursive: true,
+        filter: (file) => path.basename(file) !== ".DS_Store",
+      });
+    }
+    return;
   }
+
+  await mkdir(path.dirname(target), { recursive: true });
+  await cp(source, target);
 }
 
 async function main() {
-  const entries = await readdir(researchDir, { withFileTypes: true });
-  const itemDirs = entries
-    .filter((entry) => entry.isDirectory() && /^\d{4}-/.test(entry.name))
-    .map((entry) => entry.name)
-    .sort();
-  const items = [];
+  const privateIndex = await writePrivateIndex(repoRoot);
+  const manifest = manifestFromPrivateIndex(privateIndex);
+  const items = [...privateIndex.researchDocuments, ...privateIndex.skillPages];
 
   await rm(outputDir, { force: true, recursive: true });
   await mkdir(outputDir, { recursive: true });
 
-  for (const itemDir of itemDirs) {
-    const sourceDir = path.join(researchDir, itemDir);
-    const targetDir = path.join(outputDir, itemDir);
-    await mkdir(targetDir, { recursive: true });
-
-    for (const spec of documentSpecs) {
-      const sourceFile = path.join(sourceDir, spec.file);
-      if (!(await fileExists(sourceFile))) {
-        continue;
-      }
-
-      const markdown = await readFile(sourceFile, "utf8");
-      const key = `research-data/${itemDir}/${spec.file}`;
-      await writeFile(path.join(targetDir, spec.file), markdown);
-      items.push({
-        id: `${itemDir}-${spec.type}-${spec.language}`,
-        title: extractTitle(markdown, `${itemDir} ${spec.type}`),
-        type: spec.type,
-        language: spec.language,
-        version: extractVersion(markdown),
-        key,
-      });
-    }
+  for (const item of items) {
+    await copyIndexedObject(item);
   }
 
-  const manifest = {
-    title: "Research Repository",
-    updated: new Date().toISOString().slice(0, 10),
-    items,
-  };
+  await mkdir(path.join(outputDir, "research"), { recursive: true });
+  await cp(path.join(repoRoot, PRIVATE_INDEX_PATH), path.join(outputDir, "research/private-index.json"));
   await writeFile(path.join(outputDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
-  console.log(`Wrote ${items.length} research documents to ${path.relative(repoRoot, outputDir)}`);
+
+  console.log(
+    `Wrote ${manifest.items.length} private objects and manifest to ${path.relative(repoRoot, outputDir)}`,
+  );
 }
 
 main().catch((error) => {
