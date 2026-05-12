@@ -115,6 +115,16 @@ function uploadData(options) {
     "*/.DS_Store",
     "--exclude",
     ".gitkeep",
+    "--exclude",
+    "*/.gitkeep",
+    "--exclude",
+    "node_modules",
+    "--exclude",
+    "node_modules/*",
+    "--exclude",
+    "*/node_modules",
+    "--exclude",
+    "*/node_modules/*",
     "--force",
   ], options);
 

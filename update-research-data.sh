@@ -9,7 +9,7 @@ Usage:
   ./update-research-data.sh [options]
 
 Updates only the private datas bucket:
-  1. Generate tree.json from research/待调研, research/调研中, research/调研完成
+  1. Generate tree.json from top-level directories under research/
   2. Clean objects in the datas bucket, without deleting the bucket
   3. Upload research/ and tree.json to the datas bucket
   4. Verify tree.json and the first project entry

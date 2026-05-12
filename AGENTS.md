@@ -18,13 +18,15 @@ research/
   待调研/
   调研中/
   调研完成/
+  <extra-section>/
 upload.js
 tree.json
 ```
 
 ## Research Packages
 
-- Use only the three status directories under `research/`: `待调研`, `调研中`, and `调研完成`.
+- Keep `待调研`, `调研中`, and `调研完成` as the fixed priority status directories under `research/`.
+- Additional top-level directories such as `工具` are allowed and are rendered as extra catalog sections after the fixed status directories.
 - A directory with an `index.html` is one previewable Web package.
 - A directory without an `index.html` is a grouping or placeholder directory and may contain package directories below it.
 - Keep each package's assets and nested pages inside that package directory.

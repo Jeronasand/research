@@ -2,7 +2,8 @@ import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-export const categories = ["待调研", "调研中", "调研完成"];
+export const requiredCategories = ["待调研", "调研中", "调研完成"];
+const ignoredDirectoryNames = new Set(["node_modules"]);
 
 const __filename = fileURLToPath(import.meta.url);
 const scriptDir = path.dirname(__filename);
@@ -30,7 +31,7 @@ async function listDirectoryNodes(basePath, relativePath = "") {
   const nodes = [];
 
   for (const entry of entries) {
-    if (!entry.isDirectory() || entry.name.startsWith(".")) {
+    if (!entry.isDirectory() || entry.name.startsWith(".") || ignoredDirectoryNames.has(entry.name)) {
       continue;
     }
 
@@ -61,6 +62,7 @@ export async function buildTree() {
   await assertDirectory(researchDir, "research");
 
   const tree = {};
+  const categories = await listTopLevelCategories();
   for (const category of categories) {
     const categoryPath = path.join(researchDir, category);
     tree[category] = (await exists(categoryPath)) ? await listDirectoryNodes(categoryPath) : [];
@@ -69,10 +71,21 @@ export async function buildTree() {
   return tree;
 }
 
+async function listTopLevelCategories() {
+  const entries = await readdir(researchDir, { withFileTypes: true });
+  const extraCategories = entries
+    .filter((entry) => entry.isDirectory() && !entry.name.startsWith(".") && !ignoredDirectoryNames.has(entry.name))
+    .map((entry) => entry.name)
+    .filter((name) => !requiredCategories.includes(name))
+    .sort((left, right) => left.localeCompare(right, "zh-CN"));
+
+  return [...requiredCategories, ...extraCategories];
+}
+
 async function validateRequiredDirectories() {
   const errors = [];
 
-  for (const category of categories) {
+  for (const category of requiredCategories) {
     const categoryPath = path.join(researchDir, category);
     const info = await stat(categoryPath).catch(() => null);
     if (!info?.isDirectory()) {
@@ -148,20 +161,14 @@ function validateTreeShape(tree) {
     return ["tree.json must be an object"];
   }
 
-  for (const category of categories) {
-    if (!Array.isArray(tree[category])) {
+  for (const [category, nodes] of Object.entries(tree)) {
+    if (!Array.isArray(nodes)) {
       errors.push(`${category}: category must be an array`);
       continue;
     }
 
-    for (const node of tree[category]) {
+    for (const node of nodes) {
       validateNodeShape(node, category, "", errors);
-    }
-  }
-
-  for (const key of Object.keys(tree)) {
-    if (!categories.includes(key)) {
-      errors.push(`${key}: unknown category`);
     }
   }
 

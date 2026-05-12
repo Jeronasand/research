@@ -12,16 +12,18 @@ research/
   待调研/
   调研中/
   调研完成/
+  <extra-section>/
 upload.js
 tree.json
 ```
 
 ## Research Packages
 
-- Only the three status directories under `research/` are canonical:
+- These three status directories under `research/` are fixed priority sections:
   - `research/待调研/`
   - `research/调研中/`
   - `research/调研完成/`
+- Additional top-level directories such as `research/工具/` are valid extra catalog sections.
 - A directory with an `index.html` is one Web static package.
 - A directory without an `index.html` is a grouping or placeholder directory and may contain package directories below it.
 - Package assets and nested pages stay inside the package directory.
@@ -34,9 +36,10 @@ tree.json
 
 ```json
 {
-  "待调研": ["project-a"],
-  "调研中": ["project-b"],
-  "调研完成": ["project-c"]
+  "待调研": [{"type": "package", "name": "project-a", "path": "project-a"}],
+  "调研中": [{"type": "package", "name": "project-b", "path": "project-b"}],
+  "调研完成": [],
+  "工具": [{"type": "package", "name": "tool-a", "path": "tool-a"}]
 }
 ```
 

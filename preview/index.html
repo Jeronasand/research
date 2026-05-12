@@ -184,7 +184,7 @@
     </main>
 
     <script>
-      const categories = ["待调研", "调研中", "调研完成"];
+      const preferredCategories = ["待调研", "调研中", "调研完成"];
       const accessKeyId = sessionStorage.getItem("oss_ak_id");
       const accessKeySecret = sessionStorage.getItem("oss_ak_secret");
       const region = sessionStorage.getItem("oss_region");
@@ -407,6 +407,17 @@ document.addEventListener("click", function(event) {
         panelsDiv.innerHTML = "";
 
         let total = 0;
+        const categories = Object.keys(treeData || {}).sort((left, right) => {
+          const leftIndex = preferredCategories.indexOf(left);
+          const rightIndex = preferredCategories.indexOf(right);
+
+          if (leftIndex !== -1 || rightIndex !== -1) {
+            return (leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex) - (rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex);
+          }
+
+          return left.localeCompare(right, "zh-CN");
+        });
+
         for (const category of categories) {
           const nodes = Array.isArray(treeData[category]) ? treeData[category] : [];
           total += countNodes(nodes);
