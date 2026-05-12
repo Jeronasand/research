@@ -1,4 +1,0 @@
-interface:
-  display_name: "调研仓库规范"
-  short_description: "Bilingual product and technical repo rules"
-  default_prompt: "Use $research-repo-conventions to check bilingual product/technical research structure and commit rules."
