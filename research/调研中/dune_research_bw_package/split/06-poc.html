@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>POC 任务拆分与验收标准｜Dune 调研</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <main class="container topline">
+    <div class="eyebrow">Dune Research / Section 06 / 2026-05-12</div>
+    <div class="layout">
+      <aside>
+        <h3>章节</h3>
+        <ol><li><a href="01-summary.html">执行摘要与最终判断</a><br><span class="small">结论、评分、推荐使用边界、相对原稿的关键优化。</span></li>
+<li><a href="02-product-data.html">产品结构、数据覆盖与数据来源</a><br><span class="small">Dune 产品线、raw/decoded/curated 三层数据、coverage、数据来源推断与质量边界。</span></li>
+<li><a href="03-api-mcp.html">API、MCP 与 Agent 调用规范</a><br><span class="small">REST API、SQL Execute、saved query、execution workflow、MCP、Skills、调用代码样例。</span></li>
+<li><a href="04-integration.html">接入架构与落地方案</a><br><span class="small">面向 AI Pulse / OpenClaw / 本地服务 / Trading Bot 的推荐架构、数据模型与分层。</span></li>
+<li><a href="05-risk-cost.html">风险、成本与控制策略</a><br><span class="small">credits、失败执行、查询复杂度、数据新鲜度、权限、缓存、可观测性。</span></li>
+<li><a href="06-poc.html">POC 任务拆分与验收标准</a><br><span class="small">可直接分配给工程/研究团队的任务列表、SQL 指标、验收项。</span></li>
+<li><a href="07-html-split.html">HTML 拆分方案与编辑说明</a><br><span class="small">黑白线条视觉规范、文件拆分策略、后续细化建议。</span></li></ol>
+      </aside>
+      <article>
+        <nav class="nav"><a href="index.html">目录</a><a href="05-risk-cost.html">← 上一节</a><a href="07-html-split.html">下一节 →</a></nav>
+        <section id="poc">
+  <h2>6. POC 任务拆分与验收标准</h2>
+
+  <h3>6.1 最小 POC 指标清单</h3>
+  <table>
+    <thead><tr><th>#</th><th>指标</th><th>推荐数据源</th><th>验收标准</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>24h DEX volume by chain/project</td><td><code>dex.trades</code></td><td>可返回 Top 20，含 chain、project、volume_usd。</td></tr>
+      <tr><td>2</td><td>Stablecoin net flow by chain</td><td>stablecoin curated datasets</td><td>可按日聚合 inflow/outflow/netflow。</td></tr>
+      <tr><td>3</td><td>CEX inflow/outflow</td><td>CEX flows + labels</td><td>可识别交易所 entity 和 token 流向。</td></tr>
+      <tr><td>4</td><td>Bridge volume</td><td>bridges curated datasets</td><td>可按 source/destination chain 聚合。</td></tr>
+      <tr><td>5</td><td>Wallet balances / activity</td><td>Sim API + balances / activity</td><td>单地址可查余额、交易、活动，延迟满足应用需求。</td></tr>
+      <tr><td>6</td><td>Lending liquidations</td><td>lending curated datasets</td><td>可返回协议、链、金额、时间、清算事件。</td></tr>
+      <tr><td>7</td><td>Prediction market activity</td><td>Polymarket / Kalshi datasets</td><td>可输出 market、volume、positions 或 price 变化。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.2 两周 POC 排期</h3>
+  <table>
+    <thead><tr><th>周期</th><th>任务</th><th>产出</th></tr></thead>
+    <tbody>
+      <tr><td>Day 1-2</td><td>注册 Dune、获取 API Key、确认 plan/credits、跑通 SQL Execute 和 saved query。</td><td>API connectivity report。</td></tr>
+      <tr><td>Day 3-4</td><td>选择 5 个核心指标，确定 Dune tables，写 POC SQL。</td><td>SQL notebook / Dune queries。</td></tr>
+      <tr><td>Day 5</td><td>接入 execution status/result、pagination/filtering。</td><td>后端拉取脚本。</td></tr>
+      <tr><td>Day 6-7</td><td>缓存、成本日志、错误处理。</td><td>query cache + cost log。</td></tr>
+      <tr><td>Day 8-9</td><td>复杂指标改 materialized views 或 scheduled saved query。</td><td>物化/定时刷新策略。</td></tr>
+      <tr><td>Day 10</td><td>接 MCP 到 Codex/Claude/Cursor，用于研究探索。</td><td>Agent 调研工作流。</td></tr>
+      <tr><td>Day 11-12</td><td>测试 Sim API 的 wallet / balances / activity / DeFi positions。</td><td>Sim endpoint 测试表。</td></tr>
+      <tr><td>Day 13-14</td><td>形成生产接入建议：保留/放弃/组合数据源。</td><td>POC conclusion + backlog。</td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.3 验收标准</h3>
+  <ul>
+    <li>每个指标都能追溯到 table、query_id、execution_id、data_window。</li>
+    <li>所有生产候选 query 都有时间过滤、参数 schema、缓存 TTL、owner。</li>
+    <li>API 拉取结果具备 pagination、retry、timeout、error logging。</li>
+    <li>可区分 Dune Data API 与 Sim API 的数据新鲜度和适用场景。</li>
+    <li>能输出至少 3 个可进入产品的事件卡片：DEX volume spike、stablecoin netflow、wallet activity。</li>
+  </ul>
+
+  <h3>6.4 后续 Backlog</h3>
+  <table>
+    <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>P0</td><td>Query Registry</td><td>没有 registry 不建议让 Agent 进生产。</td></tr>
+      <tr><td>P0</td><td>Cost Dashboard</td><td>按 execution_id 汇总成本、失败率、cache hit。</td></tr>
+      <tr><td>P1</td><td>Dune MCP Research Workspace</td><td>给研究员和 Agent 探索，不直接连生产 key。</td></tr>
+      <tr><td>P1</td><td>Materialized View Pipeline</td><td>复杂指标先物化，再由后端读结果。</td></tr>
+      <tr><td>P1</td><td>Sim API Wallet Module</td><td>如果产品需要地址实时画像，单独 POC。</td></tr>
+      <tr><td>P2</td><td>Datashare / Trino / dbt</td><td>数据规模扩大后再评估。</td></tr>
+    </tbody>
+  </table>
+</section>
+        <footer class="footer">Section 06. Generated on 2026-05-12.</footer>
+      </article>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登录 - 调研平台</title>
+    <script src="https://gosspublic.alicdn.com/aliyun-oss-sdk-6.17.1.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f7fa;
+        color: #111827;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", Arial, sans-serif;
+      }
+
+      .box {
+        width: min(380px, calc(100vw - 32px));
+        padding: 32px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 4px;
+        font-size: 22px;
+      }
+
+      p {
+        margin: 0 0 20px;
+        color: #6b7280;
+        font-size: 13px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        margin-top: 12px;
+        color: #374151;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      input {
+        width: 100%;
+        height: 40px;
+        padding: 0 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        outline: none;
+        font: inherit;
+      }
+
+      input:focus {
+        border-color: #1677ff;
+        box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.12);
+      }
+
+      button {
+        width: 100%;
+        height: 42px;
+        margin-top: 18px;
+        border: 0;
+        border-radius: 4px;
+        background: #1677ff;
+        color: #fff;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.65;
+      }
+
+      .error {
+        min-height: 20px;
+        margin-top: 12px;
+        color: #dc2626;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="box">
+      <h1>授权访问 Datas 桶</h1>
+      <p>凭证仅写入当前浏览器 sessionStorage，关闭浏览器后失效。</p>
+      <label>
+        AccessKey ID
+        <input id="akId" autocomplete="off" />
+      </label>
+      <label>
+        AccessKey Secret
+        <input id="akSecret" type="password" autocomplete="new-password" />
+      </label>
+      <label>
+        Region
+        <input id="region" value="oss-cn-shenzhen" />
+      </label>
+      <label>
+        Datas 桶名称
+        <input id="bucket" value="research-pages" />
+      </label>
+      <button id="loginBtn" type="button">登录</button>
+      <div id="error" class="error"></div>
+    </main>
+
+    <script>
+      const loginBtn = document.querySelector("#loginBtn");
+      const errorBox = document.querySelector("#error");
+
+      function valueOf(id) {
+        return document.querySelector(`#${id}`).value.trim();
+      }
+
+      async function login() {
+        const accessKeyId = valueOf("akId");
+        const accessKeySecret = valueOf("akSecret");
+        const region = valueOf("region");
+        const bucket = valueOf("bucket");
+
+        if (!accessKeyId || !accessKeySecret || !region || !bucket) {
+          errorBox.textContent = "请填写完整。";
+          return;
+        }
+
+        loginBtn.disabled = true;
+        errorBox.textContent = "";
+
+        try {
+          const client = new OSS({ region, accessKeyId, accessKeySecret, bucket });
+          await client.get("tree.json");
+          sessionStorage.setItem("oss_ak_id", accessKeyId);
+          sessionStorage.setItem("oss_ak_secret", accessKeySecret);
+          sessionStorage.setItem("oss_region", region);
+          sessionStorage.setItem("oss_bucket", bucket);
+          window.location.href = "index.html";
+        } catch (error) {
+          errorBox.textContent = `验证失败：${error && error.message ? error.message : "无法读取 tree.json"}`;
+        } finally {
+          loginBtn.disabled = false;
+        }
+      }
+
+      loginBtn.addEventListener("click", login);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          login();
+        }
+      });
+    </script>
+  </body>
+</html>

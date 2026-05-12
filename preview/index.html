@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>调研目录</title>
+    <script src="https://gosspublic.alicdn.com/aliyun-oss-sdk-6.17.1.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        background: #f0f2f5;
+        color: #111827;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", Arial, sans-serif;
+      }
+
+      #header {
+        height: 56px;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        background: #001529;
+        color: #fff;
+      }
+
+      #header h1 {
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      button {
+        height: 32px;
+        padding: 0 16px;
+        border: 0;
+        border-radius: 4px;
+        background: #1677ff;
+        color: #fff;
+        cursor: pointer;
+        font: inherit;
+        font-size: 14px;
+      }
+
+      #backBtn {
+        display: none;
+      }
+
+      #logoutBtn {
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      #mainContainer {
+        padding: 28px;
+      }
+
+      .panel {
+        margin-bottom: 36px;
+      }
+
+      .panel h2 {
+        margin-bottom: 16px;
+        padding-left: 12px;
+        border-left: 4px solid #1677ff;
+        font-size: 20px;
+      }
+
+      .card-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        min-height: 84px;
+        padding: 18px 20px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        background: #fff;
+        box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+        cursor: pointer;
+        transition: 0.18s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+      }
+
+      .card .title {
+        word-break: break-word;
+        font-weight: 700;
+      }
+
+      .card .path {
+        margin-top: 8px;
+        word-break: break-all;
+        color: #6b7280;
+        font-size: 12px;
+      }
+
+      .loading,
+      .empty {
+        padding: 40px;
+        color: #6b7280;
+        text-align: center;
+      }
+
+      #viewer {
+        display: none;
+        position: fixed;
+        top: 56px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 56px);
+        border: 0;
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <header id="header">
+      <h1>调研资料库</h1>
+      <div class="actions">
+        <button id="backBtn" type="button">返回列表</button>
+        <button id="logoutBtn" type="button">退出</button>
+      </div>
+    </header>
+
+    <main id="mainContainer">
+      <section id="listArea">
+        <div class="loading" id="loading">加载目录结构中...</div>
+        <div id="panels"></div>
+      </section>
+      <iframe id="viewer" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+    </main>
+
+    <script>
+      const categories = ["待调研", "调研中", "调研完成"];
+      const accessKeyId = sessionStorage.getItem("oss_ak_id");
+      const accessKeySecret = sessionStorage.getItem("oss_ak_secret");
+      const region = sessionStorage.getItem("oss_region");
+      const bucket = sessionStorage.getItem("oss_bucket");
+
+      if (!accessKeyId || !accessKeySecret || !region || !bucket) {
+        window.location.replace("login.html");
+      }
+
+      const ossClient = new OSS({ region, accessKeyId, accessKeySecret, bucket });
+      const panelsDiv = document.querySelector("#panels");
+      const loadingDiv = document.querySelector("#loading");
+      const viewer = document.querySelector("#viewer");
+      const listArea = document.querySelector("#listArea");
+      const backBtn = document.querySelector("#backBtn");
+      const logoutBtn = document.querySelector("#logoutBtn");
+
+      async function contentToText(content) {
+        if (typeof content === "string") return content;
+        if (content instanceof Blob) return content.text();
+        if (content instanceof ArrayBuffer) return new TextDecoder().decode(content);
+        if (ArrayBuffer.isView(content)) return new TextDecoder().decode(content);
+        return String(content || "");
+      }
+
+      function isLocalReference(reference) {
+        const value = reference.trim();
+        return Boolean(value) && !value.startsWith("#") && !value.startsWith("//") && !/^[a-z][a-z0-9+.-]*:/i.test(value);
+      }
+
+      function resolveObjectKey(baseKey, reference) {
+        if (!isLocalReference(reference)) return null;
+
+        const hashIndex = reference.indexOf("#");
+        const queryIndex = reference.indexOf("?");
+        const endIndex = Math.min(...[hashIndex, queryIndex].filter((index) => index !== -1), reference.length);
+        const pathPart = reference.slice(0, endIndex);
+        if (!pathPart) return null;
+
+        const hash = hashIndex === -1 ? "" : reference.slice(hashIndex);
+        const baseDir = baseKey.split("/").slice(0, -1).join("/");
+        const resolved = new URL(pathPart, `https://research.local/${baseDir}/`);
+        return {
+          key: decodeURIComponent(resolved.pathname.replace(/^\/+/, "")),
+          hash,
+        };
+      }
+
+      function signedUrl(key) {
+        return ossClient.signatureUrl(key, { expires: 1800 });
+      }
+
+      window.__researchResolveAndSign = function resolveAndSign(baseKey, reference) {
+        const resolved = resolveObjectKey(baseKey, reference);
+        return resolved ? `${signedUrl(resolved.key)}${resolved.hash}` : reference;
+      };
+
+      function escapeAttribute(value) {
+        return value
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      async function replaceAsync(value, pattern, replacer) {
+        const matches = Array.from(value.matchAll(pattern));
+        const replacements = await Promise.all(matches.map((match) => replacer(...match)));
+        let index = 0;
+        return value.replace(pattern, () => replacements[index++]);
+      }
+
+      function rewriteCss(css, cssKey) {
+        return css.replace(/\burl\(\s*(["']?)([^"')]+)\1\s*\)/gi, (full, quote, reference) => {
+          const resolved = resolveObjectKey(cssKey, reference);
+          return resolved ? `url("${signedUrl(resolved.key)}${resolved.hash}")` : full;
+        });
+      }
+
+      async function inlineLocalStylesheets(html, entryKey) {
+        return replaceAsync(html, /<link\b[^>]*>/gi, async (full) => {
+          if (!/\brel=(["'])?stylesheet\1?/i.test(full)) return full;
+
+          const hrefMatch = full.match(/\bhref=(["'])([^"']+)\1/i);
+          if (!hrefMatch) return full;
+
+          const resolved = resolveObjectKey(entryKey, hrefMatch[2]);
+          if (!resolved) return full;
+
+          try {
+            const response = await ossClient.get(resolved.key);
+            const css = rewriteCss(await contentToText(response.content), resolved.key).replace(/<\/style/gi, "<\\/style");
+            return `<style data-research-css="${escapeAttribute(resolved.key)}">\n${css}\n</style>`;
+          } catch {
+            return full.replace(hrefMatch[0], `href=${hrefMatch[1]}${signedUrl(resolved.key)}${resolved.hash}${hrefMatch[1]}`);
+          }
+        });
+      }
+
+      function rewriteSrcset(value, entryKey) {
+        return value
+          .split(",")
+          .map((item) => {
+            const trimmed = item.trim();
+            if (!trimmed) return item;
+            const parts = trimmed.split(/\s+/);
+            const resolved = resolveObjectKey(entryKey, parts[0]);
+            return resolved ? [signedUrl(resolved.key) + resolved.hash, ...parts.slice(1)].join(" ") : trimmed;
+          })
+          .join(", ");
+      }
+
+      function injectPreviewRuntime(html, entryKey) {
+        const script = `<script>
+(function(baseKey) {
+  function sign(reference) {
+    if (typeof reference !== "string") return reference;
+    try {
+      return parent.__researchResolveAndSign(baseKey, reference);
+    } catch (error) {
+      return reference;
+    }
+  }
+
+  var originalFetch = window.fetch ? window.fetch.bind(window) : null;
+  if (originalFetch) {
+    window.fetch = function(input, init) {
+      if (typeof input === "string") {
+        return originalFetch(sign(input), init);
+      }
+      return originalFetch(input, init);
+    };
+  }
+
+  if (window.XMLHttpRequest) {
+    var originalOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url) {
+      var args = Array.prototype.slice.call(arguments);
+      args[1] = sign(String(url));
+      return originalOpen.apply(this, args);
+    };
+  }
+
+  var originalSetAttribute = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {
+    var key = String(name).toLowerCase();
+    if ((key === "src" || key === "href") && typeof value === "string") {
+      value = sign(value);
+    }
+    return originalSetAttribute.call(this, name, value);
+  };
+
+document.addEventListener("click", function(event) {
+  const link = event.target.closest("a[data-research-key]");
+  if (!link) return;
+  event.preventDefault();
+  parent.postMessage({
+    type: "research-open",
+    key: link.getAttribute("data-research-key"),
+    hash: link.getAttribute("data-research-hash") || ""
+  }, "*");
+});
+})(${JSON.stringify(entryKey)});
+<\/script>`;
+
+        if (/<head\b[^>]*>/i.test(html)) {
+          return html.replace(/<head\b([^>]*)>/i, `<head$1>${script}`);
+        }
+        return `${script}${html}`;
+      }
+
+      async function rewriteHtml(html, entryKey) {
+        const withInlineCss = await inlineLocalStylesheets(html, entryKey);
+
+        const withSignedSrcset = withInlineCss.replace(/\bsrcset=(["'])([^"']+)\1/gi, (full, quote, value) => {
+          return `srcset=${quote}${escapeAttribute(rewriteSrcset(value, entryKey))}${quote}`;
+        });
+
+        const withSignedAttributes = withSignedSrcset.replace(/\b(src|href)=(["'])([^"']+)\2/gi, (full, attribute, quote, reference) => {
+          const resolved = resolveObjectKey(entryKey, reference);
+          if (!resolved) return full;
+
+          if (attribute.toLowerCase() === "href" && /\.html?$/i.test(resolved.key.split("?")[0])) {
+            return `href=${quote}#${quote} data-research-key=${quote}${escapeAttribute(resolved.key)}${quote} data-research-hash=${quote}${escapeAttribute(resolved.hash)}${quote}`;
+          }
+
+          return `${attribute}=${quote}${signedUrl(resolved.key)}${resolved.hash}${quote}`;
+        });
+
+        const withSignedFetch = withSignedAttributes.replace(/\bfetch\(\s*(["'])([^"']+)\1/g, (full, quote, reference) => {
+          const resolved = resolveObjectKey(entryKey, reference);
+          if (!resolved) return full;
+          return `fetch(${JSON.stringify(signedUrl(resolved.key))}`;
+        });
+
+        return injectPreviewRuntime(withSignedFetch, entryKey);
+      }
+
+      async function loadTree() {
+        try {
+          const response = await ossClient.get("tree.json");
+          const treeData = JSON.parse(await contentToText(response.content));
+          renderPanels(treeData);
+        } catch (error) {
+          loadingDiv.textContent = `加载失败：${error && error.message ? error.message : "无法读取 tree.json"}`;
+        }
+      }
+
+      function renderPanels(treeData) {
+        loadingDiv.style.display = "none";
+        panelsDiv.innerHTML = "";
+
+        let total = 0;
+        for (const category of categories) {
+          const projects = Array.isArray(treeData[category]) ? treeData[category] : [];
+          total += projects.length;
+
+          const panel = document.createElement("section");
+          panel.className = "panel";
+          panel.innerHTML = `<h2>${category}</h2><div class="card-list"></div>`;
+          panelsDiv.appendChild(panel);
+
+          const list = panel.querySelector(".card-list");
+          if (!projects.length) {
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            empty.textContent = "暂无项目";
+            list.appendChild(empty);
+            continue;
+          }
+
+          for (const project of projects) {
+            const card = document.createElement("article");
+            card.className = "card";
+            card.innerHTML = `<div class="title">${project}</div><div class="path">research/${category}/${project}/</div>`;
+            card.addEventListener("click", () => openProject(category, project));
+            list.appendChild(card);
+          }
+        }
+
+        if (!total) {
+          panelsDiv.innerHTML = '<div class="empty">tree.json 中没有项目。</div>';
+        }
+      }
+
+      async function openObjectKey(entryKey) {
+        try {
+          const response = await ossClient.get(entryKey);
+          const html = await contentToText(response.content);
+          viewer.srcdoc = await rewriteHtml(html, entryKey);
+          listArea.style.display = "none";
+          viewer.style.display = "block";
+          backBtn.style.display = "inline-block";
+        } catch (error) {
+          alert(`无法打开项目：${error && error.message ? error.message : "未知错误"}`);
+        }
+      }
+
+      async function openProject(category, project) {
+        await openObjectKey(`research/${category}/${project}/index.html`);
+      }
+
+      function backToList() {
+        viewer.srcdoc = "";
+        viewer.style.display = "none";
+        listArea.style.display = "block";
+        backBtn.style.display = "none";
+      }
+
+      function logout() {
+        sessionStorage.clear();
+        window.location.replace("login.html");
+      }
+
+      backBtn.addEventListener("click", backToList);
+      logoutBtn.addEventListener("click", logout);
+      window.addEventListener("message", (event) => {
+        if (event.source === viewer.contentWindow && event.data && event.data.type === "research-open" && event.data.key) {
+          openObjectKey(event.data.key);
+        }
+      });
+      loadTree();
+    </script>
+  </body>
+</html>

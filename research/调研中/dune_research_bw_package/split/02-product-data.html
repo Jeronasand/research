@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>产品结构、数据覆盖与数据来源｜Dune 调研</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <main class="container topline">
+    <div class="eyebrow">Dune Research / Section 02 / 2026-05-12</div>
+    <div class="layout">
+      <aside>
+        <h3>章节</h3>
+        <ol><li><a href="01-summary.html">执行摘要与最终判断</a><br><span class="small">结论、评分、推荐使用边界、相对原稿的关键优化。</span></li>
+<li><a href="02-product-data.html">产品结构、数据覆盖与数据来源</a><br><span class="small">Dune 产品线、raw/decoded/curated 三层数据、coverage、数据来源推断与质量边界。</span></li>
+<li><a href="03-api-mcp.html">API、MCP 与 Agent 调用规范</a><br><span class="small">REST API、SQL Execute、saved query、execution workflow、MCP、Skills、调用代码样例。</span></li>
+<li><a href="04-integration.html">接入架构与落地方案</a><br><span class="small">面向 AI Pulse / OpenClaw / 本地服务 / Trading Bot 的推荐架构、数据模型与分层。</span></li>
+<li><a href="05-risk-cost.html">风险、成本与控制策略</a><br><span class="small">credits、失败执行、查询复杂度、数据新鲜度、权限、缓存、可观测性。</span></li>
+<li><a href="06-poc.html">POC 任务拆分与验收标准</a><br><span class="small">可直接分配给工程/研究团队的任务列表、SQL 指标、验收项。</span></li>
+<li><a href="07-html-split.html">HTML 拆分方案与编辑说明</a><br><span class="small">黑白线条视觉规范、文件拆分策略、后续细化建议。</span></li></ol>
+      </aside>
+      <article>
+        <nav class="nav"><a href="index.html">目录</a><a href="01-summary.html">← 上一节</a><a href="03-api-mcp.html">下一节 →</a></nav>
+        <section id="product-data">
+  <h2>2. 产品结构、数据覆盖与数据来源</h2>
+
+  <h3>2.1 产品结构</h3>
+  <table>
+    <thead><tr><th>产品/能力</th><th>定位</th><th>适合做什么</th><th>不适合做什么</th></tr></thead>
+    <tbody>
+      <tr><td>Data Hub</td><td>SQL 查询 + 可视化 + Dashboard</td><td>交互式链上分析、团队研究、公开 Dashboard</td><td>毫秒级交易行情、外部新闻/股票数据</td></tr>
+      <tr><td>Data API</td><td>程序化执行 query、获取结果、管理数据</td><td>自动化报告、后端拉取指标、定时任务、Agent 工具调用</td><td>未缓存的高频自由 SQL</td></tr>
+      <tr><td>Datashare</td><td>把 Dune 数据流入 Snowflake / BigQuery / Databricks 等</td><td>企业级数据仓库集成、稳定数据管道</td><td>小团队快速试错阶段的第一优先</td></tr>
+      <tr><td>DuneSQL</td><td>基于 Trino 的链上 SQL 引擎</td><td>跨链查询、varbinary / uint256 / int256、materialized views</td><td>没有 SQL 能力的完全无代码场景，除非配合 MCP/Agent</td></tr>
+      <tr><td>MCP</td><td>AI Agent 远程工具入口</td><td>表发现、SQL 生成、执行、结果读取、可视化、Dashboard 管理</td><td>无人监管的高成本生产执行</td></tr>
+      <tr><td>Sim API</td><td>面向应用的实时链上 API</td><td>钱包、portfolio、balances、transactions、NFTs、DeFi positions、activity</td><td>CEX orderbook、股票/新闻、传统宏观数据</td></tr>
+      <tr><td>Catalyst</td><td>链/协议接入 Dune 的集成工具包</td><td>链、协议、生态方让数据进入 Dune</td><td>普通用户直接查询数据的主入口</td></tr>
+      <tr><td>Agent Skills</td><td>面向 Claude/Cursor/Codex/OpenCode 等的技能包</td><td>让 Agent 学会 Dune CLI / Sim API 的上下文、参数与调用约束</td><td>替代生产后端权限控制</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 数据组织方式</h3>
+  <div class="flow">
+    <div class="flowgrid">
+      <div class="box"><strong>Raw</strong><br>Block、transaction、log、trace 等节点索引数据。适合自定义分析和深度链上取数。</div>
+      <div class="arrow">→</div>
+      <div class="box"><strong>Decoded</strong><br>基于 ABI / IDL 解析的合约事件与函数调用。适合协议行为与事件分析。</div>
+      <div class="arrow">→</div>
+      <div class="box"><strong>Curated</strong><br>Dune 维护的标准化跨链数据集。适合生产报表、跨链指标、快速 POC。</div>
+    </div>
+  </div>
+
+  <h3>2.3 主要数据集与使用价值</h3>
+  <table>
+    <thead><tr><th>数据域</th><th>代表数据</th><th>对项目价值</th><th>建议优先级</th></tr></thead>
+    <tbody>
+      <tr><td>DEX / Trading</td><td>dex.trades、交易量、项目、token pair、amount_usd</td><td>市场活跃度、协议份额、交易路径、异常交易</td><td>高</td></tr>
+      <tr><td>Token / Prices</td><td>token transfers、minute/hour/day prices、metadata</td><td>资金流、资产估值、钱包持仓、token universe</td><td>高</td></tr>
+      <tr><td>NFT</td><td>NFT trades、mints、metadata</td><td>NFT 市场、收藏品热度、钱包行为</td><td>中</td></tr>
+      <tr><td>Stablecoin</td><td>stablecoin transfers、balances、activity classification</td><td>流动性、链间迁移、资金避险/入场信号</td><td>高</td></tr>
+      <tr><td>Bridge / CEX Flows</td><td>跨链转账、CEX 流入流出、entity labels</td><td>资金迁移、链上风险监控、交易所资金变化</td><td>高</td></tr>
+      <tr><td>Lending / DeFi</td><td>supply、borrow、flash loans、liquidations</td><td>协议风险、清算压力、资金成本</td><td>高</td></tr>
+      <tr><td>Prediction Markets</td><td>Polymarket / Kalshi activity、positions、pricing</td><td>事件交易、预测市场研究、叙事追踪</td><td>中高</td></tr>
+      <tr><td>Labels / Identity</td><td>地址标签、entity、协议/交易所标识</td><td>钱包归因、AML、资金流解释</td><td>高</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.4 数据来源与证据强度</h3>
+  <table>
+    <thead><tr><th>来源类型</th><th>说明</th><th>证据强度</th><th>接入含义</th></tr></thead>
+    <tbody>
+      <tr><td>链上节点 / indexer</td><td>raw blocks、transactions、logs、traces 来自链上索引。</td><td>强</td><td>适合高可信链上事实，但需要处理链重组、链延迟、字段差异。</td></tr>
+      <tr><td>ABI / IDL / 合约解码</td><td>decoded events/calls 基于 verified ABI / IDL 与 Dune 解码管线。</td><td>强</td><td>比 raw logs 更易用，但合约覆盖和 ABI 完整性会影响解析质量。</td></tr>
+      <tr><td>Dune curated datasets</td><td>Dune 团队清洗、标准化、维护的跨链数据集。</td><td>强</td><td>生产查询优先使用，减少重复清洗和扫描成本。</td></tr>
+      <tr><td>Partner / community data</td><td>Flashbots、Farcaster、Lens、Reservoir、Snapshot 等 partner/community 数据。</td><td>中高</td><td>适合扩展分析，但要保留来源标记。</td></tr>
+      <tr><td>外部市场数据 + 链上交易</td><td>价格系统结合外部市场数据与链上交易活动。</td><td>中高</td><td>适合估值和报表；交易执行仍应使用专业行情源。</td></tr>
+      <tr><td>非 Dune 数据源</td><td>新闻、Twitter/X、股票、宏观、CEX tick/orderbook。</td><td>不属于 Dune 主覆盖</td><td>需要组合其他 provider。</td></tr>
+    </tbody>
+  </table>
+</section>
+        <footer class="footer">Section 02. Generated on 2026-05-12.</footer>
+      </article>
+    </div>
+  </main>
+</body>
+</html>

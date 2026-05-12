@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dune 调研｜可拆分 HTML 入口</title>
+  <link rel="stylesheet" href="split/assets/style.css" />
+</head>
+<body>
+  <main class="container topline">
+    <header class="header">
+      <div>
+        <div class="eyebrow">Split HTML Index / 2026-05-12</div>
+        <h1>Dune 调研 HTML 拆分入口</h1>
+        <p class="muted">每个章节都是可单独打开与细化的 HTML；统一使用 assets/style.css 的黑白线条风格。</p>
+      </div>
+      <div class="card"><h3>结构</h3><p>1 个入口页 + 7 个章节页 + 1 个共享 CSS。</p></div>
+    </header>
+    <section class="grid"><div class="card"><h3><a href="split/01-summary.html">01. 执行摘要与最终判断</a></h3><p class="muted">结论、评分、推荐使用边界、相对原稿的关键优化。</p></div>
+<div class="card"><h3><a href="split/02-product-data.html">02. 产品结构、数据覆盖与数据来源</a></h3><p class="muted">Dune 产品线、raw/decoded/curated 三层数据、coverage、数据来源推断与质量边界。</p></div>
+<div class="card"><h3><a href="split/03-api-mcp.html">03. API、MCP 与 Agent 调用规范</a></h3><p class="muted">REST API、SQL Execute、saved query、execution workflow、MCP、Skills、调用代码样例。</p></div>
+<div class="card"><h3><a href="split/04-integration.html">04. 接入架构与落地方案</a></h3><p class="muted">面向 AI Pulse / OpenClaw / 本地服务 / Trading Bot 的推荐架构、数据模型与分层。</p></div>
+<div class="card"><h3><a href="split/05-risk-cost.html">05. 风险、成本与控制策略</a></h3><p class="muted">credits、失败执行、查询复杂度、数据新鲜度、权限、缓存、可观测性。</p></div>
+<div class="card"><h3><a href="split/06-poc.html">06. POC 任务拆分与验收标准</a></h3><p class="muted">可直接分配给工程/研究团队的任务列表、SQL 指标、验收项。</p></div>
+<div class="card"><h3><a href="split/07-html-split.html">07. HTML 拆分方案与编辑说明</a></h3><p class="muted">黑白线条视觉规范、文件拆分策略、后续细化建议。</p></div></section>
+    <section>
+      <h2>信息来源</h2>
+      <table><thead><tr><th>来源</th><th>URL</th><th>用途</th></tr></thead><tbody><tr><td>Dune Data Catalog</td><td><a href="https://docs.dune.com/data-catalog/overview">https://docs.dune.com/data-catalog/overview</a></td><td>官方说明 raw / decoded / curated 三层数据、100+ blockchains、主要 curated datasets 与覆盖范围。</td></tr>
+<tr><td>Dune API Overview</td><td><a href="https://docs.dune.com/api-reference/overview/introduction">https://docs.dune.com/api-reference/overview/introduction</a></td><td>官方 API 概览：saved query 执行、结果获取、Data API、Trino/BI、Sim、dbt 等入口。</td></tr>
+<tr><td>Dune Execute SQL API</td><td><a href="https://docs.dune.com/api-reference/executions/endpoint/execute-sql">https://docs.dune.com/api-reference/executions/endpoint/execute-sql</a></td><td>任意 SQL 执行端点、Header、performance tier、usage-based credits。</td></tr>
+<tr><td>Dune Execution Object / Results</td><td><a href="https://docs.dune.com/api-reference/executions/execution-object">https://docs.dune.com/api-reference/executions/execution-object</a></td><td>执行 query、获取 latest result、execution_id、status/result 工作流。</td></tr>
+<tr><td>Dune Execution Result</td><td><a href="https://docs.dune.com/api-reference/executions/endpoint/get-execution-result">https://docs.dune.com/api-reference/executions/endpoint/get-execution-result</a></td><td>execution result JSON、90 天结果保存、32GB 查询结果上限、分页/过滤。</td></tr>
+<tr><td>Dune Result Filtering</td><td><a href="https://docs.dune.com/api-reference/executions/filtering">https://docs.dune.com/api-reference/executions/filtering</a></td><td>结果端点支持服务端 filtering、pagination、sorting，减少带宽与成本。</td></tr>
+<tr><td>Dune MCP Docs</td><td><a href="https://docs.dune.com/api-reference/agents/mcp">https://docs.dune.com/api-reference/agents/mcp</a></td><td>官方 Remote MCP：OAuth / API Key 鉴权、Codex / Claude / Cursor 等客户端配置。</td></tr>
+<tr><td>Dune MCP Blog</td><td><a href="https://dune.com/blog/dune-mcp">https://dune.com/blog/dune-mcp</a></td><td>MCP 上线说明：100+ chains、12 tools、Agent 从自然语言到 SQL / result / visualization。</td></tr>
+<tr><td>Dune Billing</td><td><a href="https://docs.dune.com/api-reference/overview/billing">https://docs.dune.com/api-reference/overview/billing</a></td><td>API billing：failed executions charged、compute credits、export/write/storage/webhooks。</td></tr>
+<tr><td>Dune Query Engine</td><td><a href="https://docs.dune.com/query-engine/overview">https://docs.dune.com/query-engine/overview</a></td><td>DuneSQL：Trino fork、varbinary、uint256/int256、columnar、query views、materialized views。</td></tr>
+<tr><td>Dune Materialized Views</td><td><a href="https://docs.dune.com/api-reference/materialized-views/overview">https://docs.dune.com/api-reference/materialized-views/overview</a></td><td>Materialized Views API、命名规范、refresh、performance tiers、cron schedule。</td></tr>
+<tr><td>Dune Sim API</td><td><a href="https://sim.dune.com/api">https://sim.dune.com/api</a></td><td>Sim：60+ chains、real-time synchronous access、balances、DeFi positions、NFTs、transactions、activity 等。</td></tr>
+<tr><td>Dune Prices Overview</td><td><a href="https://docs.dune.com/data-catalog/curated/prices/overview">https://docs.dune.com/data-catalog/curated/prices/overview</a></td><td>价格系统：跨 70+ chains 的 token prices，结合外部市场数据与链上交易活动。</td></tr>
+<tr><td>Dune Agent Skills GitHub</td><td><a href="https://github.com/duneanalytics/skills">https://github.com/duneanalytics/skills</a></td><td>Agent skills：dune skill 用于查询/表发现/usage；sim skill 用于实时 wallet/token lookup。</td></tr></tbody></table>
+    </section>
+    <footer class="footer">Generated on 2026-05-12. Split HTML package.</footer>
+  </main>
+</body>
+</html>

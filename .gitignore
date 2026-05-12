@@ -8,10 +8,3 @@ dist/
 !.env.*.example
 !**/.env.example
 !**/.env.*.example
-web/node_modules/
-web/dist/
-web/research-data/
-web/.env
-web/.env.*
-!web/.env.example
-!web/.env.*.example

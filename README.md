@@ -1,78 +1,77 @@
 # Research
 
-This private repository stores research Web packages, pending research task cards, HTML skills, and a generated private index for OSS dual-bucket preview.
+私有调研资料库，按三种状态保存已整理好的 Web 静态包，并通过 OSS 双桶预览。
 
-## Layout
+## 目录
 
-- `temptodo/`: temporary inbox for external Web/HTML files or complete webpage folders before explicit sync
-- `research/pending/tasks.json`: manually maintained pending research cards
-- `research/pending/tasks.schema.json`: pending task field contract
-- `research/pending/<topic>/index.html`: optional pending Web package preview entry
-- `research/pending/<topic>/`: optional pending source files or working notes referenced by `tasks.json`
-- `research/in-progress/<topic>/index.html`: active research Web packages
-- `research/completed/<topic>/index.html`: completed research Web packages
-- `research/private-index.json`: generated private repository index
-- `skills/<skill-id>/index.html`: HTML skill pages
-- `web/`: static preview app that reads private data through signed OSS requests
-- `scripts/private-index.mjs`: index generator
-- `scripts/package-oss.mjs`: builds separate auth/content OSS payloads
-- `scripts/upload-oss.mjs`: uploads the separate payloads with `ossutil`
-- `docs/oss-deployment.md`: OSS packaging, upload, and verification runbook
-
-## Workflow
-
-```bash
-npm run update:data
+```text
+preview/
+  login.html
+  index.html
+research/
+  待调研/
+    <项目名>/index.html
+  调研中/
+    <项目名>/index.html
+  调研完成/
+    <项目名>/index.html
+upload.js
+tree.json
 ```
 
-For local preview:
+每个项目目录都是一个完整静态站点，入口文件固定为 `index.html`。项目内可以继续包含子目录，例如 `split/index.html`、`assets/`、`data/`；包内相对 HTML 链接、CSS、图片、字体和 `fetch/XHR` 数据会在预览页内重新签名加载。
+
+## 一键部署
 
 ```bash
-cd web
-npm run dev
+npm run deploy
 ```
 
-`temptodo/` is not scanned by this workflow. It is processed only after an explicit sync request, then files or webpage folders are classified into pending tasks, previewable pending packages, `research/in-progress/`, `research/completed/`, or `skills/`. When an inbox folder has CSS, JS, images, or data files, keep those assets with the target package.
+这条命令会：
 
-## Access Model
+1. 根据 `research/待调研`、`research/调研中`、`research/调研完成` 生成 `tree.json`。
+2. 清空 datas 私有桶中的对象，但不删除桶。
+3. 上传 `research/` 和 `tree.json` 到 datas 桶。
+4. 上传 `preview/login.html` 和 `preview/index.html` 到 preview 桶，并清理 preview 桶旧对象。
+5. 验证 `tree.json`、首个项目入口、`login.html` 和 `index.html`。
 
-The preview uses a dual-bucket model:
-
-- `research-preview`: public authorization bucket for app shell only
-- `research-pages`: private content bucket for `research-data/manifest.json`, pending task JSON, pending preview packages, research package payloads, and `research/private-index.json`
-
-There is no backend. The browser signs OSS `GET` requests using user-provided AK/SK or STS credentials.
-
-## OSS Upload
-
-When only research data changed, update the private content bucket directly:
+预览执行范围：
 
 ```bash
-npm run update:data
+npm run deploy:dry-run
 ```
 
-Use `npm run update:data:dry-run` to preview the private data upload, or `npm run data:package` to refresh only local `web/research-data/` and `dist/oss/content-bucket/research-data/` without uploading.
+只生成本地 `tree.json`：
 
 ```bash
-npm run package:oss
-npm run upload:oss:dry-run
-npm run upload:oss
+npm run tree
 ```
 
-Target only one bucket when needed:
+## 默认 OSS 配置
+
+- preview 桶：`research-preview`
+- datas 桶：`research-pages`
+- endpoint：`oss-cn-shenzhen.aliyuncs.com`
+- region：`cn-shenzhen`
+
+可用环境变量覆盖：
 
 ```bash
-npm run upload:oss -- --target auth
-npm run upload:oss -- --target content
+PREVIEW_BUCKET=research-preview \
+DATAS_BUCKET=research-pages \
+OSS_ENDPOINT=oss-cn-shenzhen.aliyuncs.com \
+OSS_REGION=cn-shenzhen \
+npm run deploy
 ```
 
-The upload script uses:
+## 前端访问
 
-- `dist/oss/auth-bucket/` -> `oss://research-preview/`
-- `dist/oss/content-bucket/research-data/` -> `oss://research-pages/research-data/`
+1. 打开 preview 桶静态页面。
+2. 在 `login.html` 输入可读取 datas 桶的 AK/SK、region 和 bucket。
+3. 登录页验证能读取 `tree.json` 后进入 `index.html`。
+4. 主页读取 datas 桶的 `tree.json`，按三大板块渲染项目卡片。
+5. 点击项目后全屏 iframe 预览对应 `research/<状态>/<项目>/index.html`，包内子目录页面通过相对链接继续预览。
 
-Use `npm run verify:oss` after upload. Remote deletion is off by default; use `--delete --yes` only after a dry-run and an explicit cleanup decision.
+## 安全边界
 
-## Rules
-
-Read `AGENTS.md` and `CONVENTIONS.md` before changing structure, skills, sync logic, or commit scope.
+当前方案是纯前端 AK/SK 访问，只适合内部或个人验证环境。生产环境应改为后端签名代理或 STS 临时授权。
