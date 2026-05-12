@@ -1,13 +1,13 @@
 {
-  "schemaVersion": "research-private-index/v1",
-  "generatedAt": "2026-05-12T16:04:42.480Z",
+  "schemaVersion": "research-private-index/v2",
+  "generatedAt": "2026-05-12T18:45:47.568Z",
   "repository": {
     "visibility": "private",
     "roots": {
       "externalInbox": "temptodo/",
-      "researchHtml": "research/*.html",
-      "researchPackages": "research/*/index.html",
-      "pendingResearch": "research/pending/*/",
+      "pendingTasks": "research/pending/tasks.json",
+      "inProgressResearch": "research/in-progress/*/index.html",
+      "completedResearch": "research/completed/*/index.html",
       "skillHtml": "skills/*/index.html"
     },
     "excludedRoots": [
@@ -21,18 +21,264 @@
     "dataEndpoint": "oss-cn-shenzhen.aliyuncs.com",
     "manifestKey": "research-data/manifest.json",
     "mode": "pure-static-browser-ak-sts",
-    "authPage": "Use the OSS dual-bucket access HTML skill or the web/ authorization screen directly."
+    "authPage": "Use the web authorization screen directly."
   },
   "rules": [
-    "Research deliverables are HTML files under research/ or packaged pages under research/<topic>/index.html.",
-    "External Web or HTML files and webpage folders stay in temptodo/ until the user explicitly asks to sync.",
-    "When syncing a webpage folder, preserve the entry HTML and local assets together in the classified target folder.",
-    "Pending research topics live in their own directories under research/pending/.",
-    "Skills may be HTML pages under skills/<skill-id>/index.html.",
+    "The preview catalog has three top-level sections: pending, in-progress, and completed.",
+    "Pending research tasks are hand-maintained in research/pending/tasks.json.",
+    "In-progress and completed research entries are direct child directories with an index.html entrypoint.",
+    "Each research package keeps its local assets beside its index.html.",
     "The public preview bucket only serves the authorization/app shell.",
-    "Private research and skill HTML are indexed and uploaded to the private data bucket."
+    "The private content bucket stores the generated manifest and research package payloads."
   ],
-  "researchDocuments": [],
+  "sections": [
+    {
+      "id": "pending",
+      "title": "待调研",
+      "description": "手动维护 tasks.json，用来沉淀待启动的调研任务。",
+      "count": 1,
+      "items": [
+        {
+          "id": "financial-crypto-equity-data-sources",
+          "title": "金融 / Crypto / 股票数据源待调研清单",
+          "kind": "pending-task",
+          "sectionId": "pending",
+          "sectionTitle": "待调研",
+          "status": "pending",
+          "priority": "P1",
+          "summary": "围绕金融行情、股票、Crypto/Web3、新闻舆情、AI Search 与 Tick 数据源建立后续调研清单。",
+          "request": "拆解各数据源的商用授权、价格、调用限制、API 成熟度、再分发边界和生产可用性。",
+          "expectedOutput": "产品调研 HTML + 技术调研 HTML",
+          "targetPath": "research/in-progress/financial-crypto-equity-data-sources/",
+          "owner": "",
+          "createdAt": "2026-05-12",
+          "updatedAt": "2026-05-13",
+          "tags": [
+            "market-data",
+            "crypto",
+            "equity",
+            "api"
+          ],
+          "inputs": [
+            {
+              "type": "local",
+              "label": "交互式待调研清单",
+              "path": "research/pending/financial-crypto-equity-data-sources/index.html"
+            },
+            {
+              "type": "local",
+              "label": "数据源结构化清单",
+              "path": "research/pending/financial-crypto-equity-data-sources/data-sources.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "in-progress",
+      "title": "调研中",
+      "description": "每个子目录是一个正在产出的静态 Web 调研包。",
+      "count": 0,
+      "items": []
+    },
+    {
+      "id": "completed",
+      "title": "已完结调研",
+      "description": "每个子目录是一个已完成并可预览的静态 Web 调研包。",
+      "count": 3,
+      "items": [
+        {
+          "id": "asksurf-ai-data-api-research",
+          "title": "AskSurf.ai 数据源与 API 调研报告",
+          "kind": "research-package",
+          "sectionId": "completed",
+          "sectionTitle": "已完结调研",
+          "status": "completed",
+          "priority": "",
+          "summary": "围绕 AskSurf.ai 的信息源、API 能力、数据来源映射、使用规范和实际调用方式整理的调研报告。",
+          "owner": "",
+          "createdAt": "",
+          "updatedAt": "2026-05-13",
+          "tags": [
+            "AskSurf",
+            "API",
+            "crypto-intelligence"
+          ],
+          "language": "zh-CN",
+          "version": "html",
+          "format": "html",
+          "packagePath": "research/completed/asksurf-ai-data-api-research",
+          "sourcePath": "research/completed/asksurf-ai-data-api-research/index.html",
+          "entryKey": "research-data/research/completed/asksurf-ai-data-api-research/index.html",
+          "objectPrefix": "research-data/research/completed/asksurf-ai-data-api-research"
+        },
+        {
+          "id": "asksurf-ai-deep-research",
+          "title": "AskSurf.ai 深度调研报告",
+          "kind": "research-package",
+          "sectionId": "completed",
+          "sectionTitle": "已完结调研",
+          "status": "completed",
+          "priority": "",
+          "summary": "围绕 AskSurf.ai 产品定位、公开信息面、API、数据来源和风险边界整理的深度调研报告。",
+          "owner": "",
+          "createdAt": "",
+          "updatedAt": "2026-05-13",
+          "tags": [
+            "AskSurf",
+            "product-research",
+            "technical-research"
+          ],
+          "language": "zh-CN",
+          "version": "html",
+          "format": "html",
+          "packagePath": "research/completed/asksurf-ai-deep-research",
+          "sourcePath": "research/completed/asksurf-ai-deep-research/index.html",
+          "entryKey": "research-data/research/completed/asksurf-ai-deep-research/index.html",
+          "objectPrefix": "research-data/research/completed/asksurf-ai-deep-research"
+        },
+        {
+          "id": "dune-research-full-cn",
+          "title": "Dune.com 深度研究报告",
+          "kind": "research-package",
+          "sectionId": "completed",
+          "sectionTitle": "已完结调研",
+          "status": "completed",
+          "priority": "",
+          "summary": "覆盖 Dune 产品战略、API、DuneSQL、数据目录、定价限制、MCP/CLI/Skills 和供应商评分的完整中文研究包。",
+          "owner": "",
+          "createdAt": "",
+          "updatedAt": "2026-05-12",
+          "tags": [
+            "Dune",
+            "onchain-data",
+            "data-platform"
+          ],
+          "language": "zh-CN",
+          "version": "2026-05-12",
+          "format": "html",
+          "packagePath": "research/completed/dune-research-full-cn",
+          "sourcePath": "research/completed/dune-research-full-cn/index.html",
+          "entryKey": "research-data/research/completed/dune-research-full-cn/index.html",
+          "objectPrefix": "research-data/research/completed/dune-research-full-cn"
+        }
+      ]
+    }
+  ],
+  "pendingTasks": [
+    {
+      "id": "financial-crypto-equity-data-sources",
+      "title": "金融 / Crypto / 股票数据源待调研清单",
+      "kind": "pending-task",
+      "sectionId": "pending",
+      "sectionTitle": "待调研",
+      "status": "pending",
+      "priority": "P1",
+      "summary": "围绕金融行情、股票、Crypto/Web3、新闻舆情、AI Search 与 Tick 数据源建立后续调研清单。",
+      "request": "拆解各数据源的商用授权、价格、调用限制、API 成熟度、再分发边界和生产可用性。",
+      "expectedOutput": "产品调研 HTML + 技术调研 HTML",
+      "targetPath": "research/in-progress/financial-crypto-equity-data-sources/",
+      "owner": "",
+      "createdAt": "2026-05-12",
+      "updatedAt": "2026-05-13",
+      "tags": [
+        "market-data",
+        "crypto",
+        "equity",
+        "api"
+      ],
+      "inputs": [
+        {
+          "type": "local",
+          "label": "交互式待调研清单",
+          "path": "research/pending/financial-crypto-equity-data-sources/index.html"
+        },
+        {
+          "type": "local",
+          "label": "数据源结构化清单",
+          "path": "research/pending/financial-crypto-equity-data-sources/data-sources.json"
+        }
+      ]
+    }
+  ],
+  "inProgressResearch": [],
+  "completedResearch": [
+    {
+      "id": "asksurf-ai-data-api-research",
+      "title": "AskSurf.ai 数据源与 API 调研报告",
+      "kind": "research-package",
+      "sectionId": "completed",
+      "sectionTitle": "已完结调研",
+      "status": "completed",
+      "priority": "",
+      "summary": "围绕 AskSurf.ai 的信息源、API 能力、数据来源映射、使用规范和实际调用方式整理的调研报告。",
+      "owner": "",
+      "createdAt": "",
+      "updatedAt": "2026-05-13",
+      "tags": [
+        "AskSurf",
+        "API",
+        "crypto-intelligence"
+      ],
+      "language": "zh-CN",
+      "version": "html",
+      "format": "html",
+      "packagePath": "research/completed/asksurf-ai-data-api-research",
+      "sourcePath": "research/completed/asksurf-ai-data-api-research/index.html",
+      "entryKey": "research-data/research/completed/asksurf-ai-data-api-research/index.html",
+      "objectPrefix": "research-data/research/completed/asksurf-ai-data-api-research"
+    },
+    {
+      "id": "asksurf-ai-deep-research",
+      "title": "AskSurf.ai 深度调研报告",
+      "kind": "research-package",
+      "sectionId": "completed",
+      "sectionTitle": "已完结调研",
+      "status": "completed",
+      "priority": "",
+      "summary": "围绕 AskSurf.ai 产品定位、公开信息面、API、数据来源和风险边界整理的深度调研报告。",
+      "owner": "",
+      "createdAt": "",
+      "updatedAt": "2026-05-13",
+      "tags": [
+        "AskSurf",
+        "product-research",
+        "technical-research"
+      ],
+      "language": "zh-CN",
+      "version": "html",
+      "format": "html",
+      "packagePath": "research/completed/asksurf-ai-deep-research",
+      "sourcePath": "research/completed/asksurf-ai-deep-research/index.html",
+      "entryKey": "research-data/research/completed/asksurf-ai-deep-research/index.html",
+      "objectPrefix": "research-data/research/completed/asksurf-ai-deep-research"
+    },
+    {
+      "id": "dune-research-full-cn",
+      "title": "Dune.com 深度研究报告",
+      "kind": "research-package",
+      "sectionId": "completed",
+      "sectionTitle": "已完结调研",
+      "status": "completed",
+      "priority": "",
+      "summary": "覆盖 Dune 产品战略、API、DuneSQL、数据目录、定价限制、MCP/CLI/Skills 和供应商评分的完整中文研究包。",
+      "owner": "",
+      "createdAt": "",
+      "updatedAt": "2026-05-12",
+      "tags": [
+        "Dune",
+        "onchain-data",
+        "data-platform"
+      ],
+      "language": "zh-CN",
+      "version": "2026-05-12",
+      "format": "html",
+      "packagePath": "research/completed/dune-research-full-cn",
+      "sourcePath": "research/completed/dune-research-full-cn/index.html",
+      "entryKey": "research-data/research/completed/dune-research-full-cn/index.html",
+      "objectPrefix": "research-data/research/completed/dune-research-full-cn"
+    }
+  ],
   "skillPages": [
     {
       "id": "oss-dual-bucket-access",
@@ -41,9 +287,9 @@
       "type": "skill",
       "format": "html",
       "language": "zh-CN",
-      "version": "0.8.1",
+      "version": "0.8.2",
       "status": "active",
-      "updatedAt": "2026-05-12T18:11:04+08:00",
+      "updatedAt": "2026-05-13T00:00:00+08:00",
       "sourceRepository": {
         "provider": "GitHub",
         "owner": "Jeronasand",
@@ -79,24 +325,15 @@
       "type": "skill",
       "format": "html",
       "language": "zh-CN",
-      "version": "0.1.3",
+      "version": "0.2.0",
       "status": "active",
-      "updatedAt": "2026-05-12T18:52:00+08:00",
+      "updatedAt": "2026-05-13T00:00:00+08:00",
       "sourceRepository": {
         "visibility": "private",
         "path": "/Users/Jeronasand/Project/Jeronasand/research"
       },
       "sourcePath": "skills/research-html-private-index/index.html",
       "objectKey": "research-data/skills/research-html-private-index/index.html"
-    }
-  ],
-  "pendingResearch": [
-    {
-      "id": "financial-crypto-equity-data-sources",
-      "title": "金融 / Crypto / 股票数据源待调研清单",
-      "kind": "pending-research",
-      "status": "pending",
-      "sourcePath": "research/pending/financial-crypto-equity-data-sources"
     }
   ]
 }

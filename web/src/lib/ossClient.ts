@@ -9,44 +9,58 @@ export type OssBucketConfig = {
   endpoint: string;
 };
 
-export type ResearchDocumentItem = {
+export type ResearchCatalogInput = {
+  type?: string;
+  label?: string;
+  path?: string;
+  url?: string;
+  note?: string;
+};
+
+export type ResearchCatalogItem = {
   id: string;
   title: string;
-  type: "product" | "technical" | "overview" | "research" | "skill";
+  kind: "pending-task" | "research-package";
+  sectionId: "pending" | "in-progress" | "completed";
+  sectionTitle: string;
+  status: "pending" | "in-progress" | "completed";
+  priority: string;
+  summary: string;
+  request: string;
+  expectedOutput: string;
+  targetPath: string;
+  owner: string;
+  createdAt: string;
+  updatedAt: string;
+  tags: string[];
+  inputs: ResearchCatalogInput[];
   language: "en" | "zh-CN";
   version: string;
-  format: "markdown" | "html";
-  key: string;
-  sourcePath?: string;
+  format: "html" | "";
+  packagePath: string;
+  sourcePath: string;
+  entryKey: string;
+  objectPrefix: string;
+};
+
+export type ResearchCatalogSection = {
+  id: "pending" | "in-progress" | "completed";
+  title: string;
+  description: string;
+  count: number;
+  items: ResearchCatalogItem[];
 };
 
 export type ResearchManifest = {
   title: string;
   updated: string;
-  items: ResearchDocumentItem[];
+  sections: ResearchCatalogSection[];
+  items: ResearchCatalogItem[];
 };
 
-type RawManifestItem = Partial<ResearchDocumentItem> & {
-  path?: unknown;
-  objectKey?: unknown;
+type RawManifestItem = Partial<ResearchCatalogItem> & {
+  key?: unknown;
 };
-
-function normalizeDocumentType(type: unknown): ResearchDocumentItem["type"] {
-  return type === "product" ||
-    type === "technical" ||
-    type === "overview" ||
-    type === "research" ||
-    type === "skill"
-    ? type
-    : "overview";
-}
-
-function normalizeDocumentFormat(format: unknown, key: string): ResearchDocumentItem["format"] {
-  if (format === "html" || key.toLowerCase().endsWith(".html")) {
-    return "html";
-  }
-  return "markdown";
-}
 
 const encoder = new TextEncoder();
 const SIGNED_URL_EXPIRES_SECONDS = 300;
@@ -131,6 +145,10 @@ async function signedObjectUrl(config: OssBucketConfig, key: string, credential:
   return url.toString();
 }
 
+export async function getSignedObjectUrl(config: OssBucketConfig, key: string, credential: OssCredential) {
+  return signedObjectUrl(config, key, credential);
+}
+
 function xmlTag(payload: string, tag: string) {
   return payload.match(new RegExp(`<${tag}>([^<]*)</${tag}>`))?.[1]?.trim();
 }
@@ -173,62 +191,118 @@ export async function getSignedObjectText(config: OssBucketConfig, key: string, 
   return response.text();
 }
 
-export async function getPublicObjectText(config: OssBucketConfig, key: string) {
-  const response = await fetch(objectUrl(config, key.replace(/^\/+/, "")));
-  if (!response.ok) {
-    throw new Error(`GET ${key} failed: ${response.status} ${response.statusText}`);
+function stringValue(value: unknown, fallback = "") {
+  return typeof value === "string" && value.trim() ? value.trim() : fallback;
+}
+
+function stringArray(value: unknown) {
+  return Array.isArray(value) ? value.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim()) : [];
+}
+
+function normalizeSectionId(value: unknown): ResearchCatalogSection["id"] {
+  return value === "pending" || value === "in-progress" || value === "completed" ? value : "pending";
+}
+
+function sectionTitle(sectionId: ResearchCatalogSection["id"]) {
+  if (sectionId === "in-progress") return "调研中";
+  if (sectionId === "completed") return "已完结调研";
+  return "待调研";
+}
+
+function normalizeStatus(value: unknown, sectionId: ResearchCatalogSection["id"]): ResearchCatalogItem["status"] {
+  if (value === "pending" || value === "in-progress" || value === "completed") {
+    return value;
   }
-  return response.text();
+  return sectionId === "completed" ? "completed" : sectionId === "in-progress" ? "in-progress" : "pending";
+}
+
+function normalizeInputs(value: unknown): ResearchCatalogInput[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value
+    .filter((item) => item && typeof item === "object")
+    .map((item) => {
+      const input = item as ResearchCatalogInput;
+      return {
+        type: stringValue(input.type),
+        label: stringValue(input.label),
+        path: stringValue(input.path),
+        url: stringValue(input.url),
+        note: stringValue(input.note),
+      };
+    });
+}
+
+function normalizeItem(raw: unknown, index: number): ResearchCatalogItem {
+  const item = (raw ?? {}) as RawManifestItem;
+  const sectionId = normalizeSectionId(item.sectionId);
+  const kind = item.kind === "research-package" ? "research-package" : "pending-task";
+  const id = stringValue(item.id, `${sectionId}-${index + 1}`);
+  return {
+    id,
+    title: stringValue(item.title, id),
+    kind,
+    sectionId,
+    sectionTitle: stringValue(item.sectionTitle, sectionTitle(sectionId)),
+    status: normalizeStatus(item.status, sectionId),
+    priority: stringValue(item.priority),
+    summary: stringValue(item.summary),
+    request: stringValue(item.request),
+    expectedOutput: stringValue(item.expectedOutput),
+    targetPath: stringValue(item.targetPath),
+    owner: stringValue(item.owner),
+    createdAt: stringValue(item.createdAt),
+    updatedAt: stringValue(item.updatedAt),
+    tags: stringArray(item.tags),
+    inputs: normalizeInputs(item.inputs),
+    language: item.language === "en" || item.language === "zh-CN" ? item.language : "zh-CN",
+    version: stringValue(item.version),
+    format: item.format === "html" ? "html" : "",
+    packagePath: stringValue(item.packagePath),
+    sourcePath: stringValue(item.sourcePath),
+    entryKey: stringValue(item.entryKey || item.key),
+    objectPrefix: stringValue(item.objectPrefix),
+  };
+}
+
+function normalizeSection(raw: unknown): ResearchCatalogSection {
+  const section = (raw ?? {}) as Partial<ResearchCatalogSection>;
+  const id = normalizeSectionId(section.id);
+  const items = Array.isArray(section.items) ? section.items.map((item, itemIndex) => normalizeItem(item, itemIndex)) : [];
+  return {
+    id,
+    title: stringValue(section.title, sectionTitle(id)),
+    description: stringValue(section.description),
+    count: typeof section.count === "number" ? section.count : items.length,
+    items,
+  };
 }
 
 export function parseManifest(payload: string): ResearchManifest {
   const parsed = JSON.parse(payload) as {
     title?: unknown;
     updated?: unknown;
-    path?: unknown;
+    sections?: unknown;
     items?: unknown;
   };
 
-  if (!Array.isArray(parsed.items)) {
-    throw new Error("Manifest is missing items[]");
-  }
-
-  const manifestBasePath =
-    typeof parsed.path === "string" && parsed.path.trim() ? parsed.path.replace(/^\/+|\/+$/g, "") : "";
-
-  const items: ResearchDocumentItem[] = parsed.items.map((raw, index) => {
-    const item = (raw ?? {}) as RawManifestItem;
-    const keyCandidate =
-      (typeof item.key === "string" && item.key.trim()) ||
-      (typeof item.path === "string" && item.path.trim()) ||
-      (typeof item.objectKey === "string" && item.objectKey.trim()) ||
-      "";
-
-    if (!keyCandidate) {
-      throw new Error(`Manifest item[${index}] is missing key/path/objectKey`);
-    }
-
-    const normalizedKey = keyCandidate.replace(/^\/+/, "");
-    const key =
-      manifestBasePath && !normalizedKey.startsWith(`${manifestBasePath}/`)
-        ? `${manifestBasePath}/${normalizedKey}`
-        : normalizedKey;
-
-    return {
-      id: typeof item.id === "string" && item.id.trim() ? item.id : `item-${index + 1}`,
-      title: typeof item.title === "string" && item.title.trim() ? item.title : keyCandidate,
-      type: normalizeDocumentType(item.type),
-      language: item.language === "zh-CN" || item.language === "en" ? item.language : "zh-CN",
-      version: typeof item.version === "string" && item.version.trim() ? item.version : "unknown",
-      format: normalizeDocumentFormat(item.format, key),
-      key,
-      sourcePath: typeof item.sourcePath === "string" && item.sourcePath.trim() ? item.sourcePath : undefined,
-    };
-  });
+  const sections = Array.isArray(parsed.sections)
+    ? parsed.sections.map((section) => normalizeSection(section))
+    : [
+        {
+          id: "completed" as const,
+          title: "已完结调研",
+          description: "",
+          count: Array.isArray(parsed.items) ? parsed.items.length : 0,
+          items: Array.isArray(parsed.items) ? parsed.items.map((item, index) => normalizeItem(item, index)) : [],
+        },
+      ];
 
   return {
-    title: typeof parsed.title === "string" ? parsed.title : "Research Repository",
-    updated: typeof parsed.updated === "string" ? parsed.updated : "",
-    items,
+    title: stringValue(parsed.title, "Research Repository"),
+    updated: stringValue(parsed.updated),
+    sections,
+    items: sections.flatMap((section) => section.items),
   };
 }

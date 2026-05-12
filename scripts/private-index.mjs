@@ -8,6 +8,7 @@ const repoRoot = path.resolve(__dirname, "..");
 
 export const PRIVATE_INDEX_PATH = "research/private-index.json";
 export const DATA_PREFIX = "research-data";
+export const PENDING_TASKS_PATH = "research/pending/tasks.json";
 
 const dualBucketAccess = {
   previewBucket: "research-preview",
@@ -16,8 +17,26 @@ const dualBucketAccess = {
   dataEndpoint: "oss-cn-shenzhen.aliyuncs.com",
   manifestKey: `${DATA_PREFIX}/manifest.json`,
   mode: "pure-static-browser-ak-sts",
-  authPage: "Use the OSS dual-bucket access HTML skill or the web/ authorization screen directly.",
+  authPage: "Use the web authorization screen directly.",
 };
+
+const sectionDefinitions = [
+  {
+    id: "pending",
+    title: "待调研",
+    description: "手动维护 tasks.json，用来沉淀待启动的调研任务。",
+  },
+  {
+    id: "in-progress",
+    title: "调研中",
+    description: "每个子目录是一个正在产出的静态 Web 调研包。",
+  },
+  {
+    id: "completed",
+    title: "已完结调研",
+    description: "每个子目录是一个已完成并可预览的静态 Web 调研包。",
+  },
+];
 
 function sourcePath(...parts) {
   return path.join(...parts).split(path.sep).join("/");
@@ -93,46 +112,73 @@ async function safeReadDir(dir, options) {
   }
 }
 
-async function buildResearchDocuments(root) {
-  const researchDir = path.join(root, "research");
-  const entries = await safeReadDir(researchDir, { withFileTypes: true });
-  const htmlFiles = entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".html"))
-    .map((entry) => entry.name)
-    .sort();
-  const packageDirs = entries
-    .filter((entry) => entry.isDirectory() && entry.name !== "pending")
-    .map((entry) => entry.name)
-    .sort();
-
-  const documents = [];
-  for (const file of htmlFiles) {
-    const relativePath = sourcePath("research", file);
-    const html = await readFile(path.join(root, relativePath), "utf8");
-    const meta = metaLineFromHtml(html);
-    const slug = file.replace(/\.html$/i, "");
-
-    documents.push({
-      id: slug,
-      title: titleFromHtml(html, slug),
-      kind: "research-document",
-      type: "research",
-      format: "html",
-      language: meta.language || "zh-CN",
-      version: meta.version || meta.current_version || "html",
-      status: meta.status || "published",
-      scope: meta.scope || slug,
-      lastVerifiedAt: meta.last_verified_at || "",
-      sourcePath: relativePath,
-      objectKey: objectKeyFor(relativePath),
-    });
+async function readJsonIfExists(file) {
+  try {
+    return JSON.parse(await readFile(file, "utf8"));
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return null;
+    }
+    throw error;
   }
+}
 
-  for (const dir of packageDirs) {
-    const relativePath = sourcePath("research", dir, "index.html");
+function stringValue(value, fallback = "") {
+  return typeof value === "string" && value.trim() ? value.trim() : fallback;
+}
+
+function stringArray(value) {
+  return Array.isArray(value) ? value.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim()) : [];
+}
+
+function normalizeTask(raw, index) {
+  const item = raw && typeof raw === "object" ? raw : {};
+  const id = stringValue(item.id, `pending-${index + 1}`);
+  return {
+    id,
+    title: stringValue(item.title, id),
+    kind: "pending-task",
+    sectionId: "pending",
+    sectionTitle: "待调研",
+    status: "pending",
+    priority: stringValue(item.priority, "P2"),
+    summary: stringValue(item.summary),
+    request: stringValue(item.request),
+    expectedOutput: stringValue(item.expectedOutput),
+    targetPath: stringValue(item.targetPath),
+    owner: stringValue(item.owner),
+    createdAt: stringValue(item.createdAt),
+    updatedAt: stringValue(item.updatedAt),
+    tags: stringArray(item.tags),
+    inputs: Array.isArray(item.inputs) ? item.inputs.filter((input) => input && typeof input === "object") : [],
+  };
+}
+
+async function buildPendingTasks(root) {
+  const payload = await readJsonIfExists(path.join(root, PENDING_TASKS_PATH));
+  const items = Array.isArray(payload) ? payload : Array.isArray(payload?.items) ? payload.items : [];
+  return items.map((item, index) => normalizeTask(item, index));
+}
+
+async function buildResearchPackages(root, sectionId, sectionTitle) {
+  const sectionDir = path.join(root, "research", sectionId);
+  const entries = await safeReadDir(sectionDir, { withFileTypes: true });
+  const dirs = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+
+  const packages = [];
+  for (const dir of dirs) {
+    const packagePath = sourcePath("research", sectionId, dir);
+    const packageRoot = path.join(root, packagePath);
+    const metadata = (await readJsonIfExists(path.join(packageRoot, "research.json"))) || {};
+    const entryFile = stringValue(metadata.entry, "index.html");
+    const entrySourcePath = sourcePath(packagePath, entryFile);
     let html;
+
     try {
-      html = await readFile(path.join(root, relativePath), "utf8");
+      html = await readFile(path.join(root, entrySourcePath), "utf8");
     } catch (error) {
       if (error?.code === "ENOENT") {
         continue;
@@ -141,23 +187,30 @@ async function buildResearchDocuments(root) {
     }
 
     const meta = metaLineFromHtml(html);
-    documents.push({
-      id: dir,
-      title: titleFromHtml(html, dir),
-      kind: "research-document",
-      type: "research",
+    packages.push({
+      id: stringValue(metadata.id, dir),
+      title: stringValue(metadata.title, titleFromHtml(html, dir)),
+      kind: "research-package",
+      sectionId,
+      sectionTitle,
+      status: sectionId === "completed" ? "completed" : "in-progress",
+      priority: stringValue(metadata.priority),
+      summary: stringValue(metadata.summary),
+      owner: stringValue(metadata.owner),
+      createdAt: stringValue(metadata.createdAt),
+      updatedAt: stringValue(metadata.updatedAt || meta.updated_at || meta.last_verified_at),
+      tags: stringArray(metadata.tags),
+      language: stringValue(metadata.language || meta.language, "zh-CN"),
+      version: stringValue(metadata.version || meta.version || meta.current_version, "html"),
       format: "html",
-      language: meta.language || "zh-CN",
-      version: meta.version || meta.current_version || "html",
-      status: meta.status || "published",
-      scope: meta.scope || dir,
-      lastVerifiedAt: meta.last_verified_at || "",
-      sourcePath: relativePath,
-      objectKey: objectKeyFor(relativePath),
+      packagePath,
+      sourcePath: entrySourcePath,
+      entryKey: objectKeyFor(entrySourcePath),
+      objectPrefix: objectKeyFor(packagePath),
     });
   }
 
-  return documents;
+  return packages;
 }
 
 async function buildSkillPages(root) {
@@ -201,73 +254,59 @@ async function buildSkillPages(root) {
   return pages;
 }
 
-async function buildPendingResearch(root) {
-  const pendingDir = path.join(root, "research", "pending");
-  const entries = await safeReadDir(pendingDir, { withFileTypes: true });
-  const dirs = entries
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
-
-  const pending = [];
-  for (const dir of dirs) {
-    const readmePath = sourcePath("research", "pending", dir, "README.md");
-    let title = dir;
-    try {
-      const readme = await readFile(path.join(root, readmePath), "utf8");
-      title = readme.match(/^#\s+(.+)$/m)?.[1]?.trim() || dir;
-    } catch (error) {
-      if (error?.code !== "ENOENT") {
-        throw error;
-      }
-    }
-
-    pending.push({
-      id: dir,
-      title,
-      kind: "pending-research",
-      status: "pending",
-      sourcePath: sourcePath("research", "pending", dir),
-    });
-  }
-
-  return pending;
+function section(id, items) {
+  const definition = sectionDefinitions.find((item) => item.id === id);
+  return {
+    id,
+    title: definition.title,
+    description: definition.description,
+    count: items.length,
+    items,
+  };
 }
 
 export async function buildPrivateIndex(root = repoRoot) {
-  const [researchDocuments, skillPages, pendingResearch] = await Promise.all([
-    buildResearchDocuments(root),
+  const [pendingTasks, inProgressResearch, completedResearch, skillPages] = await Promise.all([
+    buildPendingTasks(root),
+    buildResearchPackages(root, "in-progress", "调研中"),
+    buildResearchPackages(root, "completed", "已完结调研"),
     buildSkillPages(root),
-    buildPendingResearch(root),
   ]);
 
+  const sections = [
+    section("pending", pendingTasks),
+    section("in-progress", inProgressResearch),
+    section("completed", completedResearch),
+  ];
+
   return {
-    schemaVersion: "research-private-index/v1",
+    schemaVersion: "research-private-index/v2",
     generatedAt: new Date().toISOString(),
     repository: {
       visibility: "private",
       roots: {
         externalInbox: "temptodo/",
-        researchHtml: "research/*.html",
-        researchPackages: "research/*/index.html",
-        pendingResearch: "research/pending/*/",
+        pendingTasks: PENDING_TASKS_PATH,
+        inProgressResearch: "research/in-progress/*/index.html",
+        completedResearch: "research/completed/*/index.html",
         skillHtml: "skills/*/index.html",
       },
       excludedRoots: ["temptodo/"],
     },
     dualBucketAccess,
     rules: [
-      "Research deliverables are HTML files under research/ or packaged pages under research/<topic>/index.html.",
-      "External Web or HTML files and webpage folders stay in temptodo/ until the user explicitly asks to sync.",
-      "When syncing a webpage folder, preserve the entry HTML and local assets together in the classified target folder.",
-      "Pending research topics live in their own directories under research/pending/.",
-      "Skills may be HTML pages under skills/<skill-id>/index.html.",
+      "The preview catalog has three top-level sections: pending, in-progress, and completed.",
+      "Pending research tasks are hand-maintained in research/pending/tasks.json.",
+      "In-progress and completed research entries are direct child directories with an index.html entrypoint.",
+      "Each research package keeps its local assets beside its index.html.",
       "The public preview bucket only serves the authorization/app shell.",
-      "Private research and skill HTML are indexed and uploaded to the private data bucket.",
+      "The private content bucket stores the generated manifest and research package payloads.",
     ],
-    researchDocuments,
+    sections,
+    pendingTasks,
+    inProgressResearch,
+    completedResearch,
     skillPages,
-    pendingResearch,
   };
 }
 
@@ -275,19 +314,44 @@ export function manifestFromPrivateIndex(index) {
   const toManifestItem = (item) => ({
     id: item.id,
     title: item.title,
-    type: item.type,
+    kind: item.kind,
+    sectionId: item.sectionId,
+    sectionTitle: item.sectionTitle,
+    status: item.status,
+    priority: item.priority || "",
+    summary: item.summary || "",
+    request: item.request || "",
+    expectedOutput: item.expectedOutput || "",
+    targetPath: item.targetPath || "",
+    owner: item.owner || "",
+    createdAt: item.createdAt || "",
+    updatedAt: item.updatedAt || "",
+    tags: item.tags || [],
+    inputs: item.inputs || [],
     language: item.language || "zh-CN",
-    version: item.version || "html",
-    format: item.format || "html",
-    key: item.objectKey,
-    sourcePath: item.sourcePath,
+    version: item.version || "",
+    format: item.format || "",
+    packagePath: item.packagePath || "",
+    sourcePath: item.sourcePath || "",
+    entryKey: item.entryKey || "",
+    objectPrefix: item.objectPrefix || "",
   });
 
+  const sections = index.sections.map((section) => ({
+    id: section.id,
+    title: section.title,
+    description: section.description,
+    count: section.items.length,
+    items: section.items.map(toManifestItem),
+  }));
+
   return {
+    schemaVersion: "research-preview-manifest/v2",
     title: "Research Private Repository",
     updated: new Date().toISOString().slice(0, 10),
     privateIndexKey: objectKeyFor(PRIVATE_INDEX_PATH),
-    items: [...index.researchDocuments, ...index.skillPages].map(toManifestItem),
+    sections,
+    items: sections.flatMap((section) => section.items),
   };
 }
 
@@ -302,11 +366,8 @@ export async function writePrivateIndex(root = repoRoot) {
 if (path.resolve(process.argv[1] || "") === __filename) {
   writePrivateIndex()
     .then((index) => {
-      const documentCount = index.researchDocuments.length;
-      const skillCount = index.skillPages.length;
-      const pendingCount = index.pendingResearch.length;
       console.log(
-        `Wrote ${PRIVATE_INDEX_PATH}: ${documentCount} research HTML, ${skillCount} skill HTML, ${pendingCount} pending items`,
+        `Wrote ${PRIVATE_INDEX_PATH}: ${index.pendingTasks.length} pending tasks, ${index.inProgressResearch.length} in-progress packages, ${index.completedResearch.length} completed packages`,
       );
     })
     .catch((error) => {
