@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "tree": "node upload.js --tree-only",
+    "update:datas:dry-run": "./update-research-data.sh --dry-run",
+    "update:datas": "./update-research-data.sh",
     "deploy:dry-run": "node upload.js --clean-data --preview --dry-run",
     "deploy": "node upload.js --clean-data --preview"
   }

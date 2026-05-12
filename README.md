@@ -41,6 +41,18 @@ npm run deploy
 npm run deploy:dry-run
 ```
 
+只更新 datas 私有数据桶，不更新 preview 桶：
+
+```bash
+./update-research-data.sh
+```
+
+等价 npm 命令：
+
+```bash
+npm run update:datas
+```
+
 只生成本地 `tree.json`：
 
 ```bash
