@@ -93,6 +93,34 @@ function ossutilArgs(options, target) {
   return args;
 }
 
+function ossutilSetPropsArgs(options, target, objectKey, cacheControl) {
+  const args = [
+    "set-props",
+    `oss://${target.bucket}/${objectKey}`,
+    "--endpoint",
+    target.endpoint,
+    "--region",
+    target.region,
+    "--cache-control",
+    cacheControl,
+    "--metadata-directive",
+    "update",
+    "--force",
+  ];
+
+  if (options.dryRun) {
+    args.push("--dry-run");
+  }
+  if (options.profile) {
+    args.push("--profile", options.profile);
+  }
+  if (options.configFile) {
+    args.push("--config-file", options.configFile);
+  }
+
+  return args;
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const targets = selectedTargets(options.target);
@@ -109,6 +137,11 @@ async function main() {
     await assertDirectory(target.localDir, target.label);
     console.log(`${options.dryRun ? "Dry-run" : "Uploading"} ${target.name}: ${relativeFromRepo(target.localDir)} -> ${target.ossUrl}`);
     run("ossutil", ossutilArgs(options, target));
+
+    if (target.name === "auth") {
+      console.log(`${options.dryRun ? "Dry-run cache policy" : "Applying cache policy"} ${target.name}: index.html -> no-cache`);
+      run("ossutil", ossutilSetPropsArgs(options, target, "index.html", "no-cache, no-store, must-revalidate"));
+    }
   }
 
   if (!options.dryRun) {
