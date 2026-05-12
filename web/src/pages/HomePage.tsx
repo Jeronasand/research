@@ -691,9 +691,9 @@ export function HomePage() {
 
   if (selectedItem) {
     return (
-      <div className="grid gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-4">
-          <div className="min-w-0">
+      <div className="fixed inset-0 z-50 flex min-h-0 flex-col bg-white">
+        <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-zinc-200 bg-white px-4 py-2 shadow-sm sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
               onClick={() => {
@@ -701,32 +701,31 @@ export function HomePage() {
                 setPreviewHtml("");
                 setStatus("已返回目录。");
               }}
-              className="mb-3 inline-flex h-9 items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-100"
+              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-100"
             >
               <ArrowLeft size={16} aria-hidden="true" />
               返回目录
             </button>
-            <h1 className="text-lg font-semibold text-zinc-950">{selectedItem.title}</h1>
-            <p className="mt-1 break-all text-xs text-zinc-500">{selectedItem.packagePath || selectedItem.entryKey}</p>
+            <div className="min-w-0">
+              <h1 className="truncate text-sm font-semibold text-zinc-950 sm:text-base">{selectedItem.title}</h1>
+              <p className="truncate text-xs text-zinc-500">{selectedItem.packagePath || selectedItem.entryKey}</p>
+            </div>
           </div>
           <span className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-xs text-zinc-600">
             <Eye size={14} aria-hidden="true" />
             {statusLabel(selectedItem.status)}
           </span>
         </div>
-        <article className="min-w-0 rounded-md border border-zinc-200 bg-white shadow-sm">
-          {previewHtml ? (
-            <iframe
-              title={selectedItem.title}
-              srcDoc={previewHtml}
-              sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
-              className="h-[calc(100vh-210px)] min-h-[520px] w-full rounded-md border-0 bg-white"
-            />
-          ) : (
-            <div className="flex min-h-[360px] items-center justify-center text-sm text-zinc-500">正在加载。</div>
-          )}
-        </article>
-        <StatusLine status={status} />
+        {previewHtml ? (
+          <iframe
+            title={selectedItem.title}
+            srcDoc={previewHtml}
+            sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
+            className="min-h-0 flex-1 border-0 bg-white"
+          />
+        ) : (
+          <div className="flex min-h-0 flex-1 items-center justify-center text-sm text-zinc-500">正在加载。</div>
+        )}
       </div>
     );
   }
