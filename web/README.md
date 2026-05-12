@@ -12,39 +12,48 @@ npm run dev
 
 Open `http://127.0.0.1:5173/`.
 
-`npm run sync:data` writes upload-ready data to `web/research-data/`. It is not copied into the public static bundle. Do not place research data under `web/public/`.
+`npm run sync:data` scans the private repository structure, refreshes `research/private-index.json`, and writes upload-ready private data to `web/research-data/`. This generated folder is not copied into the public static bundle.
 
-## Data Source Manifest
+## Content Model
 
-The preview bucket is `research-preview` on `oss-cn-shenzhen.aliyuncs.com`. It only hosts the public static web page.
-The data-source OSS bucket is `research-datas` on `oss-cn-beijing.aliyuncs.com`. It stays private and should expose a JSON manifest to signed OSS requests like:
+- Research deliverables are HTML files under `research/*.html`.
+- Pending research topics live under `research/pending/<topic>/`.
+- Skills may also be HTML pages under `skills/<skill-id>/index.html`.
+- The generated private index is `research/private-index.json`.
+- The generated OSS manifest is `web/research-data/manifest.json`.
 
-The first screen is login-only. There is no backend. After the user enters OSS AK or STS credentials, the browser generates a short-lived signed `GET` URL for the data-source manifest. If that request succeeds, the same credentials generate signed URLs for the selected research document keys.
+The preview can render both Markdown and HTML, but new research and skill deliverables should use HTML.
 
-```json
-{
-  "title": "Research Repository",
-  "updated": "2026-05-11",
-  "items": [
-    {
-      "id": "0001-product-en",
-      "title": "AiToEarn Product Research",
-      "type": "product",
-      "language": "en",
-      "version": "v0.2.0",
-      "key": "research-data/0001-aitoearn/product.md"
-    }
-  ]
-}
-```
+## Dual Bucket Access
 
-The preview reads known keys from the manifest. It does not require bucket listing.
+The preview uses the established dual-bucket scheme:
+
+- preview bucket: `research-preview` on `oss-cn-shenzhen.aliyuncs.com`, public static hosting for the authorization/app shell only.
+- data bucket: `research-datas` on `oss-cn-beijing.aliyuncs.com`, private ACL, read by browser-side signed OSS `GET` requests after the user enters OSS AK or STS credentials.
+- manifest key: `research-data/manifest.json`.
+
+The first screen is authorization-only. There is no backend. After authorization, the browser signs short-lived `GET` URLs for the private manifest and selected HTML objects.
 
 ## OSS CORS
 
-Browser access needs CORS on the data-source bucket for:
+The private data bucket needs CORS for:
 
 - methods: `GET`
-- origin: the actual preview origin
+- origin: the actual preview origin and local dev origins
 
-This CORS rule does not make `research-datas` public. The bucket ACL can stay private; reads still require a valid signed OSS request.
+CORS does not make `research-datas` public. Bucket ACL stays private; reads still require valid signed OSS requests.
+
+## Package And Upload From Repo Root
+
+Use the root OSS workflow when publishing:
+
+```bash
+npm run package:oss
+npm run upload:oss:dry-run
+npm run upload:oss
+```
+
+This keeps the two buckets separate:
+
+- `dist/oss/auth-bucket/` -> `oss://research-preview/`
+- `dist/oss/content-bucket/research-data/` -> `oss://research-datas/research-data/`

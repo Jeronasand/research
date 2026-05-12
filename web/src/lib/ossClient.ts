@@ -12,10 +12,12 @@ export type OssBucketConfig = {
 export type ResearchDocumentItem = {
   id: string;
   title: string;
-  type: "product" | "technical" | "overview";
+  type: "product" | "technical" | "overview" | "research" | "skill";
   language: "en" | "zh-CN";
   version: string;
+  format: "markdown" | "html";
   key: string;
+  sourcePath?: string;
 };
 
 export type ResearchManifest = {
@@ -23,6 +25,28 @@ export type ResearchManifest = {
   updated: string;
   items: ResearchDocumentItem[];
 };
+
+type RawManifestItem = Partial<ResearchDocumentItem> & {
+  path?: unknown;
+  objectKey?: unknown;
+};
+
+function normalizeDocumentType(type: unknown): ResearchDocumentItem["type"] {
+  return type === "product" ||
+    type === "technical" ||
+    type === "overview" ||
+    type === "research" ||
+    type === "skill"
+    ? type
+    : "overview";
+}
+
+function normalizeDocumentFormat(format: unknown, key: string): ResearchDocumentItem["format"] {
+  if (format === "html" || key.toLowerCase().endsWith(".html")) {
+    return "html";
+  }
+  return "markdown";
+}
 
 const encoder = new TextEncoder();
 const SIGNED_URL_EXPIRES_SECONDS = 300;
@@ -158,9 +182,53 @@ export async function getPublicObjectText(config: OssBucketConfig, key: string) 
 }
 
 export function parseManifest(payload: string): ResearchManifest {
-  const parsed = JSON.parse(payload) as ResearchManifest;
+  const parsed = JSON.parse(payload) as {
+    title?: unknown;
+    updated?: unknown;
+    path?: unknown;
+    items?: unknown;
+  };
+
   if (!Array.isArray(parsed.items)) {
     throw new Error("Manifest is missing items[]");
   }
-  return parsed;
+
+  const manifestBasePath =
+    typeof parsed.path === "string" && parsed.path.trim() ? parsed.path.replace(/^\/+|\/+$/g, "") : "";
+
+  const items: ResearchDocumentItem[] = parsed.items.map((raw, index) => {
+    const item = (raw ?? {}) as RawManifestItem;
+    const keyCandidate =
+      (typeof item.key === "string" && item.key.trim()) ||
+      (typeof item.path === "string" && item.path.trim()) ||
+      (typeof item.objectKey === "string" && item.objectKey.trim()) ||
+      "";
+
+    if (!keyCandidate) {
+      throw new Error(`Manifest item[${index}] is missing key/path/objectKey`);
+    }
+
+    const normalizedKey = keyCandidate.replace(/^\/+/, "");
+    const key =
+      manifestBasePath && !normalizedKey.startsWith(`${manifestBasePath}/`)
+        ? `${manifestBasePath}/${normalizedKey}`
+        : normalizedKey;
+
+    return {
+      id: typeof item.id === "string" && item.id.trim() ? item.id : `item-${index + 1}`,
+      title: typeof item.title === "string" && item.title.trim() ? item.title : keyCandidate,
+      type: normalizeDocumentType(item.type),
+      language: item.language === "zh-CN" || item.language === "en" ? item.language : "zh-CN",
+      version: typeof item.version === "string" && item.version.trim() ? item.version : "unknown",
+      format: normalizeDocumentFormat(item.format, key),
+      key,
+      sourcePath: typeof item.sourcePath === "string" && item.sourcePath.trim() ? item.sourcePath : undefined,
+    };
+  });
+
+  return {
+    title: typeof parsed.title === "string" ? parsed.title : "Research Repository",
+    updated: typeof parsed.updated === "string" ? parsed.updated : "",
+    items,
+  };
 }

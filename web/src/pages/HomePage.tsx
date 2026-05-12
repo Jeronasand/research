@@ -58,6 +58,9 @@ function fieldValue(value: string) {
 }
 
 function fileNameFromKey(key: string) {
+  if (!key) {
+    return "(missing-key)";
+  }
   return key.split("/").filter(Boolean).at(-1) ?? key;
 }
 
@@ -69,7 +72,10 @@ function buildDirectoryTree(items: ResearchDocumentItem[]) {
   };
 
   for (const item of items) {
-    const parts = item.key.split("/").filter(Boolean);
+    const parts = (item.key || "").split("/").filter(Boolean);
+    if (!parts.length) {
+      continue;
+    }
     let current = root;
 
     parts.forEach((part, index) => {
@@ -111,7 +117,10 @@ function expandedPathsFromItems(items: ResearchDocumentItem[]) {
   const paths = new Set<string>();
 
   for (const item of items) {
-    const parts = item.key.split("/").filter(Boolean);
+    const parts = (item.key || "").split("/").filter(Boolean);
+    if (!parts.length) {
+      continue;
+    }
     let path = "";
 
     parts.slice(0, -1).forEach((part) => {
@@ -138,6 +147,10 @@ function bucketConfig(bucket: string, endpoint: string): OssBucketConfig {
   };
 }
 
+function isHtmlDocument(item: ResearchDocumentItem | null) {
+  return item?.format === "html" || item?.key.toLowerCase().endsWith(".html");
+}
+
 function StatusLine({ status }: { status: string }) {
   return (
     <div className="min-h-9 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 shadow-sm">
@@ -152,12 +165,14 @@ function TextField({
   onChange,
   placeholder,
   type = "text",
+  autoComplete = "off",
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   type?: "text" | "password";
+  autoComplete?: string;
 }) {
   return (
     <label className="grid gap-1 text-sm">
@@ -167,6 +182,7 @@ function TextField({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         type={type}
+        autoComplete={autoComplete}
         className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-950 focus:ring-2 focus:ring-zinc-200"
       />
     </label>
@@ -298,9 +314,9 @@ export function HomePage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [manifest, setManifest] = useState<ResearchManifest | null>(null);
   const [selectedId, setSelectedId] = useState("");
-  const [markdown, setMarkdown] = useState("");
+  const [documentText, setDocumentText] = useState("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
-  const [status, setStatus] = useState("请输入可读取私有数据桶的 OSS AK 或 STS 凭证。");
+  const [status, setStatus] = useState("请输入可读取 research-datas 私有数据桶的 OSS AK 或 STS 凭证。");
   const [busy, setBusy] = useState(false);
 
   const selectedItem = useMemo(
@@ -313,7 +329,7 @@ export function HomePage() {
     setAuthenticated(false);
     setManifest(null);
     setSelectedId("");
-    setMarkdown("");
+    setDocumentText("");
     setExpandedPaths(new Set());
     if (nextStatus) {
       setStatus(nextStatus);
@@ -338,7 +354,7 @@ export function HomePage() {
 
     setManifest(nextManifest);
     setSelectedId(nextSelectedId);
-    setMarkdown("");
+    setDocumentText("");
     setExpandedPaths(expandedPathsFromItems(nextManifest.items));
     return nextManifest;
   }
@@ -351,7 +367,7 @@ export function HomePage() {
     );
 
     setSelectedId(item.id);
-    setMarkdown(payload);
+    setDocumentText(payload);
   }
 
   async function validateDataBucketAccess() {
@@ -433,18 +449,36 @@ export function HomePage() {
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h1 className="text-lg font-semibold text-zinc-950">访问授权</h1>
-              <p className="text-xs text-zinc-500">使用 OSS AK/STS 读取私有调研文档</p>
+              <p className="text-xs text-zinc-500">使用 OSS AK/STS 读取私有 HTML 调研文档和 skill</p>
             </div>
             <KeyRound className="text-zinc-950" size={22} aria-hidden="true" />
           </div>
-          <div className="grid gap-3">
+          <form
+            className="grid gap-3"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void validateDataBucketAccess();
+            }}
+          >
             <TextField label="AccessKeyId" value={form.accessKeyId} onChange={(value) => updateForm("accessKeyId", value)} />
-            <TextField label="AccessKeySecret" type="password" value={form.accessKeySecret} onChange={(value) => updateForm("accessKeySecret", value)} />
-            <TextField label="STS SecurityToken" type="password" value={form.securityToken} onChange={(value) => updateForm("securityToken", value)} />
+            <TextField
+              label="AccessKeySecret"
+              type="password"
+              autoComplete="new-password"
+              value={form.accessKeySecret}
+              onChange={(value) => updateForm("accessKeySecret", value)}
+            />
+            <TextField
+              label="STS SecurityToken"
+              type="password"
+              autoComplete="new-password"
+              value={form.securityToken}
+              onChange={(value) => updateForm("securityToken", value)}
+            />
             <ActionButton icon={<ShieldCheck size={16} aria-hidden="true" />} onClick={validateDataBucketAccess} disabled={busy}>
               授权并进入预览
             </ActionButton>
-          </div>
+          </form>
         </div>
         <StatusLine status={status} />
       </div>
@@ -458,7 +492,7 @@ export function HomePage() {
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h1 className="text-lg font-semibold text-zinc-950">调研预览</h1>
-              <p className="text-xs text-zinc-500">已授权读取私有文档</p>
+              <p className="text-xs text-zinc-500">已授权读取私有 HTML 文档</p>
             </div>
             <ShieldCheck className="text-zinc-950" size={22} aria-hidden="true" />
           </div>
@@ -525,8 +559,17 @@ export function HomePage() {
             </span>
           </div>
           <div className="grid max-h-[calc(100vh-132px)] min-h-[calc(100vh-132px)] gap-4 overflow-auto px-5 py-5">
-            {markdown ? (
-              <div className="grid max-w-4xl gap-4">{renderMarkdown(markdown)}</div>
+            {documentText ? (
+              isHtmlDocument(selectedItem) ? (
+                <iframe
+                  title={selectedItem?.title ?? "HTML preview"}
+                  srcDoc={documentText}
+                  sandbox=""
+                  className="h-[calc(100vh-184px)] w-full rounded-md border border-zinc-200 bg-white"
+                />
+              ) : (
+                <div className="grid max-w-4xl gap-4">{renderMarkdown(documentText)}</div>
+              )
             ) : (
               <div className="flex min-h-[360px] items-center justify-center rounded-md border border-dashed border-zinc-300 bg-zinc-50 text-sm text-zinc-500">
                 从左侧目录选择一个文档进行预览。
