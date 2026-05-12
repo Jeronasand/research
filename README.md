@@ -22,11 +22,7 @@ This private repository stores research Web packages, pending research task card
 ## Workflow
 
 ```bash
-npm run index:private
-npm run data:update:dry-run
-npm run data:update
-npm run package:oss
-npm run upload:oss:dry-run
+npm run update:data
 ```
 
 For local preview:
@@ -52,11 +48,10 @@ There is no backend. The browser signs OSS `GET` requests using user-provided AK
 When only research data changed, update the private content bucket directly:
 
 ```bash
-npm run data:update:dry-run
-npm run data:update
+npm run update:data
 ```
 
-Use `npm run data:package` to refresh only local `web/research-data/` and `dist/oss/content-bucket/research-data/` without uploading.
+Use `npm run update:data:dry-run` to preview the private data upload, or `npm run data:package` to refresh only local `web/research-data/` and `dist/oss/content-bucket/research-data/` without uploading.
 
 ```bash
 npm run package:oss

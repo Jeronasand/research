@@ -67,7 +67,8 @@ This is a private research repository. Project-related research deliverables are
 - Run `npm run upload:oss -- --target auth` to upload only the public authorization/app shell bucket.
 - Run `npm run upload:oss -- --target content` to upload only the private content bucket.
 - Run `npm run upload:oss` to upload both targets, then verify `index.html` and `research-data/manifest.json`.
-- When only private research data changed, run `npm run data:update:dry-run` then `npm run data:update`; this refreshes the private index, packages `web/research-data/`, and uploads only `oss://research-pages/research-data/`.
+- When only private research data changed, run `npm run update:data`; this refreshes the private index, packages `web/research-data/`, uploads only `oss://research-pages/research-data/`, and verifies `research-data/manifest.json`.
+- Use `npm run update:data:dry-run` only when you need to preview the private data upload plan.
 - Run `npm run data:package` when you only need to refresh local private data payloads without uploading.
 - Do not use `--delete` unless the user explicitly asks for remote cleanup; the script requires `--delete --yes`.
 - Keep public preview asset verification separate from private content bucket verification.
