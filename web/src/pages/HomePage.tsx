@@ -7,8 +7,9 @@ import {
   KeyRound,
   RefreshCw,
   ShieldCheck,
+  Trash2,
 } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { renderMarkdown } from "../lib/markdown";
 import {
   getSignedObjectText,
@@ -53,8 +54,74 @@ const authorizationFieldNames = new Set<keyof FormState>([
   "securityToken",
 ]);
 
+const CREDENTIAL_STORAGE_KEY = "research-preview:oss-credentials:v1";
+
 function fieldValue(value: string) {
   return value.trim();
+}
+
+function storedString(value: unknown, fallback = "") {
+  return typeof value === "string" ? value : fallback;
+}
+
+function readRememberedCredentials() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const payload = window.localStorage.getItem(CREDENTIAL_STORAGE_KEY);
+    if (!payload) {
+      return null;
+    }
+
+    const parsed = JSON.parse(payload) as { form?: Partial<Record<keyof FormState, unknown>> };
+    const storedForm = parsed.form ?? {};
+    const form: FormState = {
+      dataBucket: storedString(storedForm.dataBucket, initialForm.dataBucket),
+      dataEndpoint: storedString(storedForm.dataEndpoint, initialForm.dataEndpoint),
+      manifestKey: storedString(storedForm.manifestKey, initialForm.manifestKey),
+      accessKeyId: storedString(storedForm.accessKeyId),
+      accessKeySecret: storedString(storedForm.accessKeySecret),
+      securityToken: storedString(storedForm.securityToken),
+    };
+
+    return form.accessKeyId && form.accessKeySecret ? form : null;
+  } catch {
+    return null;
+  }
+}
+
+function rememberCredentials(form: FormState) {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    window.localStorage.setItem(
+      CREDENTIAL_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        savedAt: new Date().toISOString(),
+        form,
+      }),
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function forgetRememberedCredentials() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(CREDENTIAL_STORAGE_KEY);
+  } catch {
+    // Ignore storage failures; authorization can still continue for this session.
+  }
 }
 
 function fileNameFromKey(key: string) {
@@ -221,6 +288,29 @@ function ActionButton({
   );
 }
 
+function RememberCredentialsToggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex items-start gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-0.5 h-4 w-4 rounded border-zinc-300 text-zinc-950"
+      />
+      <span>
+        <span className="block font-medium text-zinc-800">记住 AK/SK 并自动登录</span>
+        <span className="block text-xs text-zinc-500">仅保存在当前浏览器。</span>
+      </span>
+    </label>
+  );
+}
+
 function DirectoryNodeView({
   node,
   depth,
@@ -310,7 +400,10 @@ function DirectoryNodeView({
 }
 
 export function HomePage() {
-  const [form, setForm] = useState<FormState>(initialForm);
+  const [rememberedForm] = useState<FormState | null>(() => readRememberedCredentials());
+  const autoLoginStarted = useRef(false);
+  const [form, setForm] = useState<FormState>(() => rememberedForm ?? initialForm);
+  const [rememberSavedCredentials, setRememberSavedCredentials] = useState(() => Boolean(rememberedForm));
   const [authenticated, setAuthenticated] = useState(false);
   const [manifest, setManifest] = useState<ResearchManifest | null>(null);
   const [selectedId, setSelectedId] = useState("");
@@ -343,10 +436,24 @@ export function HomePage() {
     }
   }
 
-  async function loadManifest(credential = credentialFromForm(form)) {
+  function updateRememberSavedCredentials(checked: boolean) {
+    setRememberSavedCredentials(checked);
+    if (!checked) {
+      forgetRememberedCredentials();
+      setStatus("已清除本机保存的 OSS 凭证。");
+    }
+  }
+
+  function forgetSavedCredentials(nextStatus = "已清除本机保存的 OSS 凭证。") {
+    forgetRememberedCredentials();
+    setRememberSavedCredentials(false);
+    setStatus(nextStatus);
+  }
+
+  async function loadManifest(activeForm = form, credential = credentialFromForm(activeForm)) {
     const payload = await getSignedObjectText(
-      bucketConfig(form.dataBucket, form.dataEndpoint),
-      fieldValue(form.manifestKey),
+      bucketConfig(activeForm.dataBucket, activeForm.dataEndpoint),
+      fieldValue(activeForm.manifestKey),
       credential,
     );
     const nextManifest = parseManifest(payload);
@@ -359,9 +466,9 @@ export function HomePage() {
     return nextManifest;
   }
 
-  async function loadDocumentContent(item: ResearchDocumentItem, credential = credentialFromForm(form)) {
+  async function loadDocumentContent(item: ResearchDocumentItem, activeForm = form, credential = credentialFromForm(activeForm)) {
     const payload = await getSignedObjectText(
-      bucketConfig(form.dataBucket, form.dataEndpoint),
+      bucketConfig(activeForm.dataBucket, activeForm.dataEndpoint),
       item.key,
       credential,
     );
@@ -370,20 +477,38 @@ export function HomePage() {
     setDocumentText(payload);
   }
 
-  async function validateDataBucketAccess() {
+  async function validateDataBucketAccess(
+    activeForm = form,
+    options: { auto?: boolean; remember?: boolean } = {},
+  ) {
     setBusy(true);
     try {
-      const credential = credentialFromForm(form);
-      const nextManifest = await loadManifest(credential);
+      const credential = credentialFromForm(activeForm);
+      const nextManifest = await loadManifest(activeForm, credential);
+      const shouldRemember = options.remember ?? rememberSavedCredentials;
+      let rememberStatus = "";
+
+      if (shouldRemember) {
+        rememberStatus = rememberCredentials(activeForm) ? "，已保存本机凭证" : "，但浏览器未能保存凭证";
+      } else {
+        forgetRememberedCredentials();
+      }
+
       setAuthenticated(true);
       if (nextManifest.items[0]) {
-        await loadDocumentContent(nextManifest.items[0], credential);
-        setStatus(`授权成功，正在预览：${nextManifest.items[0].title}`);
+        await loadDocumentContent(nextManifest.items[0], activeForm, credential);
+        setStatus(`${options.auto ? "自动登录成功" : "授权成功"}${rememberStatus}，正在预览：${nextManifest.items[0].title}`);
       } else {
-        setStatus("授权成功，但目录清单里没有可预览文档。");
+        setStatus(`${options.auto ? "自动登录成功" : "授权成功"}${rememberStatus}，但目录清单里没有可预览文档。`);
       }
     } catch (error) {
-      clearPreview(error instanceof Error ? error.message : "数据桶授权失败。");
+      clearPreview(
+        options.auto
+          ? `自动登录失败，请重新输入凭证：${error instanceof Error ? error.message : "数据桶授权失败。"}`
+          : error instanceof Error
+            ? error.message
+            : "数据桶授权失败。",
+      );
     } finally {
       setBusy(false);
     }
@@ -398,11 +523,11 @@ export function HomePage() {
     setBusy(true);
     try {
       const credential = credentialFromForm(form);
-      const nextManifest = await loadManifest(credential);
+      const nextManifest = await loadManifest(form, credential);
       const nextItem = nextManifest.items.find((item) => item.id === selectedId) ?? nextManifest.items[0];
 
       if (nextItem) {
-        await loadDocumentContent(nextItem, credential);
+        await loadDocumentContent(nextItem, form, credential);
         setStatus(`目录已刷新，正在预览：${nextItem.title}`);
       } else {
         setStatus("目录已刷新，但没有可预览文档。");
@@ -442,6 +567,18 @@ export function HomePage() {
     });
   }
 
+  useEffect(() => {
+    if (!rememberedForm || autoLoginStarted.current) {
+      return;
+    }
+
+    autoLoginStarted.current = true;
+    setStatus("已读取本机保存的 OSS 凭证，正在自动授权。");
+    void validateDataBucketAccess(rememberedForm, { auto: true, remember: true });
+    // Run once on mount to consume the saved credential snapshot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (!authenticated) {
     return (
       <div className="mx-auto grid max-w-[440px] gap-4">
@@ -475,6 +612,7 @@ export function HomePage() {
               value={form.securityToken}
               onChange={(value) => updateForm("securityToken", value)}
             />
+            <RememberCredentialsToggle checked={rememberSavedCredentials} onChange={updateRememberSavedCredentials} />
             <ActionButton icon={<ShieldCheck size={16} aria-hidden="true" />} onClick={validateDataBucketAccess} disabled={busy}>
               授权并进入预览
             </ActionButton>
@@ -496,7 +634,7 @@ export function HomePage() {
             </div>
             <ShieldCheck className="text-zinc-950" size={22} aria-hidden="true" />
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <ActionButton icon={<RefreshCw size={16} aria-hidden="true" />} onClick={reloadManifest} disabled={busy}>
               刷新目录
             </ActionButton>
@@ -507,6 +645,14 @@ export function HomePage() {
               variant="secondary"
             >
               退出
+            </ActionButton>
+            <ActionButton
+              icon={<Trash2 size={16} aria-hidden="true" />}
+              onClick={() => forgetSavedCredentials()}
+              disabled={busy || !rememberSavedCredentials}
+              variant="secondary"
+            >
+              忘记凭证
             </ActionButton>
           </div>
         </div>

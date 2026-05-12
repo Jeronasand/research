@@ -34,6 +34,8 @@ npm run dev
 
 首屏只做授权，没有后端服务。授权后，浏览器为私有 manifest 和选中的 HTML 对象生成短期有效的签名 `GET` URL。
 
+开启“记住 AK/SK”后，凭证只会保存在当前浏览器的 `localStorage`，下次访问会自动授权。可通过“忘记凭证”清除本机保存副本。
+
 ## OSS CORS
 
 私有数据桶需要 CORS 允许：

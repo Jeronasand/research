@@ -34,6 +34,8 @@ The preview uses the established dual-bucket scheme:
 
 The first screen is authorization-only. There is no backend. After authorization, the browser signs short-lived `GET` URLs for the private manifest and selected HTML objects.
 
+If "remember AK/SK" is enabled, the credentials are saved only in the current browser's `localStorage` and reused for automatic authorization on the next visit. Use "forget credentials" to clear the saved copy.
+
 ## OSS CORS
 
 The private data bucket needs CORS for:
