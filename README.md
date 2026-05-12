@@ -63,6 +63,18 @@ npm run update:datas
 npm run tree
 ```
 
+校验 `tree.json` 与真实目录是否一致：
+
+```bash
+npm run tree:check
+```
+
+不写入文件，只打印从 `research/` 生成的目录树：
+
+```bash
+npm run tree:print
+```
+
 ## 默认 OSS 配置
 
 - preview 桶：`research-preview`

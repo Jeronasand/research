@@ -1,12 +1,12 @@
-import { readdir, stat, writeFile } from "node:fs/promises";
+import { stat } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { findFirstPackage, writeTree } from "./scripts/research-tree.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.dirname(__filename);
 
-const categories = ["待调研", "调研中", "调研完成"];
 const researchDir = path.join(repoRoot, "research");
 const previewDir = path.join(repoRoot, "preview");
 const treePath = path.join(repoRoot, "tree.json");
@@ -85,62 +85,8 @@ function runOssutil(args, options) {
   }
 }
 
-async function exists(file) {
-  return Boolean(await stat(file).catch(() => null));
-}
-
-function sortNodes(nodes) {
-  return nodes.sort((left, right) => left.name.localeCompare(right.name, "zh-CN"));
-}
-
-async function listDirectoryNodes(basePath, relativePath = "") {
-  const entries = await readdir(basePath, { withFileTypes: true });
-  const nodes = [];
-
-  for (const entry of entries) {
-    if (!entry.isDirectory() || entry.name.startsWith(".")) {
-      continue;
-    }
-
-    const localPath = path.join(basePath, entry.name);
-    const nodePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
-    const entryHtml = path.join(localPath, "index.html");
-
-    if (await exists(entryHtml)) {
-      nodes.push({
-        type: "package",
-        name: entry.name,
-        path: nodePath,
-      });
-    } else {
-      nodes.push({
-        type: "folder",
-        name: entry.name,
-        path: nodePath,
-        children: await listDirectoryNodes(localPath, nodePath),
-      });
-    }
-  }
-
-  return sortNodes(nodes);
-}
-
-async function listNodes(category) {
-  const categoryPath = path.join(researchDir, category);
-  if (!(await exists(categoryPath))) {
-    return [];
-  }
-
-  return listDirectoryNodes(categoryPath);
-}
-
 async function generateTree() {
-  const tree = {};
-  for (const category of categories) {
-    tree[category] = await listNodes(category);
-  }
-
-  await writeFile(treePath, `${JSON.stringify(tree, null, 2)}\n`);
+  const tree = await writeTree();
   console.log(`Generated tree.json: ${JSON.stringify(tree)}`);
   return tree;
 }
@@ -200,6 +146,7 @@ function verify(options, tree) {
   }
 
   runOssutil(["stat", `oss://${options.datasBucket}/tree.json`], options);
+  const categories = Object.keys(tree);
   const firstCategory = categories.find((category) => findFirstPackage(tree[category] || []));
   const firstPackage = firstCategory ? findFirstPackage(tree[firstCategory] || []) : null;
   if (firstCategory && firstPackage) {
@@ -213,21 +160,6 @@ function verify(options, tree) {
     runOssutil(["stat", `oss://${options.previewBucket}/login.html`], options);
     runOssutil(["stat", `oss://${options.previewBucket}/index.html`], options);
   }
-}
-
-function findFirstPackage(nodes) {
-  for (const node of nodes) {
-    if (node?.type === "package" && node.path) {
-      return node;
-    }
-
-    const childPackage = findFirstPackage(Array.isArray(node?.children) ? node.children : []);
-    if (childPackage) {
-      return childPackage;
-    }
-  }
-
-  return null;
 }
 
 async function main() {
