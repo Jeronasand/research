@@ -13,6 +13,7 @@ This is a private research repository. Project-related research deliverables are
 - Put external Web or HTML files from other sources in `temptodo/` first. Treat `temptodo/` as an inbox, not as publishable content.
 - An inbox item can be a single `.html` file or a full webpage folder containing HTML, CSS, JS, images, JSON, CSV, or other local assets.
 - Maintain pending research tasks in `research/pending/tasks.json`; keep its field contract in `research/pending/tasks.schema.json`.
+- A pending task can also be a previewable Web package under `research/pending/<topic>/index.html`.
 - Put in-progress research Web packages under `research/in-progress/<topic>/`.
 - Put completed research Web packages under `research/completed/<topic>/`.
 - Each in-progress or completed package must have an `index.html` entry file. Local assets stay inside the same package directory.
@@ -29,7 +30,7 @@ This is a private research repository. Project-related research deliverables are
   - completed research package: move or copy to `research/completed/<topic>/index.html`
   - in-progress research package: move or copy to `research/in-progress/<topic>/index.html`
   - pending research task: add/update one item in `research/pending/tasks.json`
-  - pending source collection: create/update `research/pending/<topic>/` and reference it from `tasks.json`
+  - pending source collection or previewable pending package: create/update `research/pending/<topic>/` and reference it from `tasks.json`
   - reusable or workflow skill: create/update `skills/<skill-id>/index.html`
 - During sync, inspect each inbox folder as one webpage package. Identify the entry HTML file, preserve relative asset paths, and move/copy the needed assets with the classified target.
 - For a completed research package with local assets, use `research/completed/<topic-slug>/index.html` plus assets inside that folder.
@@ -51,7 +52,7 @@ This is a private research repository. Project-related research deliverables are
 
 - Use the existing dual-bucket scheme.
 - Public preview/auth bucket: `research-preview` on `oss-cn-shenzhen.aliyuncs.com`; it only hosts the authorization page and web app shell.
-- Private content/data bucket: `research-pages` on `oss-cn-shenzhen.aliyuncs.com`; it stores `research-data/manifest.json`, pending task JSON, research package payloads, and private index data.
+- Private content/data bucket: `research-pages` on `oss-cn-shenzhen.aliyuncs.com`; it stores `research-data/manifest.json`, pending task JSON, pending preview packages, research package payloads, and private index data.
 - Keep the flow pure static browser AK/STS. Do not add a backend gateway unless the user explicitly asks for one.
 - The authorization page can directly reuse the dual-bucket access skill/page.
 - Never commit AK/SK, STS tokens, signed URLs with secrets, or session dumps.
@@ -84,7 +85,8 @@ This is a private research repository. Project-related research deliverables are
 - Pending task cards are maintained in `research/pending/tasks.json`.
 - Use `research/pending/tasks.schema.json` as the field contract when creating tasks manually.
 - Each task `id` should be a short lowercase slug.
-- If a pending task needs local notes or source files, place them under `research/pending/<topic>/` and reference them from the task `inputs` array.
+- If a pending task needs local notes, source files, or a previewable Web package, place them under `research/pending/<topic>/` and reference them from the task `inputs` array.
+- If `research/pending/<topic>/index.html` exists, the private preview can open that pending card before the task moves to `research/in-progress/`.
 - When work starts, put the Web package in `research/in-progress/<topic>/`.
 - When the research is complete, put the Web package in `research/completed/<topic>/`, then refresh the private index.
 

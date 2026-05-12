@@ -60,6 +60,14 @@
           "type": "string",
           "description": "Expected future package path, for example research/in-progress/<id>/"
         },
+        "packagePath": {
+          "type": "string",
+          "description": "Optional pending preview package directory, for example research/pending/<id>/"
+        },
+        "entry": {
+          "type": "string",
+          "description": "Optional preview entry file inside packagePath. Defaults to index.html"
+        },
         "tags": {
           "type": "array",
           "items": {

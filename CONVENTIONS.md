@@ -17,6 +17,8 @@ research/
     tasks.json
     tasks.schema.json
     topic-slug/
+      index.html
+      assets/
       notes-or-inputs.*
   in-progress/
     topic-slug/
@@ -57,7 +59,7 @@ When syncing `temptodo/`, classify each file by content:
 - completed research report or finished analysis: `research/completed/<topic-slug>/index.html` plus its assets
 - active research report that is not final yet: `research/in-progress/<topic-slug>/index.html` plus its assets
 - rough request or task brief: one item in `research/pending/tasks.json`
-- source dump or local task materials: `research/pending/<topic>/`, referenced from the matching `tasks.json` item
+- source dump, local task materials, or a previewable pending Web package: `research/pending/<topic>/`, referenced from the matching `tasks.json` item
 - reusable workflow or skill page: `skills/<skill-id>/index.html` plus its assets
 - assets used by a classified HTML page: place beside that target page or under its target folder
 
@@ -67,6 +69,7 @@ After classification, refresh the generated index and data payload.
 
 - The private preview is a card catalog with exactly three main sections: `待调研`, `调研中`, and `已完结调研`.
 - `待调研` is generated from `research/pending/tasks.json`.
+- Pending cards can be previewable when the task has `packagePath` or `research/pending/<id>/index.html`.
 - `调研中` is generated from direct child directories under `research/in-progress/`.
 - `已完结调研` is generated from direct child directories under `research/completed/`.
 - The frontend opens a research package by loading its `index.html` and shows a return-to-catalog button.
@@ -86,7 +89,8 @@ After classification, refresh the generated index and data payload.
 
 - Pending card data lives in `research/pending/tasks.json`.
 - The field contract lives in `research/pending/tasks.schema.json`.
-- Use `research/pending/<topic>/` only for local notes, source files, or task materials that should be referenced from a task's `inputs`.
+- Use `research/pending/<topic>/` for local notes, source files, task materials, or a previewable pending Web package.
+- `tasks.json` can include `packagePath` and `entry`; if omitted, the indexer still tries `research/pending/<id>/index.html`.
 - When work starts, create or copy the Web package to `research/in-progress/<topic>/`.
 - When the research is complete, move or copy the Web package to `research/completed/<topic>/` and refresh the private index.
 
@@ -102,6 +106,7 @@ After classification, refresh the generated index and data payload.
 `research/private-index.json` is generated from the repo tree and should contain:
 
 - pending task entries from `research/pending/tasks.json`
+- optional pending preview package entries from `research/pending/<task-id>/index.html`
 - in-progress research package entries
 - completed research package entries
 - HTML skill entries
@@ -128,7 +133,7 @@ The generated upload root is `web/research-data/`.
 ## Dual Bucket Rules
 
 - `research-preview`: public preview/auth bucket, app shell and authorization UI only.
-- `research-pages`: private content/data bucket, sectioned manifest, pending task JSON, research packages, and private index only.
+- `research-pages`: private content/data bucket, sectioned manifest, pending task JSON, pending preview packages, research packages, and private index only.
 - `research-data/manifest.json`: private data manifest consumed by the preview app.
 - Browser access uses OSS AK/SK or STS to create signed `GET` requests directly against the private data bucket.
 - Do not add backend gateway code unless explicitly requested.

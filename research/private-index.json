@@ -1,11 +1,12 @@
 {
   "schemaVersion": "research-private-index/v2",
-  "generatedAt": "2026-05-12T18:45:47.568Z",
+  "generatedAt": "2026-05-12T19:04:29.229Z",
   "repository": {
     "visibility": "private",
     "roots": {
       "externalInbox": "temptodo/",
       "pendingTasks": "research/pending/tasks.json",
+      "pendingResearchPackages": "research/pending/<task-id>/index.html",
       "inProgressResearch": "research/in-progress/*/index.html",
       "completedResearch": "research/completed/*/index.html",
       "skillHtml": "skills/*/index.html"
@@ -26,6 +27,7 @@
   "rules": [
     "The preview catalog has three top-level sections: pending, in-progress, and completed.",
     "Pending research tasks are hand-maintained in research/pending/tasks.json.",
+    "A pending task can optionally expose a preview package at research/pending/<task-id>/index.html or task.packagePath.",
     "In-progress and completed research entries are direct child directories with an index.html entrypoint.",
     "Each research package keeps its local assets beside its index.html.",
     "The public preview bucket only serves the authorization/app shell.",
@@ -70,7 +72,14 @@
               "label": "数据源结构化清单",
               "path": "research/pending/financial-crypto-equity-data-sources/data-sources.json"
             }
-          ]
+          ],
+          "language": "zh-CN",
+          "version": "html",
+          "format": "html",
+          "packagePath": "research/pending/financial-crypto-equity-data-sources/",
+          "sourcePath": "research/pending/financial-crypto-equity-data-sources/index.html",
+          "entryKey": "research-data/research/pending/financial-crypto-equity-data-sources/index.html",
+          "objectPrefix": "research-data/research/pending/financial-crypto-equity-data-sources/"
         }
       ]
     },
@@ -198,7 +207,14 @@
           "label": "数据源结构化清单",
           "path": "research/pending/financial-crypto-equity-data-sources/data-sources.json"
         }
-      ]
+      ],
+      "language": "zh-CN",
+      "version": "html",
+      "format": "html",
+      "packagePath": "research/pending/financial-crypto-equity-data-sources/",
+      "sourcePath": "research/pending/financial-crypto-equity-data-sources/index.html",
+      "entryKey": "research-data/research/pending/financial-crypto-equity-data-sources/index.html",
+      "objectPrefix": "research-data/research/pending/financial-crypto-equity-data-sources/"
     }
   ],
   "inProgressResearch": [],
@@ -287,7 +303,7 @@
       "type": "skill",
       "format": "html",
       "language": "zh-CN",
-      "version": "0.8.2",
+      "version": "0.8.3",
       "status": "active",
       "updatedAt": "2026-05-13T00:00:00+08:00",
       "sourceRepository": {
@@ -325,7 +341,7 @@
       "type": "skill",
       "format": "html",
       "language": "zh-CN",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "status": "active",
       "updatedAt": "2026-05-13T00:00:00+08:00",
       "sourceRepository": {

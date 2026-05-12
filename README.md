@@ -7,6 +7,7 @@ This private repository stores research Web packages, pending research task card
 - `temptodo/`: temporary inbox for external Web/HTML files or complete webpage folders before explicit sync
 - `research/pending/tasks.json`: manually maintained pending research cards
 - `research/pending/tasks.schema.json`: pending task field contract
+- `research/pending/<topic>/index.html`: optional pending Web package preview entry
 - `research/pending/<topic>/`: optional pending source files or working notes referenced by `tasks.json`
 - `research/in-progress/<topic>/index.html`: active research Web packages
 - `research/completed/<topic>/index.html`: completed research Web packages
@@ -33,14 +34,14 @@ cd web
 npm run dev
 ```
 
-`temptodo/` is not scanned by this workflow. It is processed only after an explicit sync request, then files or webpage folders are classified into pending tasks, `research/in-progress/`, `research/completed/`, or `skills/`. When an inbox folder has CSS, JS, images, or data files, keep those assets with the target package.
+`temptodo/` is not scanned by this workflow. It is processed only after an explicit sync request, then files or webpage folders are classified into pending tasks, previewable pending packages, `research/in-progress/`, `research/completed/`, or `skills/`. When an inbox folder has CSS, JS, images, or data files, keep those assets with the target package.
 
 ## Access Model
 
 The preview uses a dual-bucket model:
 
 - `research-preview`: public authorization bucket for app shell only
-- `research-pages`: private content bucket for `research-data/manifest.json`, pending task JSON, research package payloads, and `research/private-index.json`
+- `research-pages`: private content bucket for `research-data/manifest.json`, pending task JSON, pending preview packages, research package payloads, and `research/private-index.json`
 
 There is no backend. The browser signs OSS `GET` requests using user-provided AK/SK or STS credentials.
 

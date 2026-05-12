@@ -16,7 +16,7 @@
       {
   "id": "oss-dual-bucket-access",
   "title": "OSS Dual Bucket Access",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "updatedAt": "2026-05-13T00:00:00+08:00",
   "entry": "skills/oss-dual-bucket-access/index.html",
   "repository": {
@@ -33,8 +33,8 @@
     "contentSourceRepository": "https://github.com/Jeronasand/skillgenome-pages",
     "sourceOfTruth": "skills/oss-dual-bucket-access/index.html#skillgenome-ai-context",
     "publishedEntry": "skills/oss-dual-bucket-access/index.html",
-    "release": "0.8.1-research-local",
-    "updatedAt": "2026-05-12T18:11:04+08:00",
+    "release": "0.8.3-research-local",
+    "updatedAt": "2026-05-13T00:00:00+08:00",
     "changeLog": "research/private-index.json",
     "issueIntake": "https://github.com/Jeronasand/skillgenome-pages/issues/new?template=skill-feedback.yml&labels=todo,skill-issue",
     "requiredTraceFields": [
@@ -49,6 +49,11 @@
     ]
   },
   "versionHistory": [
+    {
+      "version": "0.8.3",
+      "date": "2026-05-13",
+      "summary": "本仓库本地适配：private 数据桶同时承载 pending task JSON、待调研预览包、调研中包和已完结调研包。"
+    },
     {
       "version": "0.8.2",
       "date": "2026-05-13",
@@ -71,7 +76,7 @@
     }
   ],
   "install": {
-    "latestVersion": "0.8.2",
+    "latestVersion": "0.8.3",
     "updatedAt": "2026-05-13T00:00:00+08:00",
     "text": "本页当前用于 research 调研仓库，采用公开登录桶 research-preview + private 数据桶 research-pages 的双桶方案进行展示。内容模板源于 https://github.com/Jeronasand/skillgenome-pages，并已做本仓库本地适配。Web 更新时间：2026-05-13 +08:00。推荐把 SkillGenome Pages 作为上游参考；本仓库正式复用时引用 skills/oss-dual-bucket-access/index.html，并按 loginBucket、assetBuckets、credentialModes、corsRules、ramPolicy、checks 和 provenance 执行。"
   },
@@ -218,7 +223,7 @@
     {
       "bucket": "research-pages",
       "visibility": "private",
-      "purpose": "Store private sectioned JSON manifest, pending task JSON, research package payloads, media, exports, or project assets. A project can use one private asset bucket or multiple private asset prefixes.",
+      "purpose": "Store private sectioned JSON manifest, pending task JSON, pending preview packages, research package payloads, media, exports, or project assets. A project can use one private asset bucket or multiple private asset prefixes.",
       "accessedBy": [
         "browser OSS SDK with user-provided AK/SK",
         "STS temporary token",

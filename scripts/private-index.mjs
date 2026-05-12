@@ -131,33 +131,63 @@ function stringArray(value) {
   return Array.isArray(value) ? value.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim()) : [];
 }
 
-function normalizeTask(raw, index) {
+async function normalizeTask(root, raw, index) {
   const item = raw && typeof raw === "object" ? raw : {};
   const id = stringValue(item.id, `pending-${index + 1}`);
+  const packagePath = stringValue(item.packagePath, sourcePath("research", "pending", id));
+  const packageRoot = path.join(root, packagePath);
+  const metadata = (await readJsonIfExists(path.join(packageRoot, "research.json"))) || {};
+  const entryFile = stringValue(item.entry || metadata.entry, "index.html");
+  const entrySourcePath = sourcePath(packagePath, entryFile);
+  let preview = {};
+
+  try {
+    const html = await readFile(path.join(root, entrySourcePath), "utf8");
+    const meta = metaLineFromHtml(html);
+    preview = {
+      language: stringValue(item.language || metadata.language || meta.language, "zh-CN"),
+      version: stringValue(item.version || metadata.version || meta.version || meta.current_version, "html"),
+      format: "html",
+      packagePath,
+      sourcePath: entrySourcePath,
+      entryKey: objectKeyFor(entrySourcePath),
+      objectPrefix: objectKeyFor(packagePath),
+    };
+  } catch (error) {
+    if (error?.code !== "ENOENT") {
+      throw error;
+    }
+  }
+
   return {
     id,
-    title: stringValue(item.title, id),
+    title: stringValue(item.title || metadata.title, id),
     kind: "pending-task",
     sectionId: "pending",
     sectionTitle: "待调研",
     status: "pending",
     priority: stringValue(item.priority, "P2"),
-    summary: stringValue(item.summary),
+    summary: stringValue(item.summary || metadata.summary),
     request: stringValue(item.request),
     expectedOutput: stringValue(item.expectedOutput),
     targetPath: stringValue(item.targetPath),
     owner: stringValue(item.owner),
-    createdAt: stringValue(item.createdAt),
-    updatedAt: stringValue(item.updatedAt),
-    tags: stringArray(item.tags),
+    createdAt: stringValue(item.createdAt || metadata.createdAt),
+    updatedAt: stringValue(item.updatedAt || metadata.updatedAt),
+    tags: stringArray(item.tags?.length ? item.tags : metadata.tags),
     inputs: Array.isArray(item.inputs) ? item.inputs.filter((input) => input && typeof input === "object") : [],
+    ...preview,
   };
 }
 
 async function buildPendingTasks(root) {
   const payload = await readJsonIfExists(path.join(root, PENDING_TASKS_PATH));
   const items = Array.isArray(payload) ? payload : Array.isArray(payload?.items) ? payload.items : [];
-  return items.map((item, index) => normalizeTask(item, index));
+  const tasks = [];
+  for (const [index, item] of items.entries()) {
+    tasks.push(await normalizeTask(root, item, index));
+  }
+  return tasks;
 }
 
 async function buildResearchPackages(root, sectionId, sectionTitle) {
@@ -287,6 +317,7 @@ export async function buildPrivateIndex(root = repoRoot) {
       roots: {
         externalInbox: "temptodo/",
         pendingTasks: PENDING_TASKS_PATH,
+        pendingResearchPackages: "research/pending/<task-id>/index.html",
         inProgressResearch: "research/in-progress/*/index.html",
         completedResearch: "research/completed/*/index.html",
         skillHtml: "skills/*/index.html",
@@ -297,6 +328,7 @@ export async function buildPrivateIndex(root = repoRoot) {
     rules: [
       "The preview catalog has three top-level sections: pending, in-progress, and completed.",
       "Pending research tasks are hand-maintained in research/pending/tasks.json.",
+      "A pending task can optionally expose a preview package at research/pending/<task-id>/index.html or task.packagePath.",
       "In-progress and completed research entries are direct child directories with an index.html entrypoint.",
       "Each research package keeps its local assets beside its index.html.",
       "The public preview bucket only serves the authorization/app shell.",

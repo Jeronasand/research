@@ -10,6 +10,8 @@
       "request": "拆解各数据源的商用授权、价格、调用限制、API 成熟度、再分发边界和生产可用性。",
       "expectedOutput": "产品调研 HTML + 技术调研 HTML",
       "targetPath": "research/in-progress/financial-crypto-equity-data-sources/",
+      "packagePath": "research/pending/financial-crypto-equity-data-sources/",
+      "entry": "index.html",
       "tags": [
         "market-data",
         "crypto",

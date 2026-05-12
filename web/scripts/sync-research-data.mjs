@@ -43,7 +43,11 @@ async function copyResearchPackage(item) {
 async function main() {
   const privateIndex = await writePrivateIndex(repoRoot);
   const manifest = manifestFromPrivateIndex(privateIndex);
-  const packageItems = [...privateIndex.inProgressResearch, ...privateIndex.completedResearch];
+  const packageItems = [
+    ...privateIndex.pendingTasks.filter((item) => item.entryKey && item.packagePath),
+    ...privateIndex.inProgressResearch,
+    ...privateIndex.completedResearch,
+  ];
 
   await rm(outputDir, { force: true, recursive: true });
   await mkdir(outputDir, { recursive: true });
@@ -58,7 +62,7 @@ async function main() {
   await writeFile(path.join(outputDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 
   console.log(
-    `Wrote ${manifest.sections.length} sections, ${manifest.items.length} catalog items, and ${packageItems.length} research packages to ${path.relative(repoRoot, outputDir)}`,
+    `Wrote ${manifest.sections.length} sections, ${manifest.items.length} catalog items, and ${packageItems.length} preview packages to ${path.relative(repoRoot, outputDir)}`,
   );
 }
 

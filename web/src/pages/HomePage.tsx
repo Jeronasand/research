@@ -368,7 +368,7 @@ function CatalogItemCard({
   busy: boolean;
   onOpen: (item: ResearchCatalogItem) => void;
 }) {
-  const canOpen = item.kind === "research-package" && Boolean(item.entryKey);
+  const canOpen = Boolean(item.entryKey);
   const body = (
     <>
       <div className="flex items-start justify-between gap-3">
@@ -478,6 +478,8 @@ function PendingTaskSpec() {
               ["request", "建议", "你希望调研回答的问题"],
               ["expectedOutput", "建议", "期望产物，例如 产品调研 HTML + 技术调研 HTML"],
               ["targetPath", "建议", "后续静态包目录，例如 research/in-progress/<id>/"],
+              ["packagePath", "可选", "待调研预览包目录，例如 research/pending/<id>/"],
+              ["entry", "可选", "预览入口文件，默认 index.html"],
               ["tags", "可选", "字符串数组"],
               ["inputs", "可选", "输入材料数组：type / label / path / url / note"],
               ["owner", "可选", "负责人"],
