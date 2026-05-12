@@ -1,0 +1,10 @@
+{
+  "name": "git-history-report",
+  "version": "1.0.0",
+  "description": "一键生成离线的 Git 提交历史差异报告",
+  "main": "gen-history-report.js",
+  "dependencies": {
+    "diff2html": "^3.4.47"
+  },
+  "license": "MIT"
+}
