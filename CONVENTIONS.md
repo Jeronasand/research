@@ -150,6 +150,15 @@ npm run upload:oss
 npm run verify:oss
 ```
 
+For data-only changes, use the direct private-data workflow:
+
+```bash
+npm run data:update:dry-run
+npm run data:update
+```
+
+`data:update` refreshes `research/private-index.json`, regenerates `web/research-data/`, packages `dist/oss/content-bucket/research-data/`, uploads only `oss://research-pages/research-data/`, and verifies `research-data/manifest.json`.
+
 The package step creates:
 
 - `dist/oss/auth-bucket/` for `oss://research-preview/`

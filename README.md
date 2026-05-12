@@ -23,6 +23,8 @@ This private repository stores research Web packages, pending research task card
 
 ```bash
 npm run index:private
+npm run data:update:dry-run
+npm run data:update
 npm run package:oss
 npm run upload:oss:dry-run
 ```
@@ -46,6 +48,15 @@ The preview uses a dual-bucket model:
 There is no backend. The browser signs OSS `GET` requests using user-provided AK/SK or STS credentials.
 
 ## OSS Upload
+
+When only research data changed, update the private content bucket directly:
+
+```bash
+npm run data:update:dry-run
+npm run data:update
+```
+
+Use `npm run data:package` to refresh only local `web/research-data/` and `dist/oss/content-bucket/research-data/` without uploading.
 
 ```bash
 npm run package:oss

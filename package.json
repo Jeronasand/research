@@ -4,6 +4,9 @@
   "type": "module",
   "scripts": {
     "index:private": "node scripts/private-index.mjs",
+    "data:package": "node scripts/update-data.mjs --package-only",
+    "data:update:dry-run": "node scripts/update-data.mjs --dry-run",
+    "data:update": "node scripts/update-data.mjs",
     "package:oss": "node scripts/package-oss.mjs",
     "upload:oss": "node scripts/upload-oss.mjs",
     "upload:oss:dry-run": "node scripts/upload-oss.mjs --dry-run",
