@@ -22,6 +22,7 @@
     const offsets = tocLinks
       .map(link => {
         const id = link.getAttribute('href');
+        if (!id || !id.startsWith('#')) return null;
         const target = document.querySelector(id);
         if (!target) return null;
         return { link, top: target.getBoundingClientRect().top };

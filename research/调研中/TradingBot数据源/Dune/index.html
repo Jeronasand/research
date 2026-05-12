@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dune 数据源与 API 调研报告｜含术语索引</title>
-  <meta name="description" content="Dune 数据源、API、Sim、Datashare、Connector、MCP 与 Agent Skills 的单页调研报告，包含专业术语索引并跳转到 glossary.html。" />
+  <title>Dune 数据源、API、定价与术语调研报告</title>
+  <meta name="description" content="Dune 数据源、API、Sim、Datashare、Connector、MCP、Agent Skills、定价、额度与消费方式的单页调研报告。" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -33,6 +33,7 @@
         <a href="#architecture">集成架构</a>
         <a href="#decision">选型建议</a>
         <a href="#risks">风险与限制</a>
+        <a href="#pricing">定价与额度</a>
         <a href="#glossary-index">术语索引</a>
         <a href="./glossary.html">术语详解页</a>
         <a href="#sources">信息源</a>
@@ -50,6 +51,7 @@
           <span>形态：HTML + CSS + JS</span>
           <span>风格：黑白线条</span>
           <span>术语页：glossary.html</span>
+          <span>新增：定价 / 额度 / 扣费逻辑</span>
         </div>
       </section>
 
@@ -71,6 +73,7 @@
         <div class="key-points">
           <div><b><a class="term-link" href="./glossary.html#term-data-api">Data API</a></b><span>执行 SQL、读取查询结果、管理 Query、上传数据、Pipeline、Webhook。</span></div>
           <div><b><a class="term-link" href="./glossary.html#term-sim-api">Sim API</a></b><span>面向实时应用，提供钱包余额、交易、NFT、DeFi Position、Token Holder 等接口。</span></div>
+          <div><b><a class="term-link" href="./glossary.html#term-credit">Credit</a> / <a class="term-link" href="./glossary.html#term-compute-unit">CU</a></b><span>Data Hub / Data API 主要按 Credit 计费；Sim API 按 Compute Unit 计量。</span></div>
           <div><b><a class="term-link" href="./glossary.html#term-datashare">Datashare</a></b><span>企业级数据流向 Snowflake、BigQuery、Databricks。</span></div>
           <div><b><a class="term-link" href="./glossary.html#term-trino-connector">Trino</a> / <a class="term-link" href="./glossary.html#term-dbt-connector">dbt</a></b><span>通过 Trino endpoint 接入 BI、SQL Client、dbt 转换流程。</span></div>
           <div><b><a class="term-link" href="./glossary.html#term-mcp">MCP</a> / <a class="term-link" href="./glossary.html#term-agent-skills">Skills</a></b><span>面向 AI Agent，让 Agent 可查询数据集、执行查询、调用 Sim。</span></div>
@@ -527,9 +530,253 @@
       </section>
 
 
-      <section class="panel searchable" id="glossary-index">
+
+      <section class="panel searchable" id="pricing">
         <div class="section-head">
           <span class="number">12</span>
+          <h2>Dune 定价、消费方式与额度扣减</h2>
+        </div>
+        <p class="section-intro">Dune 的费用体系要分开看：<b>Data Hub / Data API / SQL / Connector</b> 主要按 <a class="term-link" href="./glossary.html#term-credit">Credit</a> 计量；<b>Sim 实时 API</b> 使用独立的 <a class="term-link" href="./glossary.html#term-compute-unit">Compute Unit，CU</a> 计量。两套体系不要混在一起估算。</p>
+
+        <div class="grid three pricing-metrics">
+          <article class="card strong">
+            <h3>Data API：Credit</h3>
+            <p>执行 SQL、执行已保存 Query、读取结果、导出 CSV/API、写入上传表、物化视图刷新、dbt / Trino Connector 查询都会消耗计划内 Credits 或额外 Credits。</p>
+          </article>
+          <article class="card strong">
+            <h3>Sim API：CU</h3>
+            <p>面向实时钱包、余额、交易、NFT、Token Holder 等接口。按 API 请求消耗 CU，多链查询通常按链数量放大。</p>
+          </article>
+          <article class="card strong">
+            <h3>额度控制</h3>
+            <p>可通过单次查询成本上限、月度额外 Credit 上限、明确 chain_ids、缓存结果、分页读取和白名单 Query 控制成本。</p>
+          </article>
+        </div>
+
+        <h3 class="subhead">Data Hub / Data API 计划价格</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>计划</th>
+                <th>月费 / 年费</th>
+                <th>每月 Credits</th>
+                <th>额外 Credit 单价</th>
+                <th>适用判断</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Free</td>
+                <td>免费</td>
+                <td>2,500</td>
+                <td>$5.00 / 100 Credits</td>
+                <td>测试、低频查询、前期验证。</td>
+              </tr>
+              <tr>
+                <td>Analyst</td>
+                <td>$75 / 月；年付约 $65 / 月，$780 / 年</td>
+                <td>4,000</td>
+                <td>$1.875 / 100 Credits；年付 $1.625 / 100 Credits</td>
+                <td>个人或小团队的稳定分析。</td>
+              </tr>
+              <tr>
+                <td>Plus</td>
+                <td>$399 / 月；年付约 $349 / 月，$4,188 / 年</td>
+                <td>25,000</td>
+                <td>$1.596 / 100 Credits；年付 $1.396 / 100 Credits</td>
+                <td>团队级 API、CSV、私有查询、较高频自动化。</td>
+              </tr>
+              <tr>
+                <td>Enterprise</td>
+                <td>Custom</td>
+                <td>Custom</td>
+                <td>Custom / 通常可谈更低单价</td>
+                <td>数仓集成、Datashare、dbt Connector、SSO、专属支持。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="subhead">Credit 怎么扣</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>行为</th>
+                <th>扣费方式</th>
+                <th>关键说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Query / SQL 执行</td>
+                <td>按实际计算资源消耗 Credits</td>
+                <td>复杂查询、长时间运行、更多扫描和更高执行层级会消耗更多。官方没有公开固定公式。</td>
+              </tr>
+              <tr>
+                <td>Performance Tier</td>
+                <td>Small / Medium / Large 消耗不同</td>
+                <td>Small 成本较低但资源少；Medium 是常规 API 默认层级；Large 更快、更强，但同类查询通常消耗更多。</td>
+              </tr>
+              <tr>
+                <td>执行失败</td>
+                <td>失败执行也会扣 Credits</td>
+                <td>如果触发执行但没有拉取结果，只扣执行部分；不会再扣结果读取部分。</td>
+              </tr>
+              <tr>
+                <td>读取最新 Query 结果</td>
+                <td>不触发新执行，但按结果大小消耗 Credits</td>
+                <td>适合读取缓存结果，避免重复执行高成本 Query。</td>
+              </tr>
+              <tr>
+                <td>API / CSV 导出</td>
+                <td>按导出数据量扣 Credits</td>
+                <td>Free：20 Credits / MB；Analyst：10 Credits / MB；Plus：2 Credits / MB；Enterprise：Custom。</td>
+              </tr>
+              <tr>
+                <td>Data Writes / Uploads</td>
+                <td>按写入 GB 和最低操作费扣 Credits</td>
+                <td>Free / Analyst / Plus：3 Credits / GB Written；每次写操作最低 1 Credit；Enterprise Custom。</td>
+              </tr>
+              <tr>
+                <td>Materialized View 刷新</td>
+                <td>每次刷新按实际计算资源扣 Credits</td>
+                <td>适合预计算高成本结果，但刷新频率越高，累计成本越高。</td>
+              </tr>
+              <tr>
+                <td>Trino Connector</td>
+                <td>查询按 Large Query Engine 执行并扣 Credits</td>
+                <td>结果获取还会按返回 datapoints / 结果规模消耗额度。</td>
+              </tr>
+              <tr>
+                <td>dbt / Data Transformations</td>
+                <td>计算、写入、维护操作都可能扣 Credits</td>
+                <td>CI/CD 每次 Push / PR 触发的模型运行都会消耗同一个 Credit 池。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="subhead">额度、续费与超额</h3>
+        <div class="grid two">
+          <article class="card">
+            <h3>月度额度</h3>
+            <p>Credits 每月重置；年付计划也是按月发放额度。月底未用完的 Credits 不会结转到下个月。</p>
+          </article>
+          <article class="card">
+            <h3>超额使用</h3>
+            <p>额度用完后可按额外 Credits 继续使用。Free 也支持 Pay-as-you-go，按 $5 / 100 Credits 计。</p>
+          </article>
+          <article class="card">
+            <h3>费用上限</h3>
+            <p>可以在订阅设置里设置月度额外 Credit 上限。设置为 $0 时，会阻止产生额外用量计费。</p>
+          </article>
+          <article class="card">
+            <h3>成本可见性</h3>
+            <p>执行前通常看不到精确成本，执行后可在 Usage / Billing Dashboard 查看 Credits、额外 Credits 和历史使用情况。</p>
+          </article>
+        </div>
+
+        <h3 class="subhead">存储、导出、Webhook 配额</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>项目</th>
+                <th>Free</th>
+                <th>Analyst</th>
+                <th>Plus</th>
+                <th>Enterprise</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Storage Limit</td>
+                <td>100 MB</td>
+                <td>1 GB</td>
+                <td>15 GB</td>
+                <td>Custom / 200 GB+</td>
+              </tr>
+              <tr>
+                <td>API / CSV Export</td>
+                <td>20 Credits / MB</td>
+                <td>10 Credits / MB</td>
+                <td>2 Credits / MB</td>
+                <td>Custom</td>
+              </tr>
+              <tr>
+                <td>Webhooks / Alerts</td>
+                <td>1</td>
+                <td>5</td>
+                <td>5</td>
+                <td>Custom</td>
+              </tr>
+              <tr>
+                <td>CSV Export 权限</td>
+                <td>不建议依赖</td>
+                <td>不建议依赖</td>
+                <td>支持</td>
+                <td>支持 / Custom</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="subhead">Sim API 定价与 CU 扣减</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sim 计划 / 行为</th>
+                <th>额度或价格</th>
+                <th>扣减逻辑</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Free</td>
+                <td>1,000,000 CU / 月；5 RPS</td>
+                <td>适合测试、小项目和早期验证。</td>
+              </tr>
+              <tr>
+                <td>Enterprise</td>
+                <td>10,000,000+ CU / 月；100 - 1000 RPS；Starting at $500 / 月</td>
+                <td>适合生产钱包、Portfolio、实时应用。</td>
+              </tr>
+              <tr>
+                <td>普通 API Call</td>
+                <td>通常从 1 CU 起</td>
+                <td>简单请求消耗 1 CU。</td>
+              </tr>
+              <tr>
+                <td>多链请求</td>
+                <td>按链数量放大</td>
+                <td>例如一个钱包查 3 条链余额，大致消耗 3 CU；务必显式传 <code>chain_ids</code>。</td>
+              </tr>
+              <tr>
+                <td>Token Holders</td>
+                <td>固定 2 CU / request</td>
+                <td>适合查询某 Token 持有人分布。</td>
+              </tr>
+              <tr>
+                <td>Solana Transactions</td>
+                <td>固定 1 CU / request</td>
+                <td>适合 Solana 地址交易记录查询。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pricing-note">
+          <b>对你的集成建议：</b>
+          <span>Data API 适合定时同步、报表、指标沉淀；Sim 适合实时钱包和用户资产展示。生产环境建议把 Dune Query 固化成白名单，后端加缓存、重试、限流、分页和成本预算，不要让 Agent 任意执行无限制 SQL。</span>
+        </div>
+      </section>
+
+      <section class="panel searchable" id="glossary-index">
+        <div class="section-head">
+          <span class="number">13</span>
           <h2>专业术语索引</h2>
         </div>
         <p class="section-intro">本节把报告中的关键词集中索引。点击术语可跳转到 <a class="term-link" href="./glossary.html">glossary.html</a> 查看完整解释，包括详细定义、适合用法和注意点。</p>
@@ -542,6 +789,12 @@
           <a href="./glossary.html#term-indexer">Indexer</a>
           <a href="./glossary.html#term-normalizer">Normalizer</a>
           <a href="./glossary.html#term-ai-memory">AI Memory</a>
+          <a href="./glossary.html#term-credit">Credit</a>
+          <a href="./glossary.html#term-compute-credit">Compute Credit</a>
+          <a href="./glossary.html#term-compute-unit">Compute Unit</a>
+          <a href="./glossary.html#term-extra-credit">Extra Credit</a>
+          <a href="./glossary.html#term-performance-tier">Performance Tier</a>
+          <a href="./glossary.html#term-quota">Quota</a>
         </div>
         <div class="table-wrap term-index-table">
           <table>
@@ -713,6 +966,37 @@
                 <td>Token 数据</td>
                 <td>Token 的名称、符号、小数位、Logo、价格、供应量等描述信息。</td>
               </tr>
+
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-credit">Credit</a></td>
+                <td>计费 / Dune</td>
+                <td>Dune Data Hub / Data API 的主要用量单位，执行查询、导出、写入和部分连接器操作会消耗 Credits。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-compute-credit">Compute Credit</a></td>
+                <td>计费 / 查询执行</td>
+                <td>按实际计算资源扣减的 Credits，受查询复杂度、执行时间、扫描量和引擎层级影响。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-compute-unit">Compute Unit / CU</a></td>
+                <td>计费 / Sim</td>
+                <td>Sim API 的独立用量单位。简单请求通常 1 CU，多链请求会按链数量放大。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-extra-credit">Extra Credit</a></td>
+                <td>计费 / 超额</td>
+                <td>超过月度计划额度后继续使用产生的额外 Credits，可通过月度上限控制。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-performance-tier">Performance Tier</a></td>
+                <td>查询执行</td>
+                <td>Small、Medium、Large 三种查询执行层级，资源越强通常越快，但消耗可能更高。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-quota">Quota</a></td>
+                <td>额度 / 限制</td>
+                <td>每月 Credits、Sim CU、存储、Webhook、API rate limit 等都属于额度或限制项。</td>
+              </tr>
               <tr>
                 <td><a class="term-link" href="./glossary.html#term-data-warehouse">Data Warehouse</a></td>
                 <td>数据平台</td>
@@ -735,7 +1019,7 @@
 
       <section class="panel searchable" id="sources">
         <div class="section-head">
-          <span class="number">13</span>
+          <span class="number">14</span>
           <h2>信息源</h2>
         </div>
         <div class="source-list">
@@ -747,6 +1031,11 @@
           <a href="https://docs.dune.com/api-reference/connectors/overview" target="_blank" rel="noreferrer">Connectors Overview</a>
           <a href="https://docs.sim.dune.com/" target="_blank" rel="noreferrer">Sim by Dune Docs</a>
           <a href="https://github.com/duneanalytics/skills" target="_blank" rel="noreferrer">Dune Agent Skills</a>
+          <a href="https://dune.com/pricing" target="_blank" rel="noreferrer">Dune Pricing</a>
+          <a href="https://docs.dune.com/learning/how-tos/credit-system" target="_blank" rel="noreferrer">Dune Credit System</a>
+          <a href="https://docs.dune.com/api-reference/overview/billing" target="_blank" rel="noreferrer">Dune API Billing</a>
+          <a href="https://sim.dune.com/pricing" target="_blank" rel="noreferrer">Sim Pricing</a>
+          <a href="https://docs.sim.dune.com/compute-units" target="_blank" rel="noreferrer">Sim Compute Units</a>
         </div>
       </section>
     </main>

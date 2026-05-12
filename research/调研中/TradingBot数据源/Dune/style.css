@@ -430,3 +430,26 @@ mark { background: transparent; border-bottom: 2px solid var(--line); color: inh
   .content { max-width: none; padding: 0; }
   .panel { break-inside: avoid; margin-bottom: 12px; }
 }
+
+
+/* Pricing section */
+.subhead {
+  margin: 22px 0 12px;
+  padding-left: 10px;
+  border-left: 6px solid var(--line);
+}
+.pricing-metrics { margin-bottom: 18px; }
+.pricing-note {
+  margin-top: 18px;
+  border: 2px solid var(--line);
+  background: var(--shade);
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 14px;
+  padding: 16px;
+}
+.pricing-note b { font-size: 15px; }
+.pricing-note span { color: #222; }
+@media (max-width: 980px) {
+  .pricing-note { grid-template-columns: 1fr; }
+}

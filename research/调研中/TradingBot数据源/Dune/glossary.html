@@ -57,6 +57,12 @@
 <a href="#term-token-metadata">Token Metadata</a>
 <a href="#term-data-warehouse">Data Warehouse</a>
 <a href="#term-bi">BI</a>
+<a href="#term-credit">Credit</a>
+<a href="#term-compute-credit">Compute Credit</a>
+<a href="#term-compute-unit">Compute Unit / CU</a>
+<a href="#term-extra-credit">Extra Credit</a>
+<a href="#term-performance-tier">Performance Tier</a>
+<a href="#term-quota">Quota</a>
 <a href="#term-snowflake-bigquery-databricks">Snowflake / BigQuery / Databricks</a>
       </nav>
       <button class="back-top" id="backTop" type="button">返回顶部</button>
@@ -684,6 +690,82 @@
           </article>
         </div>
       </section>
+
+      <section class="panel glossary-section" id="cat-pricing">
+        <div class="section-head">
+          <span class="number">26</span>
+          <h2>计费 / 额度</h2>
+        </div>
+        <div class="definition-grid">
+          <article class="definition-card searchable" id="term-credit">
+            <div class="definition-kicker">计费 / Dune</div>
+            <h2>Credit</h2>
+            <p class="definition-short">Dune Data Hub / Data API 的主要用量单位。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>执行查询、读取结果、导出数据、写入数据、刷新物化视图、通过部分连接器运行查询时，都会消耗计划内 Credits 或额外 Credits。</dd>
+              <dt>适合用法</dt><dd>用于估算 Dune SQL 分析、API 抓取、ETL 和自动化报告成本。</dd>
+              <dt>注意点</dt><dd>Credit 不等于固定请求次数。查询越复杂、扫描越多、运行越久，消耗越高。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#pricing">返回定价与额度</a>
+          </article>
+          <article class="definition-card searchable" id="term-compute-credit">
+            <div class="definition-kicker">计费 / 查询执行</div>
+            <h2>Compute Credit</h2>
+            <p class="definition-short">按实际计算资源扣减的 Credits。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Compute Credit 与 CPU-seconds、网络资源、查询复杂度、执行时间和所选执行引擎有关。官方不公开单次查询固定公式。</dd>
+              <dt>适合用法</dt><dd>适合评估 SQL 查询、定时任务、物化视图刷新和 Connector 查询成本。</dd>
+              <dt>注意点</dt><dd>生产环境应为查询设置成本上限，并优先复用缓存结果或物化视图。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#pricing">返回定价与额度</a>
+          </article>
+          <article class="definition-card searchable" id="term-compute-unit">
+            <div class="definition-kicker">计费 / Sim</div>
+            <h2>Compute Unit / CU</h2>
+            <p class="definition-short">Sim API 的独立用量单位。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Sim 按 API 调用消耗 CU。简单请求通常 1 CU，多链请求会按处理链数量消耗多个 CU。</dd>
+              <dt>适合用法</dt><dd>适合估算钱包余额、交易记录、NFT、Token Holder 等实时接口成本。</dd>
+              <dt>注意点</dt><dd>务必显式传 chain_ids，避免默认链集合变化导致 CU 消耗不可控。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#pricing">返回定价与额度</a>
+          </article>
+          <article class="definition-card searchable" id="term-extra-credit">
+            <div class="definition-kicker">计费 / 超额</div>
+            <h2>Extra Credit</h2>
+            <p class="definition-short">超过月度计划额度后继续使用产生的额外 Credits。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>当计划内 Credits 用完，如果允许超额使用，会按对应计划的额外 Credit 价格继续计费。</dd>
+              <dt>适合用法</dt><dd>适合偶发大查询或短期流量波动。</dd>
+              <dt>注意点</dt><dd>需要设置月度上限。若不想产生超额费用，应把额外 Credit 上限设为 0。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#pricing">返回定价与额度</a>
+          </article>
+          <article class="definition-card searchable" id="term-performance-tier">
+            <div class="definition-kicker">查询执行</div>
+            <h2>Performance Tier</h2>
+            <p class="definition-short">Dune 查询执行层级，常见为 Small、Medium、Large。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>不同 tier 分配不同计算资源。Small 成本低但资源少，Medium 适合常规查询，Large 适合复杂查询但通常消耗更多。</dd>
+              <dt>适合用法</dt><dd>根据查询复杂度和时效要求选择执行层级。</dd>
+              <dt>注意点</dt><dd>不要默认把所有任务放到 Large。应先优化 SQL，再提升 tier。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#pricing">返回定价与额度</a>
+          </article>
+          <article class="definition-card searchable" id="term-quota">
+            <div class="definition-kicker">额度 / 限制</div>
+            <h2>Quota</h2>
+            <p class="definition-short">平台对用量、存储、并发、频率或功能数量设置的限制。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Dune 的 Quota 包括每月 Credits、存储容量、Webhook 数量、API Rate Limit、私有查询数；Sim 的 Quota 包括 CU 和 RPS。</dd>
+              <dt>适合用法</dt><dd>用于设计限流、任务调度、用户分层和成本预算。</dd>
+              <dt>注意点</dt><dd>Quota 到达上限后可能失败、排队或产生额外费用，取决于具体计划和设置。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#pricing">返回定价与额度</a>
+          </article>
+        </div>
+      </section>
+
     </main>
   </div>
   <script src="./app.js"></script>
