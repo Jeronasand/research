@@ -29,7 +29,7 @@ npm run dev
 预览继续使用既有双桶方案：
 
 - 预览桶：`research-preview`，endpoint `oss-cn-shenzhen.aliyuncs.com`，只托管公开授权页和应用壳。
-- 数据桶：`research-datas`，endpoint `oss-cn-beijing.aliyuncs.com`，保持 private ACL，用户输入 OSS AK 或 STS 后由浏览器签名读取。
+- 数据桶：`research-pages`，endpoint `oss-cn-shenzhen.aliyuncs.com`，保持 private ACL，用户输入 OSS AK 或 STS 后由浏览器签名读取。
 - manifest key：`research-data/manifest.json`。
 
 首屏只做授权，没有后端服务。授权后，浏览器为私有 manifest 和选中的 HTML 对象生成短期有效的签名 `GET` URL。
@@ -41,7 +41,7 @@ npm run dev
 - methods: `GET`
 - origin: 实际预览页面域名和本地开发域名
 
-CORS 不会把 `research-datas` 变成公开桶。桶 ACL 继续保持 private，读取仍必须携带有效 OSS 签名。
+CORS 不会把 `research-pages` 变成公开桶。桶 ACL 继续保持 private，读取仍必须携带有效 OSS 签名。
 
 ## 从仓库根目录打包上传
 
@@ -56,4 +56,4 @@ npm run upload:oss
 这会保持两个桶分开：
 
 - `dist/oss/auth-bucket/` -> `oss://research-preview/`
-- `dist/oss/content-bucket/research-data/` -> `oss://research-datas/research-data/`
+- `dist/oss/content-bucket/research-data/` -> `oss://research-pages/research-data/`

@@ -45,7 +45,7 @@ This is a private research repository. Project-related research deliverables are
 
 - Use the existing dual-bucket scheme.
 - Public preview/auth bucket: `research-preview` on `oss-cn-shenzhen.aliyuncs.com`; it only hosts the authorization page and web app shell.
-- Private content/data bucket: `research-datas` on `oss-cn-beijing.aliyuncs.com`; it stores `research-data/manifest.json`, research HTML, skill HTML, and private index data.
+- Private content/data bucket: `research-pages` on `oss-cn-shenzhen.aliyuncs.com`; it stores `research-data/manifest.json`, research HTML, skill HTML, and private index data.
 - Keep the flow pure static browser AK/STS. Do not add a backend gateway unless the user explicitly asks for one.
 - The authorization page can directly reuse the dual-bucket access skill/page.
 - Never commit AK/SK, STS tokens, signed URLs with secrets, or session dumps.
@@ -55,7 +55,7 @@ This is a private research repository. Project-related research deliverables are
 - The repository owns its OSS packaging and upload workflow.
 - Run `npm run package:oss` from the repo root to build two local payloads:
   - `dist/oss/auth-bucket/` -> `oss://research-preview/`
-  - `dist/oss/content-bucket/research-data/` -> `oss://research-datas/research-data/`
+  - `dist/oss/content-bucket/research-data/` -> `oss://research-pages/research-data/`
 - Run `npm run upload:oss:dry-run` before the first real upload or before any risky change.
 - Run `npm run upload:oss -- --target auth` to upload only the public authorization/app shell bucket.
 - Run `npm run upload:oss -- --target content` to upload only the private content bucket.

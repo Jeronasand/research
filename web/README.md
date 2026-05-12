@@ -29,7 +29,7 @@ The preview can render both Markdown and HTML, but new research and skill delive
 The preview uses the established dual-bucket scheme:
 
 - preview bucket: `research-preview` on `oss-cn-shenzhen.aliyuncs.com`, public static hosting for the authorization/app shell only.
-- data bucket: `research-datas` on `oss-cn-beijing.aliyuncs.com`, private ACL, read by browser-side signed OSS `GET` requests after the user enters OSS AK or STS credentials.
+- data bucket: `research-pages` on `oss-cn-shenzhen.aliyuncs.com`, private ACL, read by browser-side signed OSS `GET` requests after the user enters OSS AK or STS credentials.
 - manifest key: `research-data/manifest.json`.
 
 The first screen is authorization-only. There is no backend. After authorization, the browser signs short-lived `GET` URLs for the private manifest and selected HTML objects.
@@ -41,7 +41,7 @@ The private data bucket needs CORS for:
 - methods: `GET`
 - origin: the actual preview origin and local dev origins
 
-CORS does not make `research-datas` public. Bucket ACL stays private; reads still require valid signed OSS requests.
+CORS does not make `research-pages` public. Bucket ACL stays private; reads still require valid signed OSS requests.
 
 ## Package And Upload From Repo Root
 
@@ -56,4 +56,4 @@ npm run upload:oss
 This keeps the two buckets separate:
 
 - `dist/oss/auth-bucket/` -> `oss://research-preview/`
-- `dist/oss/content-bucket/research-data/` -> `oss://research-datas/research-data/`
+- `dist/oss/content-bucket/research-data/` -> `oss://research-pages/research-data/`

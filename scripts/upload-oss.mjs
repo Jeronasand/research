@@ -74,6 +74,7 @@ function ossutilArgs(options, target) {
     ".DS_Store",
     "--exclude",
     "*/.DS_Store",
+    "--force",
   ];
 
   if (options.dryRun) {

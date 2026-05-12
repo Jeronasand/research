@@ -95,7 +95,7 @@ async function main() {
     safety: [
       "authorization/app shell bucket and private content bucket are packaged separately",
       "run dry-run before first upload or before enabling --delete",
-      "content payload is uploaded under research-data/ in research-datas",
+      "content payload is uploaded under research-data/ in research-pages",
       "do not commit or package credentials, STS tokens, signed URLs, or session dumps",
     ],
   };

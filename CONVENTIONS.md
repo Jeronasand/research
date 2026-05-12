@@ -79,7 +79,7 @@ After classification, refresh the generated index and data payload.
 - HTML skill entries
 - pending research directories
 - dual-bucket access metadata
-- object keys for upload to `research-datas`
+- object keys for upload to `research-pages`
 
 It must not include `temptodo/`; that directory is an unsynced inbox.
 
@@ -101,7 +101,7 @@ The generated upload root is `web/research-data/`.
 ## Dual Bucket Rules
 
 - `research-preview`: public preview/auth bucket, app shell and authorization UI only.
-- `research-datas`: private content/data bucket, indexed HTML and manifest only.
+- `research-pages`: private content/data bucket, indexed HTML and manifest only.
 - `research-data/manifest.json`: private data manifest consumed by the preview app.
 - Browser access uses OSS AK/SK or STS to create signed `GET` requests directly against the private data bucket.
 - Do not add backend gateway code unless explicitly requested.
@@ -121,7 +121,7 @@ npm run verify:oss
 The package step creates:
 
 - `dist/oss/auth-bucket/` for `oss://research-preview/`
-- `dist/oss/content-bucket/research-data/` for `oss://research-datas/research-data/`
+- `dist/oss/content-bucket/research-data/` for `oss://research-pages/research-data/`
 - `dist/oss/upload-plan.json` as the local deployment manifest
 
 Upload rules:
@@ -129,7 +129,7 @@ Upload rules:
 - Use `ossutil sync`, not ad hoc object copies.
 - Always use explicit endpoint and region flags.
 - Auth bucket endpoint/region: `oss-cn-shenzhen.aliyuncs.com` / `cn-shenzhen`.
-- Content bucket endpoint/region: `oss-cn-beijing.aliyuncs.com` / `cn-beijing`.
+- Content bucket endpoint/region: `oss-cn-shenzhen.aliyuncs.com` / `cn-shenzhen`.
 - Run dry-run first for new prefixes or broad changes.
 - `--delete` is destructive and requires `--delete --yes`.
 - Do not upload `web/research-data/` to the public auth bucket.

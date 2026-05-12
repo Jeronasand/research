@@ -1,6 +1,6 @@
 {
   "schemaVersion": "research-private-index/v1",
-  "generatedAt": "2026-05-12T11:04:30.908Z",
+  "generatedAt": "2026-05-12T11:35:49.002Z",
   "repository": {
     "visibility": "private",
     "roots": {
@@ -17,8 +17,8 @@
   "dualBucketAccess": {
     "previewBucket": "research-preview",
     "previewEndpoint": "oss-cn-shenzhen.aliyuncs.com",
-    "dataBucket": "research-datas",
-    "dataEndpoint": "oss-cn-beijing.aliyuncs.com",
+    "dataBucket": "research-pages",
+    "dataEndpoint": "oss-cn-shenzhen.aliyuncs.com",
     "manifestKey": "research-data/manifest.json",
     "mode": "pure-static-browser-ak-sts",
     "authPage": "Use the OSS dual-bucket access HTML skill or the web/ authorization screen directly."

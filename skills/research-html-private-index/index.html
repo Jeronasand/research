@@ -26,9 +26,9 @@
           "需要处理 temptodo/ 中外部来源的 Web、HTML 文件或完整网页文件夹",
           "新增或更新 skills/<skill-id>/index.html HTML skill",
           "需要维护 research/private-index.json",
-          "需要打包 research-datas 私有数据桶 payload",
-          "需要打包或上传 research-preview 授权桶和 research-datas 内容桶",
-          "需要确认 research-preview / research-datas 双桶边界"
+          "需要打包 research-pages 私有数据桶 payload",
+          "需要打包或上传 research-preview 授权桶和 research-pages 内容桶",
+          "需要确认 research-preview / research-pages 双桶边界"
         ],
         "workflow": [
           "外部来源的 Web、HTML 或完整网页文件夹先放在 temptodo/，默认不进入索引、不进入 OSS payload。",
@@ -42,13 +42,13 @@
           "运行 cd web && npm run sync:data 生成 web/research-data/manifest.json 和上传数据。",
           "运行 npm run package:oss 生成 dist/oss/auth-bucket 和 dist/oss/content-bucket/research-data 两个 payload。",
           "运行 npm run upload:oss:dry-run 预览两个桶的上传范围，再按需运行 npm run upload:oss 或 --target auth/content。",
-          "使用 research-preview 承载公开授权页，使用 research-datas 承载 private HTML 和 manifest。"
+          "使用 research-preview 承载公开授权页，使用 research-pages 承载 private HTML 和 manifest。"
         ],
         "dualBucketAccess": {
           "previewBucket": "research-preview",
           "previewEndpoint": "oss-cn-shenzhen.aliyuncs.com",
-          "dataBucket": "research-datas",
-          "dataEndpoint": "oss-cn-beijing.aliyuncs.com",
+          "dataBucket": "research-pages",
+          "dataEndpoint": "oss-cn-shenzhen.aliyuncs.com",
           "manifestKey": "research-data/manifest.json",
           "mode": "pure-static-browser-ak-sts"
         },
@@ -59,7 +59,7 @@
           "web/research-data/manifest.json 的 key 指向 research-data/ 前缀。",
           "dist/oss/auth-bucket 只包含公开授权页和应用壳。",
           "dist/oss/content-bucket/research-data 包含 private manifest、research HTML、skill HTML 和 private index。",
-          "web 预览默认数据桶是 research-datas / oss-cn-beijing.aliyuncs.com。",
+          "web 预览默认数据桶是 research-pages / oss-cn-shenzhen.aliyuncs.com。",
           "没有新增后端网关、AK/SK、STS token 或签名 URL。"
         ]
       }
@@ -153,7 +153,7 @@ npm run sync:data</pre>
       <h2>双桶边界</h2>
       <ul>
         <li><code>research-preview</code> 只承载公开授权页和应用壳。</li>
-        <li><code>research-datas</code> 承载 private manifest、research HTML、skill HTML 和 private index。</li>
+        <li><code>research-pages</code> 承载 private manifest、research HTML、skill HTML 和 private index。</li>
         <li>保持纯静态浏览器 AK/STS 访问，不引入后端网关。</li>
       </ul>
 
@@ -164,7 +164,7 @@ npm run upload:oss:dry-run
 npm run upload:oss</pre>
       <ul>
         <li><code>dist/oss/auth-bucket/</code> 上传到 <code>oss://research-preview/</code>。</li>
-        <li><code>dist/oss/content-bucket/research-data/</code> 上传到 <code>oss://research-datas/research-data/</code>。</li>
+        <li><code>dist/oss/content-bucket/research-data/</code> 上传到 <code>oss://research-pages/research-data/</code>。</li>
         <li>只发布授权页时使用 <code>npm run upload:oss -- --target auth</code>。</li>
         <li>只发布内容数据时使用 <code>npm run upload:oss -- --target content</code>。</li>
         <li><code>--delete</code> 只能在 dry-run 后显式配合 <code>--yes</code> 使用。</li>

@@ -38,7 +38,7 @@ npm run dev
 The preview uses a dual-bucket model:
 
 - `research-preview`: public authorization bucket for app shell only
-- `research-datas`: private content bucket for `research-data/manifest.json`, research HTML, skill HTML, and `research/private-index.json`
+- `research-pages`: private content bucket for `research-data/manifest.json`, research HTML, skill HTML, and `research/private-index.json`
 
 There is no backend. The browser signs OSS `GET` requests using user-provided AK/SK or STS credentials.
 
@@ -60,7 +60,7 @@ npm run upload:oss -- --target content
 The upload script uses:
 
 - `dist/oss/auth-bucket/` -> `oss://research-preview/`
-- `dist/oss/content-bucket/research-data/` -> `oss://research-datas/research-data/`
+- `dist/oss/content-bucket/research-data/` -> `oss://research-pages/research-data/`
 
 Use `npm run verify:oss` after upload. Remote deletion is off by default; use `--delete --yes` only after a dry-run and an explicit cleanup decision.
 

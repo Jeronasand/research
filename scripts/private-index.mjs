@@ -12,8 +12,8 @@ export const DATA_PREFIX = "research-data";
 const dualBucketAccess = {
   previewBucket: "research-preview",
   previewEndpoint: "oss-cn-shenzhen.aliyuncs.com",
-  dataBucket: "research-datas",
-  dataEndpoint: "oss-cn-beijing.aliyuncs.com",
+  dataBucket: "research-pages",
+  dataEndpoint: "oss-cn-shenzhen.aliyuncs.com",
   manifestKey: `${DATA_PREFIX}/manifest.json`,
   mode: "pure-static-browser-ak-sts",
   authPage: "Use the OSS dual-bucket access HTML skill or the web/ authorization screen directly.",

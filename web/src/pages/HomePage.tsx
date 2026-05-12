@@ -36,8 +36,8 @@ type DirectoryTreeNode = {
 };
 
 const initialForm: FormState = {
-  dataBucket: "research-datas",
-  dataEndpoint: "oss-cn-beijing.aliyuncs.com",
+  dataBucket: "research-pages",
+  dataEndpoint: "oss-cn-shenzhen.aliyuncs.com",
   manifestKey: "research-data/manifest.json",
   accessKeyId: "",
   accessKeySecret: "",
@@ -316,7 +316,7 @@ export function HomePage() {
   const [selectedId, setSelectedId] = useState("");
   const [documentText, setDocumentText] = useState("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
-  const [status, setStatus] = useState("请输入可读取 research-datas 私有数据桶的 OSS AK 或 STS 凭证。");
+  const [status, setStatus] = useState("请输入可读取 research-pages 私有数据桶的 OSS AK 或 STS 凭证。");
   const [busy, setBusy] = useState(false);
 
   const selectedItem = useMemo(

@@ -7,7 +7,7 @@ This repository publishes two separate OSS payloads.
 | Purpose | Local payload | OSS target | Endpoint | Region |
 | --- | --- | --- | --- | --- |
 | Authorization/app shell | `dist/oss/auth-bucket/` | `oss://research-preview/` | `oss-cn-shenzhen.aliyuncs.com` | `cn-shenzhen` |
-| Private content data | `dist/oss/content-bucket/research-data/` | `oss://research-datas/research-data/` | `oss-cn-beijing.aliyuncs.com` | `cn-beijing` |
+| Private content data | `dist/oss/content-bucket/research-data/` | `oss://research-pages/research-data/` | `oss-cn-shenzhen.aliyuncs.com` | `cn-shenzhen` |
 
 ## Package
 
@@ -67,6 +67,6 @@ npm run verify:oss
 This checks:
 
 - `oss://research-preview/index.html`
-- `oss://research-datas/research-data/manifest.json`
+- `oss://research-pages/research-data/manifest.json`
 
 Keep these checks separate. A public preview upload can pass while the private content bucket still fails because of ACL, RAM, CORS, or region mismatch.
