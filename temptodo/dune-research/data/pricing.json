@@ -1,8 +1,0 @@
-{
-  "model": "Credit Based",
-  "factors": [
-    "Query Complexity",
-    "Scan Size",
-    "Export Size"
-  ]
-}

@@ -1,9 +1,0 @@
-{
-  "features": [
-    "Dataset Discovery",
-    "SQL Generation",
-    "Execute Queries",
-    "Dashboard Management",
-    "Visualization Management"
-  ]
-}
