@@ -3,11 +3,7 @@
     "financial-crypto-equity-data-sources"
   ],
   "调研中": [
-    "dune_research_bw_package"
+    "Dune"
   ],
-  "调研完成": [
-    "asksurf-ai-data-api-research",
-    "asksurf-ai-deep-research",
-    "dune-research-full-cn"
-  ]
+  "调研完成": []
 }
