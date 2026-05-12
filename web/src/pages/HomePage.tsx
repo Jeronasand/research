@@ -613,7 +613,11 @@ export function HomePage() {
               onChange={(value) => updateForm("securityToken", value)}
             />
             <RememberCredentialsToggle checked={rememberSavedCredentials} onChange={updateRememberSavedCredentials} />
-            <ActionButton icon={<ShieldCheck size={16} aria-hidden="true" />} onClick={validateDataBucketAccess} disabled={busy}>
+            <ActionButton
+              icon={<ShieldCheck size={16} aria-hidden="true" />}
+              onClick={() => void validateDataBucketAccess()}
+              disabled={busy}
+            >
               授权并进入预览
             </ActionButton>
           </form>
