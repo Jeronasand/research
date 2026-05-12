@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dune 专业术语解释</title>
+  <meta name="description" content="Dune 调研报告配套专业术语解释页，覆盖 Data API、Sim、DuneSQL、MCP、Indexer、Normalizer、AI Memory 等关键词。" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="page-grid">
+    <aside class="sidebar" aria-label="术语目录">
+      <div class="brand">
+        <span class="brand-mark">G</span>
+        <div>
+          <strong>Dune Glossary</strong>
+          <small>专业术语解释</small>
+        </div>
+      </div>
+      <label class="search-box">
+        <span>搜索术语</span>
+        <input id="globalSearch" type="search" placeholder="搜索 Data API、Indexer、MCP..." />
+      </label>
+      <nav class="toc" id="toc">
+        <a href="./index.html">返回报告首页</a>
+        <a href="#term-data-api">Data API</a>
+<a href="#term-sim-api">Sim API</a>
+<a href="#term-dunesql">DuneSQL</a>
+<a href="#term-query">Query</a>
+<a href="#term-dashboard">Dashboard</a>
+<a href="#term-dataset">Dataset</a>
+<a href="#term-execution-id">Execution ID</a>
+<a href="#term-materialized-view">Materialized View</a>
+<a href="#term-pipeline">Pipeline</a>
+<a href="#term-webhook">Webhook</a>
+<a href="#term-datashare">Datashare</a>
+<a href="#term-trino-connector">Trino Connector</a>
+<a href="#term-dbt-connector">dbt Connector</a>
+<a href="#term-mcp">MCP</a>
+<a href="#term-agent-skills">Agent Skills</a>
+<a href="#term-api-key">API Key</a>
+<a href="#term-rate-limit">Rate Limit</a>
+<a href="#term-pagination">Pagination</a>
+<a href="#term-partial-results">Partial Results</a>
+<a href="#term-etl">ETL</a>
+<a href="#term-elt">ELT</a>
+<a href="#term-indexer">Indexer</a>
+<a href="#term-normalizer">Normalizer</a>
+<a href="#term-provider-adapter">Provider Adapter</a>
+<a href="#term-ai-memory">AI Memory</a>
+<a href="#term-abi">ABI</a>
+<a href="#term-evm">EVM</a>
+<a href="#term-erc20">ERC20</a>
+<a href="#term-erc721-1155">ERC721 / ERC1155</a>
+<a href="#term-defi-position">DeFi Position</a>
+<a href="#term-token-holder">Token Holder</a>
+<a href="#term-token-metadata">Token Metadata</a>
+<a href="#term-data-warehouse">Data Warehouse</a>
+<a href="#term-bi">BI</a>
+<a href="#term-snowflake-bigquery-databricks">Snowflake / BigQuery / Databricks</a>
+      </nav>
+      <button class="back-top" id="backTop" type="button">返回顶部</button>
+    </aside>
+
+    <main class="content">
+      <section class="hero panel searchable" id="top">
+        <div class="eyebrow">Glossary</div>
+        <h1>Dune 专业术语解释</h1>
+        <p class="lead">用于配合 index.html 阅读的关键词说明页，重点解释 Dune 数据源、API、链上数据、数据工程和 AI Agent 集成中的核心术语。</p>
+        <div class="hero-meta">
+          <span>独立页面：glossary.html</span>
+          <span>可从 index.html 术语索引跳转</span>
+          <span>本地静态可预览</span>
+        </div>
+      </section>
+      
+      <section class="panel glossary-section" id="cat-dune-api">
+        <div class="section-head">
+          <span class="number">01</span>
+          <h2>Dune / API</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-data-api">
+            <div class="definition-kicker">Dune / API</div>
+            <h2>Data API</h2>
+            <p class="definition-short">Dune 的通用数据接口，用于执行 SQL、执行已保存 Query、读取结果和管理数据资产。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Data API 更偏离线分析、自动化报表和数据管道。它的核心是把 DuneSQL 查询能力通过 HTTP 暴露出来，让后端服务可以程序化触发查询、轮询状态、读取 JSON 或 CSV 结果。</dd>
+              <dt>适合用法</dt><dd>适合协议指标、历史数据分析、Dashboard 结果同步、定时 ETL、AI Agent 白名单查询。</dd>
+              <dt>注意点</dt><dd>不适合直接承担高并发钱包资产接口；实时资产展示优先看 Sim。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-sim-api">
+            <div class="definition-kicker">Dune / API</div>
+            <h2>Sim API</h2>
+            <p class="definition-short">Dune 的实时链上应用 API，面向钱包资产、交易、NFT、DeFi 持仓和 Token 数据。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Sim API 与 Data API 的定位不同。Sim 更接近应用后端可直接调用的语义化接口，隐藏了大量链上索引与聚合逻辑。</dd>
+              <dt>适合用法</dt><dd>适合 Portfolio、钱包首页、地址画像、Token Holder、NFT 持仓、DeFi Position 展示。</dd>
+              <dt>注意点</dt><dd>不要用 Sim 替代复杂历史 SQL 分析；复杂聚合仍应使用 DuneSQL / Data API。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">02</span>
+          <h2>查询语言</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-dunesql">
+            <div class="definition-kicker">查询语言</div>
+            <h2>DuneSQL</h2>
+            <p class="definition-short">Dune 基于 Trino 生态的 SQL 查询语言，用来查询链上数据表和上传数据表。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>DuneSQL 用 SQL 方式访问多链数据、解码表、社区数据集和用户上传表。对分析师友好，也便于把查询沉淀成可复用 Query。</dd>
+              <dt>适合用法</dt><dd>适合写协议收入、DEX 交易量、地址留存、资金流、Token 分布等链上指标。</dd>
+              <dt>注意点</dt><dd>复杂查询需要关注性能、扫描量、分页和结果大小。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-dune">
+        <div class="section-head">
+          <span class="number">03</span>
+          <h2>Dune / 资产</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-query">
+            <div class="definition-kicker">Dune / 资产</div>
+            <h2>Query</h2>
+            <p class="definition-short">Dune 上保存的一段 SQL 查询，可以公开、私有、归档或通过 API 执行。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Query 是 Dune 中最核心的可复用分析资产。一个 Query 可以有参数、执行历史和结果缓存，也可以被 Dashboard 或 API 使用。</dd>
+              <dt>适合用法</dt><dd>适合把经过验证的 SQL 固化为稳定数据接口。</dd>
+              <dt>注意点</dt><dd>不要让 Agent 任意生成高成本 Query；生产环境建议白名单 Query。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-dune">
+        <div class="section-head">
+          <span class="number">04</span>
+          <h2>Dune / 可视化</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-dashboard">
+            <div class="definition-kicker">Dune / 可视化</div>
+            <h2>Dashboard</h2>
+            <p class="definition-short">由多个 Query 和图表组成的分析看板。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Dashboard 面向研究展示和业务监控，通常用于把 Query 结果组织为可视化页面。</dd>
+              <dt>适合用法</dt><dd>适合运营、研究、协议指标展示和对外报告。</dd>
+              <dt>注意点</dt><dd>Dashboard 适合人看；系统集成时通常读取 Query 或 Execution 结果。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-dune">
+        <div class="section-head">
+          <span class="number">05</span>
+          <h2>Dune / 数据发现</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-dataset">
+            <div class="definition-kicker">Dune / 数据发现</div>
+            <h2>Dataset</h2>
+            <p class="definition-short">Dune 中可搜索、可查询的数据表或数据集合。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Dataset 是 Agent 或数据服务进行自动发现时的重要对象。通过 Dataset 搜索可以找到可查询表、字段和元信息。</dd>
+              <dt>适合用法</dt><dd>适合自动发现可用表，或者为 Agent 提供数据目录。</dd>
+              <dt>注意点</dt><dd>发现 Dataset 不等于能低成本查询，需要结合表大小和字段设计。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-api">
+        <div class="section-head">
+          <span class="number">06</span>
+          <h2>API / 执行流程</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-execution-id">
+            <div class="definition-kicker">API / 执行流程</div>
+            <h2>Execution ID</h2>
+            <p class="definition-short">一次查询执行任务的唯一标识，用于轮询状态和获取结果。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>调用执行 SQL 或执行已保存 Query 后，通常先拿到 execution_id，再通过状态接口确认任务完成，最后读取结果。</dd>
+              <dt>适合用法</dt><dd>适合异步任务、调度系统、Webhook 或后端轮询。</dd>
+              <dt>注意点</dt><dd>不要假设请求发出后立即有结果；必须处理 pending、failed、cancelled 等状态。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">07</span>
+          <h2>数据工程</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-materialized-view">
+            <div class="definition-kicker">数据工程</div>
+            <h2>Materialized View</h2>
+            <p class="definition-short">物化视图，把高成本查询结果预计算并保存，后续读取更快。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Materialized View 用于把昂贵 SQL 的中间结果或聚合结果固化，降低重复扫描成本。</dd>
+              <dt>适合用法</dt><dd>适合热点指标、日级聚合、复杂 Join 或多 Agent 共用结果。</dd>
+              <dt>注意点</dt><dd>物化视图需要刷新策略；不是实时结果。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-pipeline">
+            <div class="definition-kicker">数据工程</div>
+            <h2>Pipeline</h2>
+            <p class="definition-short">多步骤、有依赖关系的数据任务流程。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Pipeline 用于把多个查询、转换或处理步骤串起来，适合构建更完整的数据处理链路。</dd>
+              <dt>适合用法</dt><dd>适合自动化数据处理、定时刷新、多阶段指标生成。</dd>
+              <dt>注意点</dt><dd>需要明确失败重试、依赖关系和下游消费机制。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-etl">
+            <div class="definition-kicker">数据工程</div>
+            <h2>ETL</h2>
+            <p class="definition-short">Extract、Transform、Load，先抽取，再转换，最后写入目标库。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>ETL 是传统数据管道模式，适合把外部数据经过清洗后进入数据库。</dd>
+              <dt>适合用法</dt><dd>适合多服务商抓取、统一结构化、长期留存。</dd>
+              <dt>注意点</dt><dd>转换逻辑集中在数据管道，维护成本会随数据源增多上升。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-elt">
+            <div class="definition-kicker">数据工程</div>
+            <h2>ELT</h2>
+            <p class="definition-short">Extract、Load、Transform，先入库，再在数仓内转换。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>ELT 适合现代数据仓库，先保存原始数据，再用 SQL/dbt 做转换建模。</dd>
+              <dt>适合用法</dt><dd>适合保留原始响应、后续反复建模。</dd>
+              <dt>注意点</dt><dd>需要较好的数仓治理和成本控制。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">08</span>
+          <h2>系统集成</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-webhook">
+            <div class="definition-kicker">系统集成</div>
+            <h2>Webhook</h2>
+            <p class="definition-short">当任务完成或事件发生时，由服务端主动推送通知到你的回调地址。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Webhook 能减少客户端轮询，让数据任务完成后自动触发后续处理。</dd>
+              <dt>适合用法</dt><dd>适合查询完成通知、结果入库、Agent 工作流回调。</dd>
+              <dt>注意点</dt><dd>回调接口要做鉴权、幂等、防重放和失败重试。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">09</span>
+          <h2>企业数仓</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-datashare">
+            <div class="definition-kicker">企业数仓</div>
+            <h2>Datashare</h2>
+            <p class="definition-short">把 Dune 数据共享或同步到 Snowflake、BigQuery、Databricks 等企业数仓。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Datashare 适合已有数仓体系的团队，避免通过 API 分页搬运大规模数据。</dd>
+              <dt>适合用法</dt><dd>适合企业 BI、风控、合规、长期数据建模。</dd>
+              <dt>注意点</dt><dd>通常涉及企业权限、成本和开通流程。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-snowflake-bigquery-databricks">
+            <div class="definition-kicker">企业数仓</div>
+            <h2>Snowflake / BigQuery / Databricks</h2>
+            <p class="definition-short">常见企业级数据仓库或湖仓平台。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>这些平台用于承载企业数据资产，Datashare 可以把 Dune 数据接入其中。</dd>
+              <dt>适合用法</dt><dd>适合企业已有数仓体系的团队。</dd>
+              <dt>注意点</dt><dd>成本、权限、数据治理和开通流程需要单独评估。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">10</span>
+          <h2>连接器</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-trino-connector">
+            <div class="definition-kicker">连接器</div>
+            <h2>Trino Connector</h2>
+            <p class="definition-short">通过 Trino Endpoint 只读访问 Dune 数据仓库。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Trino Connector 让 BI 工具、SQL Client、Notebook 能连接 Dune 数据。</dd>
+              <dt>适合用法</dt><dd>适合 PowerBI、Tableau、Metabase、DBeaver、Hex、Notebook。</dd>
+              <dt>注意点</dt><dd>只读为主；生产写入和转换通常还要配合 dbt 或自有管道。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-dbt-connector">
+            <div class="definition-kicker">连接器</div>
+            <h2>dbt Connector</h2>
+            <p class="definition-short">通过 dbt-trino 对 Dune 数据做模型转换、测试和 CI/CD。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>dbt Connector 面向数据工程团队，让 Dune 数据进入标准化建模流程。</dd>
+              <dt>适合用法</dt><dd>适合生产级模型、增量表、测试、数据血缘和版本管理。</dd>
+              <dt>注意点</dt><dd>需要团队具备 dbt 工程流程，且可能需要企业级功能。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-ai-agent">
+        <div class="section-head">
+          <span class="number">11</span>
+          <h2>AI Agent</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-mcp">
+            <div class="definition-kicker">AI Agent</div>
+            <h2>MCP</h2>
+            <p class="definition-short">Model Context Protocol，让 Agent 以标准工具协议连接 Dune。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>MCP 可以让 Codex、Cursor、Claude、OpenClaw 等工具型 Agent 调用 Dune 能力，而不是只靠自然语言复制粘贴。</dd>
+              <dt>适合用法</dt><dd>适合让 Agent 搜索表、执行查询、读取结果、生成分析。</dd>
+              <dt>注意点</dt><dd>必须限制权限、额度和可执行查询范围。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-agent-skills">
+            <div class="definition-kicker">AI Agent</div>
+            <h2>Agent Skills</h2>
+            <p class="definition-short">可安装到 Agent 环境中的技能包，封装 Dune / Sim 的调用方法和提示规范。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Skills 的价值是把 API 调用、使用规范和任务模板打包给 Agent，使其按固定方式使用 Dune。</dd>
+              <dt>适合用法</dt><dd>适合 Codex、Cursor、Claude Code、OpenClaw 的链上数据工具化。</dd>
+              <dt>注意点</dt><dd>Skill 不是安全边界；真正权限仍应由 API Key、代理服务和后端策略控制。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">12</span>
+          <h2>安全 / 认证</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-api-key">
+            <div class="definition-kicker">安全 / 认证</div>
+            <h2>API Key</h2>
+            <p class="definition-short">调用 Dune 或 Sim API 的访问凭证。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>API Key 是服务鉴权的核心凭据，通常放在后端环境变量或密钥管理系统中。</dd>
+              <dt>适合用法</dt><dd>适合按环境、服务商、Agent、任务类型拆分管理。</dd>
+              <dt>注意点</dt><dd>不能放在前端 HTML、JS 或公开仓库。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">13</span>
+          <h2>稳定性</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-rate-limit">
+            <div class="definition-kicker">稳定性</div>
+            <h2>Rate Limit</h2>
+            <p class="definition-short">接口调用频率限制，用于保护服务和控制成本。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Rate Limit 通常与套餐、接口类型和使用场景有关。后端需要做令牌桶、队列、缓存和降级。</dd>
+              <dt>适合用法</dt><dd>适合所有自动化抓取和 Agent 调用。</dd>
+              <dt>注意点</dt><dd>不要让多个 Agent 共享一个无限制 Key 并发调用。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-api">
+        <div class="section-head">
+          <span class="number">14</span>
+          <h2>API / 结果读取</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-pagination">
+            <div class="definition-kicker">API / 结果读取</div>
+            <h2>Pagination</h2>
+            <p class="definition-short">分页读取大结果集，避免单次返回过大。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>当查询结果很多时，API 通常通过 limit、offset、cursor 等方式分页返回。</dd>
+              <dt>适合用法</dt><dd>适合 ETL、报表同步、大表结果入库。</dd>
+              <dt>注意点</dt><dd>需要保证去重、排序稳定和断点续传。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-partial-results">
+            <div class="definition-kicker">API / 结果读取</div>
+            <h2>Partial Results</h2>
+            <p class="definition-short">超大结果可能只返回部分数据，需要显式处理不完整结果。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Partial Results 表示当前结果并非完整数据集，系统设计时要把它作为异常或降级状态处理。</dd>
+              <dt>适合用法</dt><dd>适合在 UI 中提示“结果被截断”，或在后端重新分片查询。</dd>
+              <dt>注意点</dt><dd>不能把 partial results 当成完整事实写入长期记忆。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">15</span>
+          <h2>链上数据</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-indexer">
+            <div class="definition-kicker">链上数据</div>
+            <h2>Indexer</h2>
+            <p class="definition-short">链上索引器，把区块、日志、交易和合约事件解析成可查询数据。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Indexer 是链上应用的基础设施。自建 indexer 控制力强，但开发和维护成本高。Dune/Sim 本质上帮你承担了部分索引工作。</dd>
+              <dt>适合用法</dt><dd>适合高实时、自定义合约事件、强一致性业务。</dd>
+              <dt>注意点</dt><dd>Dune 适合分析和应用数据源，但不是所有场景都能替代自建 indexer。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-abi">
+            <div class="definition-kicker">链上数据</div>
+            <h2>ABI</h2>
+            <p class="definition-short">Application Binary Interface，智能合约函数和事件的接口描述。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>ABI 用来解码链上合约调用和事件日志。没有 ABI 时，链上原始数据难以直接读懂。</dd>
+              <dt>适合用法</dt><dd>适合解析合约事件、函数调用、Token 标准接口。</dd>
+              <dt>注意点</dt><dd>合约升级、代理合约和非标准事件会增加解析难度。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">16</span>
+          <h2>数据架构</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-normalizer">
+            <div class="definition-kicker">数据架构</div>
+            <h2>Normalizer</h2>
+            <p class="definition-short">标准化层，把不同服务商返回的数据转换成统一结构。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Normalizer 是多数据源架构的关键。它把 Dune、Sim、其他 API 或自建节点返回的数据映射为统一字段。</dd>
+              <dt>适合用法</dt><dd>适合你的“10 个服务商并行抓取 + 统一入库 + AI 记忆”架构。</dd>
+              <dt>注意点</dt><dd>不要让业务直接依赖第三方原始字段。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">17</span>
+          <h2>软件架构</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-provider-adapter">
+            <div class="definition-kicker">软件架构</div>
+            <h2>Provider Adapter</h2>
+            <p class="definition-short">每个数据源一个适配器，负责认证、请求、限流、重试和响应转换。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Provider Adapter 把外部服务接入细节封装起来，对内部暴露统一 Fetch 接口。</dd>
+              <dt>适合用法</dt><dd>适合 Go 服务中的 DuneAdapter、SimAdapter、其他供应商 Adapter。</dd>
+              <dt>注意点</dt><dd>Adapter 不应包含太多业务逻辑；业务判断放到上层策略层。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-ai">
+        <div class="section-head">
+          <span class="number">18</span>
+          <h2>AI / 数据存储</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-ai-memory">
+            <div class="definition-kicker">AI / 数据存储</div>
+            <h2>AI Memory</h2>
+            <p class="definition-short">供 AI 后续检索和推理使用的长期结构化记忆或向量索引。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>AI Memory 不应直接保存原始杂乱响应，而应保存可追溯、可过期、可重算的结构化摘要。</dd>
+              <dt>适合用法</dt><dd>适合保存指标、实体、时间、来源、SQL、置信度和过期时间。</dd>
+              <dt>注意点</dt><dd>不要把不完整结果、过期数据或未标注来源的数据写入长期记忆。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">19</span>
+          <h2>链上基础</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-evm">
+            <div class="definition-kicker">链上基础</div>
+            <h2>EVM</h2>
+            <p class="definition-short">Ethereum Virtual Machine，以太坊及兼容链的执行环境。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>EVM 生态包括 Ethereum、Base、Arbitrum、Optimism、Polygon 等兼容链。很多 Dune 和 Sim 接口都围绕 EVM 数据建模。</dd>
+              <dt>适合用法</dt><dd>适合跨 EVM 链钱包、Token、NFT、DeFi 数据聚合。</dd>
+              <dt>注意点</dt><dd>非 EVM 链的数据模型和接口可能不同。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-token">
+        <div class="section-head">
+          <span class="number">20</span>
+          <h2>Token 标准</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-erc20">
+            <div class="definition-kicker">Token 标准</div>
+            <h2>ERC20</h2>
+            <p class="definition-short">EVM 上最常见的同质化 Token 标准。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>ERC20 描述余额、转账、授权等基础方法，是 DeFi 和资产展示的核心数据类型。</dd>
+              <dt>适合用法</dt><dd>适合 Token 余额、Holder、转账、Approve、流动性分析。</dd>
+              <dt>注意点</dt><dd>部分 Token 有税费、黑名单、rebasing 等非标准行为。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-nft">
+        <div class="section-head">
+          <span class="number">21</span>
+          <h2>NFT 标准</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-erc721-1155">
+            <div class="definition-kicker">NFT 标准</div>
+            <h2>ERC721 / ERC1155</h2>
+            <p class="definition-short">EVM 上常见的 NFT 标准，ERC721 是单件 NFT，ERC1155 支持半同质化批量资产。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>NFT 数据通常包含合约、token_id、owner、metadata、collection 信息。</dd>
+              <dt>适合用法</dt><dd>适合收藏品、游戏资产、NFT 持仓展示。</dd>
+              <dt>注意点</dt><dd>Metadata 可能延迟、失效或被外部服务影响。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-defi">
+        <div class="section-head">
+          <span class="number">22</span>
+          <h2>DeFi 数据</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-defi-position">
+            <div class="definition-kicker">DeFi 数据</div>
+            <h2>DeFi Position</h2>
+            <p class="definition-short">用户在借贷、LP、Vault、收益策略中的链上持仓状态。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>DeFi Position 往往不是简单 Token 余额，而是需要解析协议状态、份额、债务、收益和价格。</dd>
+              <dt>适合用法</dt><dd>适合 Portfolio、风险监控、资产聚合。</dd>
+              <dt>注意点</dt><dd>协议模型差异大，估值和收益计算需要标注来源和时间。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-token">
+        <div class="section-head">
+          <span class="number">23</span>
+          <h2>Token 数据</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-token-holder">
+            <div class="definition-kicker">Token 数据</div>
+            <h2>Token Holder</h2>
+            <p class="definition-short">持有某个 Token 的地址及其余额分布。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Token Holder 数据可用于分析集中度、鲸鱼地址、分发情况和社区规模。</dd>
+              <dt>适合用法</dt><dd>适合项目研究、风险识别、空投分析。</dd>
+              <dt>注意点</dt><dd>要注意交易所、合约地址和桥地址会影响真实用户判断。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+          <article class="definition-card searchable" id="term-token-metadata">
+            <div class="definition-kicker">Token 数据</div>
+            <h2>Token Metadata</h2>
+            <p class="definition-short">Token 的名称、符号、小数位、Logo、价格、供应量等描述信息。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>Metadata 能让原始地址变成可读资产信息，是钱包和 Portfolio 的基础。</dd>
+              <dt>适合用法</dt><dd>适合 UI 展示、资产归类、数据清洗。</dd>
+              <dt>注意点</dt><dd>Metadata 可能被伪造、重复或更新，需要可信来源。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">24</span>
+          <h2>数据平台</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-data-warehouse">
+            <div class="definition-kicker">数据平台</div>
+            <h2>Data Warehouse</h2>
+            <p class="definition-short">面向分析的集中式数据仓库。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>数仓用于存储结构化数据、支持 BI、报表、建模和跨部门数据使用。Dune 本身也可视为链上数据仓库。</dd>
+              <dt>适合用法</dt><dd>适合长期指标沉淀、企业报表、跨源 Join。</dd>
+              <dt>注意点</dt><dd>高频实时业务通常不直接打数仓。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+      <section class="panel glossary-section" id="cat-">
+        <div class="section-head">
+          <span class="number">25</span>
+          <h2>数据分析</h2>
+        </div>
+        <div class="definition-grid">
+          
+          <article class="definition-card searchable" id="term-bi">
+            <div class="definition-kicker">数据分析</div>
+            <h2>BI</h2>
+            <p class="definition-short">Business Intelligence，用于报表、看板和业务分析的工具体系。</p>
+            <dl class="definition-detail">
+              <dt>详细解释</dt><dd>BI 工具包括 PowerBI、Tableau、Metabase 等。它们通常通过 SQL/Connector 连接数据源。</dd>
+              <dt>适合用法</dt><dd>适合运营看板、管理报表、协议增长分析。</dd>
+              <dt>注意点</dt><dd>BI 面向分析，不适合做交易链路或实时强依赖后端。</dd>
+            </dl>
+            <a class="back-link" href="./index.html#glossary-index">返回 index 术语索引</a>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

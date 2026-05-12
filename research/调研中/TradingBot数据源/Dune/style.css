@@ -347,6 +347,82 @@ mark { background: transparent; border-bottom: 2px solid var(--line); color: inh
   .source-list { grid-template-columns: 1fr; }
 }
 
+
+/* Glossary / term index */
+.term-link {
+  border-bottom: 2px dotted var(--line);
+  font-weight: 700;
+}
+.term-link:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.term-quick-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 18px;
+}
+.term-quick-nav a,
+.back-link {
+  display: inline-flex;
+  border: 1.8px solid var(--line);
+  padding: 8px 10px;
+  background: var(--paper);
+  font-size: 13px;
+}
+.term-quick-nav a:hover,
+.back-link:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.term-index-table table { min-width: 860px; }
+.definition-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.definition-card {
+  border: 1.8px solid var(--line);
+  padding: 18px;
+  background: var(--paper);
+}
+.definition-card:target {
+  outline: 4px solid var(--line);
+  box-shadow: 8px 8px 0 var(--line);
+}
+.definition-kicker {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  font-size: 12px;
+  margin-bottom: 10px;
+  background: var(--shade);
+}
+.definition-short {
+  font-weight: 700;
+  color: var(--ink);
+}
+.definition-detail {
+  margin: 14px 0;
+  display: grid;
+  gap: 10px;
+}
+.definition-detail dt {
+  font-weight: 800;
+  border-left: 4px solid var(--line);
+  padding-left: 8px;
+}
+.definition-detail dd {
+  margin: -8px 0 4px;
+  color: #222;
+}
+.glossary-section .section-head { margin-bottom: 16px; }
+
+@media (max-width: 980px) {
+  .definition-grid { grid-template-columns: 1fr; }
+}
+
 @media print {
   body { background: #fff; }
   .sidebar, .back-top, .filter-bar { display: none; }

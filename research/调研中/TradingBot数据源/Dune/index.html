@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dune 数据源与 API 调研报告</title>
-  <meta name="description" content="Dune 数据源、API、Sim、Datashare、Connector、MCP 与 Agent Skills 的单页调研报告。" />
+  <title>Dune 数据源与 API 调研报告｜含术语索引</title>
+  <meta name="description" content="Dune 数据源、API、Sim、Datashare、Connector、MCP 与 Agent Skills 的单页调研报告，包含专业术语索引并跳转到 glossary.html。" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -33,6 +33,8 @@
         <a href="#architecture">集成架构</a>
         <a href="#decision">选型建议</a>
         <a href="#risks">风险与限制</a>
+        <a href="#glossary-index">术语索引</a>
+        <a href="./glossary.html">术语详解页</a>
         <a href="#sources">信息源</a>
       </nav>
       <button class="back-top" id="backTop" type="button">返回顶部</button>
@@ -47,6 +49,7 @@
           <span>版本：2026-05</span>
           <span>形态：HTML + CSS + JS</span>
           <span>风格：黑白线条</span>
+          <span>术语页：glossary.html</span>
         </div>
       </section>
 
@@ -66,11 +69,11 @@
           </article>
         </div>
         <div class="key-points">
-          <div><b>Data API</b><span>执行 SQL、读取查询结果、管理 Query、上传数据、Pipeline、Webhook。</span></div>
-          <div><b>Sim API</b><span>面向实时应用，提供钱包余额、交易、NFT、DeFi Position、Token Holder 等接口。</span></div>
-          <div><b>Datashare</b><span>企业级数据流向 Snowflake、BigQuery、Databricks。</span></div>
-          <div><b>Trino / dbt</b><span>通过 Trino endpoint 接入 BI、SQL Client、dbt 转换流程。</span></div>
-          <div><b>MCP / Skills</b><span>面向 AI Agent，让 Agent 可查询数据集、执行查询、调用 Sim。</span></div>
+          <div><b><a class="term-link" href="./glossary.html#term-data-api">Data API</a></b><span>执行 SQL、读取查询结果、管理 Query、上传数据、Pipeline、Webhook。</span></div>
+          <div><b><a class="term-link" href="./glossary.html#term-sim-api">Sim API</a></b><span>面向实时应用，提供钱包余额、交易、NFT、DeFi Position、Token Holder 等接口。</span></div>
+          <div><b><a class="term-link" href="./glossary.html#term-datashare">Datashare</a></b><span>企业级数据流向 Snowflake、BigQuery、Databricks。</span></div>
+          <div><b><a class="term-link" href="./glossary.html#term-trino-connector">Trino</a> / <a class="term-link" href="./glossary.html#term-dbt-connector">dbt</a></b><span>通过 Trino endpoint 接入 BI、SQL Client、dbt 转换流程。</span></div>
+          <div><b><a class="term-link" href="./glossary.html#term-mcp">MCP</a> / <a class="term-link" href="./glossary.html#term-agent-skills">Skills</a></b><span>面向 AI Agent，让 Agent 可查询数据集、执行查询、调用 Sim。</span></div>
         </div>
       </section>
 
@@ -97,37 +100,37 @@
                 <td>高：先用它验证查询逻辑</td>
               </tr>
               <tr>
-                <td>Data API</td>
+                <td><a class="term-link" href="./glossary.html#term-data-api">Data API</a></td>
                 <td>程序化执行 Query / SQL，读取结果，管理查询与数据集</td>
                 <td>后端服务、数据管道、自动化报告</td>
                 <td>高：适合接入你的抓取服务</td>
               </tr>
               <tr>
-                <td>Sim</td>
+                <td><a class="term-link" href="./glossary.html#term-sim-api">Sim</a></td>
                 <td>低延迟实时钱包、Token、NFT、交易、DeFi Position API</td>
                 <td>钱包、Portfolio、交易/风控产品</td>
                 <td>高：实时业务优先用 Sim</td>
               </tr>
               <tr>
-                <td>Datashare</td>
+                <td><a class="term-link" href="./glossary.html#term-datashare">Datashare</a></td>
                 <td>把 Dune 数据直接同步/共享到企业数仓</td>
                 <td>企业数据团队、BI、风控、合规</td>
                 <td>中：企业级后再接</td>
               </tr>
               <tr>
-                <td>Trino Connector</td>
+                <td><a class="term-link" href="./glossary.html#term-trino-connector">Trino Connector</a></td>
                 <td>只读连接 Dune 数据仓库，BI / SQL Client 查询</td>
                 <td>数据分析、BI、Notebook</td>
                 <td>中：适合内部分析工具</td>
               </tr>
               <tr>
-                <td>dbt Connector</td>
+                <td><a class="term-link" href="./glossary.html#term-dbt-connector">dbt Connector</a></td>
                 <td>基于 Dune 数据做 dbt 转换、增量模型、CI/CD</td>
                 <td>数据工程团队</td>
                 <td>中：需要企业权限</td>
               </tr>
               <tr>
-                <td>MCP / CLI / Skills</td>
+                <td><a class="term-link" href="./glossary.html#term-mcp">MCP</a> / CLI / <a class="term-link" href="./glossary.html#term-agent-skills">Skills</a></td>
                 <td>给 AI Agent 查询表、执行 SQL、管理查询、调用 Sim</td>
                 <td>Codex、Cursor、Claude Code、OpenClaw 等 Agent</td>
                 <td>高：适合 AI 工作流</td>
@@ -430,7 +433,7 @@
 └─────────────┬────────────┘
               │
 ┌─────────────▼────────────┐
-│  Go Provider Adapter     │  DuneAdapter / SimAdapter
+│  <a class="term-link" href="./glossary.html#term-provider-adapter">Go Provider Adapter</a>     │  DuneAdapter / SimAdapter
 │  - rate limit            │  - retry / timeout
 │  - auth injection        │  - normalized response
 └───────┬───────────┬──────┘
@@ -441,13 +444,13 @@
 └───────┬──────┘ └──┬────────────────┘
         │           │
 ┌───────▼───────────▼──────┐
-│ Normalizer + Schema Layer │
+│ <a class="term-link" href="./glossary.html#term-normalizer">Normalizer</a> + Schema Layer │
 │ source / entity / metric  │
 │ timestamp / confidence    │
 └─────────────┬────────────┘
               │
 ┌─────────────▼────────────┐
-│ DB + AI Memory Index      │
+│ DB + <a class="term-link" href="./glossary.html#term-ai-memory">AI Memory</a> Index      │
 │ Postgres / Vector / Logs  │
 └──────────────────────────┘</pre>
         </div>
@@ -523,9 +526,216 @@
         </div>
       </section>
 
-      <section class="panel searchable" id="sources">
+
+      <section class="panel searchable" id="glossary-index">
         <div class="section-head">
           <span class="number">12</span>
+          <h2>专业术语索引</h2>
+        </div>
+        <p class="section-intro">本节把报告中的关键词集中索引。点击术语可跳转到 <a class="term-link" href="./glossary.html">glossary.html</a> 查看完整解释，包括详细定义、适合用法和注意点。</p>
+        <div class="term-quick-nav">
+          <a href="./glossary.html#term-data-api">Data API</a>
+          <a href="./glossary.html#term-sim-api">Sim API</a>
+          <a href="./glossary.html#term-dunesql">DuneSQL</a>
+          <a href="./glossary.html#term-datashare">Datashare</a>
+          <a href="./glossary.html#term-mcp">MCP</a>
+          <a href="./glossary.html#term-indexer">Indexer</a>
+          <a href="./glossary.html#term-normalizer">Normalizer</a>
+          <a href="./glossary.html#term-ai-memory">AI Memory</a>
+        </div>
+        <div class="table-wrap term-index-table">
+          <table>
+            <thead>
+              <tr>
+                <th>关键词</th>
+                <th>分类</th>
+                <th>索引讲解</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-data-api">Data API</a></td>
+                <td>Dune / API</td>
+                <td>Dune 的通用数据接口，用于执行 SQL、执行已保存 Query、读取结果和管理数据资产。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-sim-api">Sim API</a></td>
+                <td>Dune / API</td>
+                <td>Dune 的实时链上应用 API，面向钱包资产、交易、NFT、DeFi 持仓和 Token 数据。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-dunesql">DuneSQL</a></td>
+                <td>查询语言</td>
+                <td>Dune 基于 Trino 生态的 SQL 查询语言，用来查询链上数据表和上传数据表。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-query">Query</a></td>
+                <td>Dune / 资产</td>
+                <td>Dune 上保存的一段 SQL 查询，可以公开、私有、归档或通过 API 执行。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-dashboard">Dashboard</a></td>
+                <td>Dune / 可视化</td>
+                <td>由多个 Query 和图表组成的分析看板。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-dataset">Dataset</a></td>
+                <td>Dune / 数据发现</td>
+                <td>Dune 中可搜索、可查询的数据表或数据集合。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-execution-id">Execution ID</a></td>
+                <td>API / 执行流程</td>
+                <td>一次查询执行任务的唯一标识，用于轮询状态和获取结果。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-materialized-view">Materialized View</a></td>
+                <td>数据工程</td>
+                <td>物化视图，把高成本查询结果预计算并保存，后续读取更快。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-pipeline">Pipeline</a></td>
+                <td>数据工程</td>
+                <td>多步骤、有依赖关系的数据任务流程。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-webhook">Webhook</a></td>
+                <td>系统集成</td>
+                <td>当任务完成或事件发生时，由服务端主动推送通知到你的回调地址。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-datashare">Datashare</a></td>
+                <td>企业数仓</td>
+                <td>把 Dune 数据共享或同步到 Snowflake、BigQuery、Databricks 等企业数仓。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-trino-connector">Trino Connector</a></td>
+                <td>连接器</td>
+                <td>通过 Trino Endpoint 只读访问 Dune 数据仓库。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-dbt-connector">dbt Connector</a></td>
+                <td>连接器</td>
+                <td>通过 dbt-trino 对 Dune 数据做模型转换、测试和 CI/CD。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-mcp">MCP</a></td>
+                <td>AI Agent</td>
+                <td>Model Context Protocol，让 Agent 以标准工具协议连接 Dune。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-agent-skills">Agent Skills</a></td>
+                <td>AI Agent</td>
+                <td>可安装到 Agent 环境中的技能包，封装 Dune / Sim 的调用方法和提示规范。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-api-key">API Key</a></td>
+                <td>安全 / 认证</td>
+                <td>调用 Dune 或 Sim API 的访问凭证。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-rate-limit">Rate Limit</a></td>
+                <td>稳定性</td>
+                <td>接口调用频率限制，用于保护服务和控制成本。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-pagination">Pagination</a></td>
+                <td>API / 结果读取</td>
+                <td>分页读取大结果集，避免单次返回过大。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-partial-results">Partial Results</a></td>
+                <td>API / 结果读取</td>
+                <td>超大结果可能只返回部分数据，需要显式处理不完整结果。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-etl">ETL</a></td>
+                <td>数据工程</td>
+                <td>Extract、Transform、Load，先抽取，再转换，最后写入目标库。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-elt">ELT</a></td>
+                <td>数据工程</td>
+                <td>Extract、Load、Transform，先入库，再在数仓内转换。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-indexer">Indexer</a></td>
+                <td>链上数据</td>
+                <td>链上索引器，把区块、日志、交易和合约事件解析成可查询数据。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-normalizer">Normalizer</a></td>
+                <td>数据架构</td>
+                <td>标准化层，把不同服务商返回的数据转换成统一结构。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-provider-adapter">Provider Adapter</a></td>
+                <td>软件架构</td>
+                <td>每个数据源一个适配器，负责认证、请求、限流、重试和响应转换。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-ai-memory">AI Memory</a></td>
+                <td>AI / 数据存储</td>
+                <td>供 AI 后续检索和推理使用的长期结构化记忆或向量索引。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-abi">ABI</a></td>
+                <td>链上数据</td>
+                <td>Application Binary Interface，智能合约函数和事件的接口描述。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-evm">EVM</a></td>
+                <td>链上基础</td>
+                <td>Ethereum Virtual Machine，以太坊及兼容链的执行环境。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-erc20">ERC20</a></td>
+                <td>Token 标准</td>
+                <td>EVM 上最常见的同质化 Token 标准。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-erc721-1155">ERC721 / ERC1155</a></td>
+                <td>NFT 标准</td>
+                <td>EVM 上常见的 NFT 标准，ERC721 是单件 NFT，ERC1155 支持半同质化批量资产。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-defi-position">DeFi Position</a></td>
+                <td>DeFi 数据</td>
+                <td>用户在借贷、LP、Vault、收益策略中的链上持仓状态。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-token-holder">Token Holder</a></td>
+                <td>Token 数据</td>
+                <td>持有某个 Token 的地址及其余额分布。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-token-metadata">Token Metadata</a></td>
+                <td>Token 数据</td>
+                <td>Token 的名称、符号、小数位、Logo、价格、供应量等描述信息。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-data-warehouse">Data Warehouse</a></td>
+                <td>数据平台</td>
+                <td>面向分析的集中式数据仓库。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-bi">BI</a></td>
+                <td>数据分析</td>
+                <td>Business Intelligence，用于报表、看板和业务分析的工具体系。</td>
+              </tr>
+              <tr>
+                <td><a class="term-link" href="./glossary.html#term-snowflake-bigquery-databricks">Snowflake / BigQuery / Databricks</a></td>
+                <td>企业数仓</td>
+                <td>常见企业级数据仓库或湖仓平台。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel searchable" id="sources">
+        <div class="section-head">
+          <span class="number">13</span>
           <h2>信息源</h2>
         </div>
         <div class="source-list">
