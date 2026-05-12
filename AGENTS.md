@@ -25,8 +25,8 @@ tree.json
 ## Research Packages
 
 - Use only the three status directories under `research/`: `待调研`, `调研中`, and `调研完成`.
-- Every direct child directory under those status directories is one previewable Web package.
-- Every package must have an `index.html` entry file.
+- A directory with an `index.html` is one previewable Web package.
+- A directory without an `index.html` is a grouping or placeholder directory and may contain package directories below it.
 - Keep each package's assets and nested pages inside that package directory.
 - Packages may contain subdirectories such as `split/`, `assets/`, and `data/`; package-internal relative HTML links and resources must remain relative so the preview page can sign and load them.
 - Do not reintroduce the old React/Vite app shell, `research-data/manifest.json`, private-index workflow, skills catalog, or `temptodo/` inbox unless the user explicitly asks.

@@ -111,6 +111,40 @@
         font-size: 12px;
       }
 
+      .folder-block {
+        grid-column: 1 / -1;
+        padding: 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        background: #fff;
+      }
+
+      .folder-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .folder-title {
+        font-weight: 700;
+      }
+
+      .folder-path {
+        color: #6b7280;
+        font-size: 12px;
+        word-break: break-all;
+      }
+
+      .folder-empty {
+        padding: 16px;
+        border: 1px dashed #d1d5db;
+        border-radius: 6px;
+        color: #6b7280;
+      }
+
       .loading,
       .empty {
         padding: 40px;
@@ -214,6 +248,15 @@
           .replace(/"/g, "&quot;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
       }
 
       async function replaceAsync(value, pattern, replacer) {
@@ -365,8 +408,8 @@ document.addEventListener("click", function(event) {
 
         let total = 0;
         for (const category of categories) {
-          const projects = Array.isArray(treeData[category]) ? treeData[category] : [];
-          total += projects.length;
+          const nodes = Array.isArray(treeData[category]) ? treeData[category] : [];
+          total += countNodes(nodes);
 
           const panel = document.createElement("section");
           panel.className = "panel";
@@ -374,7 +417,7 @@ document.addEventListener("click", function(event) {
           panelsDiv.appendChild(panel);
 
           const list = panel.querySelector(".card-list");
-          if (!projects.length) {
+          if (!nodes.length) {
             const empty = document.createElement("div");
             empty.className = "empty";
             empty.textContent = "暂无项目";
@@ -382,17 +425,65 @@ document.addEventListener("click", function(event) {
             continue;
           }
 
-          for (const project of projects) {
-            const card = document.createElement("article");
-            card.className = "card";
-            card.innerHTML = `<div class="title">${project}</div><div class="path">research/${category}/${project}/</div>`;
-            card.addEventListener("click", () => openProject(category, project));
-            list.appendChild(card);
-          }
+          renderNodes(list, category, nodes);
         }
 
         if (!total) {
           panelsDiv.innerHTML = '<div class="empty">tree.json 中没有项目。</div>';
+        }
+      }
+
+      function normalizeNode(node) {
+        if (typeof node === "string") {
+          const name = node.split("/").filter(Boolean).pop() || node;
+          return { type: "package", name, path: node, children: [] };
+        }
+
+        const children = Array.isArray(node && node.children) ? node.children.map(normalizeNode) : [];
+        const path = String((node && node.path) || (node && node.name) || "");
+        const name = String((node && node.name) || path.split("/").filter(Boolean).pop() || path);
+        const type = node && node.type === "folder" ? "folder" : "package";
+        return { type, name, path, children };
+      }
+
+      function countNodes(nodes) {
+        return nodes.map(normalizeNode).reduce((sum, node) => {
+          return sum + 1 + (node.type === "folder" ? countNodes(node.children) : 0);
+        }, 0);
+      }
+
+      function renderNodes(container, category, rawNodes) {
+        for (const node of rawNodes.map(normalizeNode)) {
+          if (node.type === "folder") {
+            const folder = document.createElement("section");
+            folder.className = "folder-block";
+            folder.innerHTML = `
+              <div class="folder-head">
+                <div class="folder-title">${escapeHtml(node.name)}</div>
+                <div class="folder-path">research/${escapeHtml(category)}/${escapeHtml(node.path)}/</div>
+              </div>
+              <div class="card-list"></div>
+            `;
+
+            const childList = folder.querySelector(".card-list");
+            if (node.children.length) {
+              renderNodes(childList, category, node.children);
+            } else {
+              const empty = document.createElement("div");
+              empty.className = "folder-empty";
+              empty.textContent = "目录已保留，暂无 index.html 入口。";
+              childList.appendChild(empty);
+            }
+
+            container.appendChild(folder);
+            continue;
+          }
+
+          const card = document.createElement("article");
+          card.className = "card";
+          card.innerHTML = `<div class="title">${escapeHtml(node.name)}</div><div class="path">research/${escapeHtml(category)}/${escapeHtml(node.path)}/</div>`;
+          card.addEventListener("click", () => openPackage(category, node.path));
+          container.appendChild(card);
         }
       }
 
@@ -409,8 +500,8 @@ document.addEventListener("click", function(event) {
         }
       }
 
-      async function openProject(category, project) {
-        await openObjectKey(`research/${category}/${project}/index.html`);
+      async function openPackage(category, packagePath) {
+        await openObjectKey(`research/${category}/${packagePath}/index.html`);
       }
 
       function backToList() {

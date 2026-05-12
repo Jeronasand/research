@@ -13,13 +13,15 @@ research/
     <项目名>/index.html
   调研中/
     <项目名>/index.html
+    <项目组>/
+      <项目名>/index.html
   调研完成/
     <项目名>/index.html
 upload.js
 tree.json
 ```
 
-每个项目目录都是一个完整静态站点，入口文件固定为 `index.html`。项目内可以继续包含子目录，例如 `split/index.html`、`assets/`、`data/`；包内相对 HTML 链接、CSS、图片、字体和 `fetch/XHR` 数据会在预览页内重新签名加载。
+每个项目目录都是一个完整静态站点，入口文件固定为 `index.html`。状态目录下面可以继续放分组目录；没有 `index.html` 的目录会作为分组或占位目录展示，继续向下索引。项目内可以继续包含子目录，例如 `split/index.html`、`assets/`、`data/`；包内相对 HTML 链接、CSS、图片、字体和 `fetch/XHR` 数据会在预览页内重新签名加载。
 
 ## 一键部署
 
@@ -46,6 +48,8 @@ npm run deploy:dry-run
 ```bash
 ./update-research-data.sh
 ```
+
+如果改了 `preview/`、`upload.js`、`tree.json` 结构或索引规则，先运行一次 `npm run deploy` 更新 preview 桶；之后只改 `research/` 内容时再用上面的 datas 更新脚本。
 
 等价 npm 命令：
 

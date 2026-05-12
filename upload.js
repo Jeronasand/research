@@ -1,4 +1,4 @@
-import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
+import { readdir, stat, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -89,34 +89,55 @@ async function exists(file) {
   return Boolean(await stat(file).catch(() => null));
 }
 
-async function listProjects(category) {
-  const categoryPath = path.join(researchDir, category);
-  if (!(await exists(categoryPath))) {
-    return [];
-  }
+function sortNodes(nodes) {
+  return nodes.sort((left, right) => left.name.localeCompare(right.name, "zh-CN"));
+}
 
-  const entries = await readdir(categoryPath, { withFileTypes: true });
-  const projects = [];
+async function listDirectoryNodes(basePath, relativePath = "") {
+  const entries = await readdir(basePath, { withFileTypes: true });
+  const nodes = [];
+
   for (const entry of entries) {
     if (!entry.isDirectory() || entry.name.startsWith(".")) {
       continue;
     }
 
-    const entryHtml = path.join(categoryPath, entry.name, "index.html");
+    const localPath = path.join(basePath, entry.name);
+    const nodePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+    const entryHtml = path.join(localPath, "index.html");
+
     if (await exists(entryHtml)) {
-      projects.push(entry.name);
+      nodes.push({
+        type: "package",
+        name: entry.name,
+        path: nodePath,
+      });
     } else {
-      console.warn(`Skip ${category}/${entry.name}: missing index.html`);
+      nodes.push({
+        type: "folder",
+        name: entry.name,
+        path: nodePath,
+        children: await listDirectoryNodes(localPath, nodePath),
+      });
     }
   }
 
-  return projects.sort((left, right) => left.localeCompare(right, "zh-CN"));
+  return sortNodes(nodes);
+}
+
+async function listNodes(category) {
+  const categoryPath = path.join(researchDir, category);
+  if (!(await exists(categoryPath))) {
+    return [];
+  }
+
+  return listDirectoryNodes(categoryPath);
 }
 
 async function generateTree() {
   const tree = {};
   for (const category of categories) {
-    tree[category] = await listProjects(category);
+    tree[category] = await listNodes(category);
   }
 
   await writeFile(treePath, `${JSON.stringify(tree, null, 2)}\n`);
@@ -179,11 +200,12 @@ function verify(options, tree) {
   }
 
   runOssutil(["stat", `oss://${options.datasBucket}/tree.json`], options);
-  const firstCategory = categories.find((category) => tree[category]?.length);
-  if (firstCategory) {
+  const firstCategory = categories.find((category) => findFirstPackage(tree[category] || []));
+  const firstPackage = firstCategory ? findFirstPackage(tree[firstCategory] || []) : null;
+  if (firstCategory && firstPackage) {
     runOssutil([
       "stat",
-      `oss://${options.datasBucket}/research/${firstCategory}/${tree[firstCategory][0]}/index.html`,
+      `oss://${options.datasBucket}/research/${firstCategory}/${firstPackage.path}/index.html`,
     ], options);
   }
 
@@ -191,6 +213,21 @@ function verify(options, tree) {
     runOssutil(["stat", `oss://${options.previewBucket}/login.html`], options);
     runOssutil(["stat", `oss://${options.previewBucket}/index.html`], options);
   }
+}
+
+function findFirstPackage(nodes) {
+  for (const node of nodes) {
+    if (node?.type === "package" && node.path) {
+      return node;
+    }
+
+    const childPackage = findFirstPackage(Array.isArray(node?.children) ? node.children : []);
+    if (childPackage) {
+      return childPackage;
+    }
+  }
+
+  return null;
 }
 
 async function main() {

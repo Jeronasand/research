@@ -26,13 +26,16 @@
       background: #fff;
       font-size: 14px;
     }
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       background: #fff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      min-width: 1000px;
     }
     th, td {
       padding: 12px 14px;
@@ -61,6 +64,16 @@
       color: #374151;
       font-size: 12px;
     }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-待调研 { background: #fef3c7; color: #b45309; }
+    .status-调研中 { background: #dbeafe; color: #1e40af; }
+    .status-调研完成 { background: #d1fae5; color: #065f46; }
     .error {
       padding: 16px;
       background: #fee2e2;
@@ -81,22 +94,31 @@
     <select id="categoryFilter">
       <option value="">全部分类</option>
     </select>
+    <select id="statusFilter">
+      <option value="">全部状态</option>
+      <option value="待调研">待调研</option>
+      <option value="调研中">调研中</option>
+      <option value="调研完成">调研完成</option>
+    </select>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>优先级</th>
-        <th>分类</th>
-        <th>数据源</th>
-        <th>类型</th>
-        <th>覆盖</th>
-        <th>接入方式</th>
-        <th>授权 / 风险</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>优先级</th>
+          <th>分类</th>
+          <th>数据源</th>
+          <th>类型</th>
+          <th>覆盖</th>
+          <th>接入方式</th>
+          <th>调研状态</th>
+          <th>授权 / 风险</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
 
   <script>
     let researchData = null;
@@ -107,6 +129,7 @@
     const searchInput = document.getElementById("searchInput");
     const priorityFilter = document.getElementById("priorityFilter");
     const categoryFilter = document.getElementById("categoryFilter");
+    const statusFilter = document.getElementById("statusFilter");
 
     async function loadData() {
       try {
@@ -148,10 +171,16 @@
       });
     }
 
+    function getStatusClass(status) {
+      if (!status) return "status-待调研";
+      return `status-${status}`;
+    }
+
     function renderTable() {
       const keyword = searchInput.value.trim().toLowerCase();
       const priority = priorityFilter.value;
       const category = categoryFilter.value;
+      const status = statusFilter.value;
 
       tableBody.innerHTML = "";
 
@@ -160,6 +189,7 @@
 
         group.items.forEach(item => {
           if (priority && item.priority !== priority) return;
+          if (status && item.status !== status) return;
 
           const text = [
             group.name,
@@ -168,12 +198,14 @@
             item.type,
             ...(item.coverage || []),
             ...(item.access || []),
-            item.risk
+            item.risk,
+            item.status
           ].join(" ").toLowerCase();
 
           if (keyword && !text.includes(keyword)) return;
 
           const tr = document.createElement("tr");
+          const statusText = item.status || "待调研";
           tr.innerHTML = `
             <td class="${item.priority.toLowerCase()}">${item.priority}</td>
             <td>${group.name}</td>
@@ -181,6 +213,7 @@
             <td>${item.type || ""}</td>
             <td>${(item.coverage || []).map(x => `<span class="tag">${x}</span>`).join("")}</td>
             <td>${(item.access || []).map(x => `<span class="tag">${x}</span>`).join("")}</td>
+            <td><span class="status-badge ${getStatusClass(statusText)}">${statusText}</span></td>
             <td>${item.risk || ""}</td>
           `;
           tableBody.appendChild(tr);
@@ -191,6 +224,7 @@
     searchInput.addEventListener("input", renderTable);
     priorityFilter.addEventListener("change", renderTable);
     categoryFilter.addEventListener("change", renderTable);
+    statusFilter.addEventListener("change", renderTable);
 
     loadData();
   </script>

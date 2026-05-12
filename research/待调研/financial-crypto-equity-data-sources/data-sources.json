@@ -22,7 +22,7 @@
             "OpenAPI"
           ],
           "risk": "TradFi 覆盖不足",
-          "status": "待调研"
+          "status": "调研中"
         },
         {
           "priority": "P0",
@@ -41,7 +41,7 @@
             "Datashare"
           ],
           "risk": "查询成本和商业授权需确认",
-          "status": "待调研"
+          "status": "调研中"
         },
         {
           "priority": "P0",

@@ -1,9 +1,30 @@
 {
   "待调研": [
-    "financial-crypto-equity-data-sources"
+    {
+      "type": "package",
+      "name": "financial-crypto-equity-data-sources",
+      "path": "financial-crypto-equity-data-sources"
+    }
   ],
   "调研中": [
-    "Dune"
+    {
+      "type": "folder",
+      "name": "TradingBot数据源",
+      "path": "TradingBot数据源",
+      "children": [
+        {
+          "type": "package",
+          "name": "Dune",
+          "path": "TradingBot数据源/Dune"
+        },
+        {
+          "type": "folder",
+          "name": "Surf-AskSurf",
+          "path": "TradingBot数据源/Surf-AskSurf",
+          "children": []
+        }
+      ]
+    }
   ],
   "调研完成": []
 }

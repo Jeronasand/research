@@ -22,8 +22,8 @@ tree.json
   - `research/待调研/`
   - `research/调研中/`
   - `research/调研完成/`
-- Each direct child directory is one Web static package.
-- Every package must have an `index.html` entry file.
+- A directory with an `index.html` is one Web static package.
+- A directory without an `index.html` is a grouping or placeholder directory and may contain package directories below it.
 - Package assets and nested pages stay inside the package directory.
 - Subdirectories such as `split/`, `assets/`, and `data/` are allowed. Use relative package-internal links so the preview page can sign and load nested HTML pages and resources.
 - Do not add generated manifest formats other than `tree.json` unless the user changes the contract.
