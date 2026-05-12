@@ -1,5 +1,6 @@
-import { stat } from "node:fs/promises";
+import { cp, mkdtemp, rm, stat } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { findFirstPackage, writeTree } from "./scripts/research-tree.mjs";
@@ -10,6 +11,7 @@ const repoRoot = path.dirname(__filename);
 const researchDir = path.join(repoRoot, "research");
 const previewDir = path.join(repoRoot, "preview");
 const treePath = path.join(repoRoot, "tree.json");
+const uploadIgnoredNames = new Set([".DS_Store", ".gitkeep", "node_modules"]);
 
 const defaults = {
   endpoint: process.env.OSS_ENDPOINT || "oss-cn-shenzhen.aliyuncs.com",
@@ -103,30 +105,55 @@ function cleanDataBucket(options) {
   runOssutil(["rm", `oss://${options.datasBucket}/`, "--recursive", "--force"], options);
 }
 
-function uploadData(options) {
+function shouldCopyToUploadPayload(sourcePath) {
+  const relativePath = path.relative(researchDir, sourcePath);
+  if (!relativePath) {
+    return true;
+  }
+
+  return !relativePath.split(path.sep).some((part) => uploadIgnoredNames.has(part));
+}
+
+async function createResearchUploadPayload() {
+  const stagingRoot = await mkdtemp(path.join(os.tmpdir(), "research-oss-upload-"));
+  const stagingResearchDir = path.join(stagingRoot, "research");
+  await cp(researchDir, stagingResearchDir, {
+    recursive: true,
+    filter: shouldCopyToUploadPayload,
+  });
+
+  return { stagingRoot, stagingResearchDir };
+}
+
+async function uploadData(options) {
+  const payload = await createResearchUploadPayload();
   console.log(`${options.dryRun ? "Dry-run upload" : "Uploading"} research/ -> oss://${options.datasBucket}/research/`);
-  runOssutil([
-    "sync",
-    researchDir,
-    `oss://${options.datasBucket}/research/`,
-    "--exclude",
-    ".DS_Store",
-    "--exclude",
-    "*/.DS_Store",
-    "--exclude",
-    ".gitkeep",
-    "--exclude",
-    "*/.gitkeep",
-    "--exclude",
-    "node_modules",
-    "--exclude",
-    "node_modules/*",
-    "--exclude",
-    "*/node_modules",
-    "--exclude",
-    "*/node_modules/*",
-    "--force",
-  ], options);
+  try {
+    runOssutil([
+      "sync",
+      payload.stagingResearchDir,
+      `oss://${options.datasBucket}/research/`,
+      "--exclude",
+      ".DS_Store",
+      "--exclude",
+      "*/.DS_Store",
+      "--exclude",
+      ".gitkeep",
+      "--exclude",
+      "*/.gitkeep",
+      "--exclude",
+      "node_modules",
+      "--exclude",
+      "node_modules/*",
+      "--exclude",
+      "*/node_modules",
+      "--exclude",
+      "*/node_modules/*",
+      "--force",
+    ], options);
+  } finally {
+    await rm(payload.stagingRoot, { recursive: true, force: true });
+  }
 
   console.log(`${options.dryRun ? "Dry-run upload" : "Uploading"} tree.json -> oss://${options.datasBucket}/tree.json`);
   runOssutil(["cp", treePath, `oss://${options.datasBucket}/tree.json`, "--force"], options);
@@ -185,7 +212,7 @@ async function main() {
     cleanDataBucket(options);
   }
 
-  uploadData(options);
+  await uploadData(options);
   if (options.uploadPreview) {
     await uploadPreview(options);
   }

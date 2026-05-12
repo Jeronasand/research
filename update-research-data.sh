@@ -11,7 +11,8 @@ Usage:
 Updates only the private datas bucket:
   1. Generate tree.json from top-level directories under research/
   2. Clean objects in the datas bucket, without deleting the bucket
-  3. Upload research/ and tree.json to the datas bucket
+  3. Upload filtered research/ and tree.json to the datas bucket
+     - node_modules, .DS_Store, and .gitkeep are excluded
   4. Verify tree.json and the first project entry
 
 Examples:
