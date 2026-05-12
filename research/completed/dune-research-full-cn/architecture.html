@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dune 集成架构</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Dune 调研包</h1>
+      <p>数据源提供商 / Web3 链上数据 / API / MCP / Skill / Agent 集成</p>
+    </div>
+    <nav class="nav"><a class="" href="index.html">总览</a>
+<a class="" href="api.html">API 能力</a>
+<a class="" href="endpoints.html">端点清单</a>
+<a class="" href="mcp.html">MCP / Agent</a>
+<a class="" href="skills.html">CLI & Skills</a>
+<a class="" href="query-engine.html">DuneSQL</a>
+<a class="" href="data-catalog.html">数据目录</a>
+<a class="" href="uploads.html">上传数据</a>
+<a class="" href="materialized-views.html">Materialized Views</a>
+<a class="" href="pipelines-webhooks.html">Pipelines / Webhooks</a>
+<a class="" href="sdks-connectors.html">SDK / Connectors</a>
+<a class="" href="pricing-limits.html">计费 / 限制</a>
+<a class="" href="usecases.html">使用场景</a>
+<a class="active" href="architecture.html">集成架构</a>
+<a class="" href="evaluation.html">供应商评分</a>
+<a class="" href="sources.html">资料来源</a></nav>
+  </aside>
+  <main class="content">
+
+<section class="hero"><h1>推荐集成架构</h1><p>针对你现在的方向，建议把 Dune 放在“链上数据层”和“AI Agent Tool 层”，通过本地 Go 服务做权限、缓存、成本和通知控制。</p></section>
+<div class="card">
+<h2>架构 A：Codex / Agent 直接使用 MCP</h2>
+<pre>Codex / Claude / Cursor
+  ↓ MCP
+Dune MCP Server
+  ↓
+Dune Data Warehouse / Query Engine
+  ↓
+结果返回给 Agent</pre>
+<p>优点：接入快，适合研究和探索。缺点：成本和权限需要严格控制。</p>
+</div>
+<div class="card">
+<h2>架构 B：本地 Go 服务代理 Dune API</h2>
+<pre>Codex / 前端 / AI Pulse
+  ↓
+Local Go API
+  ↓ 权限控制 / Query 白名单 / 缓存 / 成本限制
+Dune Data API
+  ↓
+Dune Query / MV / Pipeline
+  ↓
+Local DB / Notification / Dashboard</pre>
+<p>这是更适合生产的模式。API Key 只放在本地服务中，不暴露给 Agent 或浏览器。</p>
+</div>
+<div class="card">
+<h2>架构 C：Dune Webhook → AI Pulse</h2>
+<pre>Dune Scheduled Query
+  ↓ Webhook
+ai-pulse-server
+  ↓ 规则判断
+Flutter App / 手机通知 / Slack / 飞书</pre>
+<p>适合把“链上指标变化”变成事件通知。</p>
+</div>
+<div class="card">
+<h2>本地 Docker 建议</h2>
+<pre>services:
+  ai-pulse-dune:
+    image: ai-pulse-dune:latest
+    environment:
+      - DUNE_API_KEY=${DUNE_API_KEY}
+      - MAX_QUERY_DAYS=7
+      - MAX_ROWS=1000
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+    ports:
+      - "8080:8080"</pre>
+</div>
+<div class="card">
+<h2>接口设计建议</h2>
+<table>
+<tr><th>本地接口</th><th>说明</th></tr>
+<tr><td><code>POST /api/dune/query/run</code></td><td>执行白名单 Query。</td></tr>
+<tr><td><code>GET /api/dune/query/:id/latest</code></td><td>获取 Query 最新结果。</td></tr>
+<tr><td><code>POST /api/dune/webhook/:secret</code></td><td>接收 Dune Webhook。</td></tr>
+<tr><td><code>GET /api/dune/usage</code></td><td>查看 credits 用量。</td></tr>
+<tr><td><code>POST /api/dune/signal/evaluate</code></td><td>把结果转成 AI Pulse 事件。</td></tr>
+</table>
+</div>
+
+    <div class="footer">生成时间：2026-05-12｜本包为中文调研草案，建议以 Dune 官方文档作为最终准绳。</div>
+  </main>
+</div>
+</body>
+</html>

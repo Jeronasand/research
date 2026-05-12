@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dune 上传数据</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <script src="assets/app.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Dune 调研包</h1>
+      <p>数据源提供商 / Web3 链上数据 / API / MCP / Skill / Agent 集成</p>
+    </div>
+    <nav class="nav"><a class="" href="index.html">总览</a>
+<a class="" href="api.html">API 能力</a>
+<a class="" href="endpoints.html">端点清单</a>
+<a class="" href="mcp.html">MCP / Agent</a>
+<a class="" href="skills.html">CLI & Skills</a>
+<a class="" href="query-engine.html">DuneSQL</a>
+<a class="" href="data-catalog.html">数据目录</a>
+<a class="active" href="uploads.html">上传数据</a>
+<a class="" href="materialized-views.html">Materialized Views</a>
+<a class="" href="pipelines-webhooks.html">Pipelines / Webhooks</a>
+<a class="" href="sdks-connectors.html">SDK / Connectors</a>
+<a class="" href="pricing-limits.html">计费 / 限制</a>
+<a class="" href="usecases.html">使用场景</a>
+<a class="" href="architecture.html">集成架构</a>
+<a class="" href="evaluation.html">供应商评分</a>
+<a class="" href="sources.html">资料来源</a></nav>
+  </aside>
+  <main class="content">
+
+<section class="hero"><h1>Data Uploads：上传自定义数据</h1><p>Dune 支持把自己的数据上传成可查询表。这个能力对 AI Agent 非常关键，因为它可以把内部数据、策略结果、钱包标签与链上数据放到同一个 SQL 环境里 Join。</p></section>
+<div class="card">
+<h2>两种上传方式</h2>
+<table>
+<tr><th>方式</th><th>说明</th><th>优点</th><th>缺点</th></tr>
+<tr><td>CSV Upload</td><td>UI 或 API 上传 CSV，自动推断 schema。</td><td>简单，适合快速验证。</td><td>schema 控制弱，不适合复杂增量数据。</td></tr>
+<tr><td>Create Table + Insert</td><td>先创建表，再插入 CSV 或 NDJSON。</td><td>更适合程序化、增量、Agent 工作流。</td><td>需要提前设计 schema 和写入流程。</td></tr>
+</table>
+</div>
+<div class="card">
+<h2>可上传的数据类型建议</h2>
+<ul>
+<li>钱包标签：地址、标签、风险等级、来源。</li>
+<li>交易策略结果：signal_id、token、score、reason、created_at。</li>
+<li>内部监控事件：alert_type、chain、contract、value、timestamp。</li>
+<li>用户自定义 watchlist：wallet、token、protocol。</li>
+<li>外部行情快照：token、price、volume、source。</li>
+</ul>
+</div>
+<div class="card">
+<h2>示例 schema：钱包标签表</h2>
+<pre>team.wallet_labels
+- address varbinary / varchar
+- label varchar
+- category varchar
+- risk_level varchar
+- source varchar
+- updated_at timestamp</pre>
+</div>
+<div class="card">
+<h2>架构价值</h2>
+<pre>本地系统 / AI Pulse / Trading Bot
+  ↓ 上传自有数据
+Dune Uploaded Table
+  ↓ Join
+Dune Curated Onchain Data
+  ↓
+统一 SQL 指标
+  ↓
+Webhook / API / Dashboard</pre>
+</div>
+
+    <div class="footer">生成时间：2026-05-12｜本包为中文调研草案，建议以 Dune 官方文档作为最终准绳。</div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,1219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AskSurf.ai 深度调研报告</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#11172a;
+      --panel-2:#0f1526;
+      --text:#e8edf7;
+      --muted:#9eb0cf;
+      --line:#24324f;
+      --brand:#7dd3fc;
+      --brand-2:#a78bfa;
+      --ok:#86efac;
+      --warn:#fbbf24;
+      --bad:#fca5a5;
+      --chip:#15203a;
+      --shadow:0 14px 40px rgba(0,0,0,.28);
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      --sans:Inter,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#08101f 0%,#0b1020 100%);color:var(--text);font-family:var(--sans);line-height:1.7}
+    a{color:#9bdcff;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:1220px;margin:0 auto;padding:28px 22px 80px}
+    .hero{
+      background:
+        radial-gradient(circle at 0 0, rgba(125,211,252,.12), transparent 38%),
+        radial-gradient(circle at 100% 0, rgba(167,139,250,.12), transparent 34%),
+        linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:28px 28px 18px;
+      box-shadow:var(--shadow);
+    }
+    h1{font-size:34px;line-height:1.2;margin:0 0 10px}
+    h2{
+      font-size:24px;
+      margin:34px 0 16px;
+      padding-top:8px;
+      border-top:1px solid rgba(255,255,255,.04);
+    }
+    h3{font-size:18px;margin:22px 0 10px}
+    p{margin:10px 0}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 0}
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 12px;border:1px solid var(--line);
+      border-radius:999px;background:var(--chip);font-size:13px;color:var(--muted)
+    }
+    .grid{display:grid;gap:18px}
+    .g2{grid-template-columns:1.2fr .8fr}
+    .g3{grid-template-columns:repeat(3,1fr)}
+    @media (max-width:980px){.g2,.g3{grid-template-columns:1fr}}
+    .panel{
+      background:linear-gradient(180deg,var(--panel),var(--panel-2));
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px 18px 16px;
+      box-shadow:var(--shadow);
+    }
+    .callout{
+      padding:14px 16px;border-radius:16px;border:1px solid var(--line);
+      background:rgba(125,211,252,.06);color:#d9f3ff
+    }
+    .callout.warn{background:rgba(251,191,36,.08);color:#fff3cc}
+    .callout.bad{background:rgba(252,165,165,.08);color:#ffe1e1}
+    .small{font-size:13px;color:var(--muted)}
+    ul{margin:8px 0 8px 18px}
+    li{margin:6px 0}
+    table{width:100%;border-collapse:collapse;margin:12px 0 4px;overflow:hidden;border-radius:14px}
+    th,td{
+      border:1px solid rgba(255,255,255,.07);
+      padding:10px 12px;vertical-align:top;font-size:14px
+    }
+    th{background:#121b31;color:#cfe1ff;text-align:left}
+    td code, pre code{font-family:var(--mono)}
+    code.inline{
+      font-family:var(--mono);
+      background:#10182c;border:1px solid var(--line);
+      padding:1px 6px;border-radius:8px;font-size:.93em
+    }
+    pre{
+      margin:12px 0;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-family:var(--mono);
+      background:#0b1224;border:1px solid var(--line);
+      border-radius:16px;padding:14px 16px;color:#d9e5ff;overflow:auto
+    }
+    .capture{
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#0b1224;
+      box-shadow:var(--shadow)
+    }
+    .capture figcaption{
+      padding:10px 12px;
+      color:var(--muted);
+      font-size:13px;
+      border-top:1px solid var(--line);
+      background:#0d1428
+    }
+    .capture img{display:block;width:100%;height:auto}
+    .toc{
+      position:sticky;top:16px;align-self:start
+    }
+    .toc ol{margin:8px 0 0 18px;padding:0}
+    .toc li{margin:4px 0}
+    .src-id{
+      display:inline-block;min-width:44px;text-align:center;font-weight:700;
+      color:#d6ecff;background:#12304b;border:1px solid #234e73;
+      padding:4px 8px;border-radius:10px
+    }
+    .badge{padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--line);display:inline-block}
+    .badge.direct{background:rgba(134,239,172,.08);color:var(--ok)}
+    .badge.infer{background:rgba(125,211,252,.08);color:var(--brand)}
+    .badge.unspec{background:rgba(252,165,165,.08);color:var(--bad)}
+    .foot{font-size:13px;color:var(--muted)}
+    .mermaid-box{
+      background:#0b1224;border:1px solid var(--line);border-radius:18px;padding:14px 16px
+    }
+    .kv{display:grid;grid-template-columns:200px 1fr;gap:8px 16px}
+    @media (max-width:720px){.kv{grid-template-columns:1fr}}
+    .sep{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);margin:16px 0}
+    details{border:1px solid var(--line);border-radius:16px;background:#0e1527;padding:10px 12px}
+    summary{cursor:pointer;color:#dff3ff;font-weight:700}
+    .quote{border-left:3px solid var(--brand);padding-left:12px;color:#c8d8f6}
+  </style>
+  <script>
+    function toggleAllDetails(open=true){
+      document.querySelectorAll('details').forEach(d => d.open = open);
+    }
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>AskSurf.ai 深度调研报告</h1>
+      <p>范围：公开站点、官方文档、条款/隐私入口、App Store/Google Play 官方上架页、官方 GitHub/NPM 线索、官方 cURL/SDK/CLI/MCP 示例。输出重点覆盖 <strong>信息源</strong>、<strong>相关 API</strong>、<strong>每类 API 背后的可能数据来源</strong>、<strong>调用规范</strong>、<strong>curl / JS fetch 用法</strong>、<strong>API 与数据源对照表</strong>、<strong>数据流流程图</strong>、<strong>证据截图/请求样例</strong>。结论以可验证证据为先，无法公开验证之处统一标为 <strong>unspecified</strong>。</p>
+      <div class="meta">
+        <span class="chip">日期：2026-05-13（Asia/Singapore）</span>
+        <span class="chip">语言：zh-CN</span>
+        <span class="chip">证据策略：官方优先，中文来源优先补充</span>
+        <span class="chip">结论密度：偏分析型、偏工程集成导向</span>
+      </div>
+    </section>
+
+    <div class="grid g2" style="margin-top:18px">
+      <div class="panel">
+        <h2 id="summary">执行摘要</h2>
+        <ul>
+          <li><strong>AskSurf 的公开产品面已经非常清晰：</strong>主站 <code class="inline">asksurf.ai</code>、开发者文档 <code class="inline">docs.asksurf.ai</code>、代理/CLI 入口 <code class="inline">agent.asksurf.ai</code> / <code class="inline">agents.asksurf.ai</code>、FAQ、Terms、Privacy、<code class="inline">/llm.txt</code> / <code class="inline">/llms.txt</code> / <code class="inline">/llms-full.txt</code>、Blog/Pulse/Share 页面都可见。<span class="badge direct">直接证据</span></li>
+          <li><strong>官方对外暴露的“可编程接口面”至少有 6 层：</strong>Chat API、REST Data API、Onchain SQL / Data Catalog、CLI、Skill、MCP。官方文档还公开了 <code class="inline">openapi.json</code> 与 <code class="inline">hermod-openapi.json</code> 索引入口。<span class="badge direct">直接证据</span></li>
+          <li><strong>已被官方明确点名的数据来源非常多：</strong>CEX 侧有 Binance / OKX / Bybit 等；社交侧是 X/Twitter；预测市场侧是 Polymarket / Kalshi；价格侧是 CoinGecko + DEX VWAP；衍生链上数据管线涉及 BigQuery、cryo、S3、RPC snapshots、dbt；Hyperliquid 使用 Hyperliquid Info API；部分协议级指标遵循 DefiLlama 口径。<span class="badge direct">直接证据</span></li>
+          <li><strong>文档存在“计数与路径漂移”：</strong>有的页面写 83 endpoints，有的写 86 endpoints，还有入口资料写 90+ commands；Data Catalog 有“58 tables”与旧快照“84 tables”并存；Chat API 的基址/路径在“端点页”和“AI Prompts 页”也并不完全一致。工程上应以 <strong>当前 OpenAPI</strong> 与具体 endpoint 页面为准，不要只抄 marketing 文案。<span class="badge infer">强推断</span></li>
+          <li><strong>对用户最有价值的结论：</strong>如果你想集成 AskSurf，最稳妥路线是 <strong>先用 REST Data API / Chat API 做最小功能验证</strong>，再决定是否上 CLI/MCP/Skill；如果你需要长周期、复杂分析与 agent 工作流，MCP 与 Onchain SQL 的价值最高。<span class="badge infer">强推断</span></li>
+          <li><strong>仍不可公开确认的部分：</strong>主站前端 JS bundle、实时浏览器 DevTools network trace、主站 tracker 清单、主站 CDN 明细、Web Search 的底层搜索供应商、Web Fetch 的底层抓取/清洗引擎、Chat 模型底层提供方，都无法从当前可见证据中落实，因此本文统一标注为 <strong>unspecified</strong>。<span class="badge unspec">unspecified</span></li>
+        </ul>
+      </div>
+
+      <aside class="panel toc">
+        <h2 style="margin-top:0">目录</h2>
+        <ol>
+          <li><a href="#summary">执行摘要</a></li>
+          <li><a href="#surface">公开信息面与证据清单</a></li>
+          <li><a href="#apis">API 面与端点盘点</a></li>
+          <li><a href="#sources">数据来源映射与推断</a></li>
+          <li><a href="#specs">调用规范与最佳实践</a></li>
+          <li><a href="#howto">逐步使用指南</a></li>
+          <li><a href="#limits">未披露项、假设与进度脉冲</a></li>
+          <li><a href="#refs">来源</a></li>
+        </ol>
+        <div class="sep"></div>
+        <p class="small">按钮：<a href="javascript:toggleAllDetails(true)">展开全部折叠块</a> / <a href="javascript:toggleAllDetails(false)">收起全部折叠块</a></p>
+      </aside>
+    </div>
+
+    <section class="panel">
+      <h2 id="surface">公开信息面与证据清单</h2>
+      <p>从公开可见面看，AskSurf 不是单一网页，而是由 <strong>主站产品页、开发者文档、Agent/CLI 分发面、分享页、博客/动态页、FAQ/隐私/条款页、App 上架页</strong> 组成的多域名发布体系。这一点对“数据源”和“API 发现”非常关键，因为很多真实能力并不在首页，而在 <code class="inline">docs.asksurf.ai</code> 与 <code class="inline">agent(s).asksurf.ai</code>。 </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>公开面</th>
+            <th>主要路径 / 主机</th>
+            <th>用途</th>
+            <th>证据级别</th>
+            <th>结论</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>主站产品页</td>
+            <td><code class="inline">asksurf.ai</code>、<code class="inline">/home</code>、<code class="inline">/enterprise</code></td>
+            <td>产品定位、营销、入口导航</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>对外定位为 AI 驱动的加密研究与情报平台</td>
+          </tr>
+          <tr>
+            <td>FAQ / Terms / Privacy</td>
+            <td><code class="inline">/faq</code>、<code class="inline">/terms-of-service</code>、<code class="inline">/privacy-policy</code></td>
+            <td>法律、合规、使用限制、数据处理入口</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>Terms 明确覆盖网站、web app、API、软件、工具、开发者服务、数据、文档</td>
+          </tr>
+          <tr>
+            <td>LLM 索引</td>
+            <td><code class="inline">/llm.txt</code>、<code class="inline">/llms.txt</code>、<code class="inline">/llms-full.txt</code></td>
+            <td>给 agent / crawler 暴露站点索引</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td><code class="inline">/llm.txt</code> 只是兼容指针，canonical index 指向 <code class="inline">/llms.txt</code></td>
+          </tr>
+          <tr>
+            <td>开发者文档</td>
+            <td><code class="inline">docs.asksurf.ai</code></td>
+            <td>API、CLI、Skill、MCP、Data Catalog</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>这是最核心、最权威的一手资料面</td>
+          </tr>
+          <tr>
+            <td>Agent / CLI 分发</td>
+            <td><code class="inline">agent.asksurf.ai</code>、<code class="inline">agents.asksurf.ai</code></td>
+            <td>CLI 安装、Agent 使用说明</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>Surf 明确面向 AI coding agents 设计</td>
+          </tr>
+          <tr>
+            <td>Blog / Pulse / Share</td>
+            <td><code class="inline">/blog/*</code>、<code class="inline">/pulse/*</code>、<code class="inline">/share/&lt;uuid&gt;</code></td>
+            <td>内容分发、研究成果分享、SEO</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>存在英文与中文内容面，说明其输出可被公开分享</td>
+          </tr>
+          <tr>
+            <td>移动端官方上架</td>
+            <td>App Store / Google Play</td>
+            <td>产品能力说明、隐私申报、版本演进</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>对数据类型、语言支持、功能更新很有用</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <figure class="capture">
+        <img alt="公开面结构图（data URI）" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='290' viewBox='0 0 1400 290'><rect width='1400' height='290' fill='%230b1224'/><rect x='30' y='38' rx='18' ry='18' width='240' height='92' fill='%23131f3a' stroke='%23243b63'/><text x='55' y='78' font-size='28' fill='%23e8edf7' font-family='Arial'>asksurf.ai</text><text x='55' y='106' font-size='18' fill='%239eb0cf' font-family='Arial'>主站 / FAQ / 条款 / 隐私 / Share</text><rect x='320' y='38' rx='18' ry='18' width='290' height='92' fill='%23131f3a' stroke='%23243b63'/><text x='345' y='78' font-size='28' fill='%23e8edf7' font-family='Arial'>docs.asksurf.ai</text><text x='345' y='106' font-size='18' fill='%239eb0cf' font-family='Arial'>Chat API / Data API / CLI / MCP / Catalog</text><rect x='660' y='38' rx='18' ry='18' width='300' height='92' fill='%23131f3a' stroke='%23243b63'/><text x='685' y='78' font-size='28' fill='%23e8edf7' font-family='Arial'>agent(s).asksurf.ai</text><text x='685' y='106' font-size='18' fill='%239eb0cf' font-family='Arial'>CLI 安装 / Agent 教程 / Skills 入口</text><rect x='1010' y='38' rx='18' ry='18' width='340' height='92' fill='%23131f3a' stroke='%23243b63'/><text x='1035' y='78' font-size='28' fill='%23e8edf7' font-family='Arial'>App Store / Google Play</text><text x='1035' y='106' font-size='18' fill='%239eb0cf' font-family='Arial'>能力说明 / 隐私申报 / 版本更新</text><line x1='150' y1='165' x2='150' y2='250' stroke='%235e84c2' stroke-width='3'/><line x1='465' y1='165' x2='465' y2='250' stroke='%235e84c2' stroke-width='3'/><line x1='810' y1='165' x2='810' y2='250' stroke='%235e84c2' stroke-width='3'/><line x1='1180' y1='165' x2='1180' y2='250' stroke='%235e84c2' stroke-width='3'/><rect x='250' y='214' rx='18' ry='18' width='900' height='54' fill='%23111b32' stroke='%23243b63'/><text x='285' y='248' font-size='22' fill='%237dd3fc' font-family='Arial'>观察重点：真正可编程能力主要集中在 docs.asksurf.ai 与 api.asksurf.ai/gateway</text></svg>" />
+        <figcaption>图 A：公开产品面结构图。该图是根据公开路径与文档索引重绘的证据示意图，不是浏览器真截图。</figcaption>
+      </figure>
+
+      <h3>可以确认的产品定位</h3>
+      <p class="quote">官方开发者文档把 Surf 定义为“AI-powered crypto intelligence for agents and developers”；平台覆盖 <strong>40+ blockchains</strong>、<strong>200+ data sources</strong>、<strong>100k+ verified crypto voices</strong>。中文 App Store 描述进一步明确其“多 Agents 研究架构覆盖 40+ 条区块链和 10 万+ X 账号”，强调链上数据、资金流、社交情绪、基本面研究的整合。</p>
+
+      <div class="grid g2">
+        <div class="callout">
+          <strong>确认项</strong><br/>
+          文档站显式提供 API/CLI/MCP/Data Catalog；主站显式提供 FAQ、Terms、Privacy、llm/llms 索引；App Store 明确开发者为 <strong>Cybertino Inc</strong>，语言含简体中文、英语、日语、韩语。
+        </div>
+        <div class="callout warn">
+          <strong>不可确认项</strong><br/>
+          主站前端 bundle、主站 tracker 清单、主站 CDN 明细，以及是否引入 Segment / GA / PostHog / Sentry 等第三方埋点，当前公开证据不足，记为 <strong>unspecified</strong>。
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 id="apis">API 面与端点盘点</h2>
+
+      <h3>顶层 API / 接口面比较</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>接口面</th>
+            <th>公开入口</th>
+            <th>认证</th>
+            <th>内容类型</th>
+            <th>主要能力</th>
+            <th>结论</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chat API</td>
+            <td><code class="inline">POST /v1/chat/completions</code></td>
+            <td>Bearer API Key</td>
+            <td>JSON / SSE</td>
+            <td>OpenAI-compatible chat，支持 <code class="inline">tools</code>、<code class="inline">ability</code>、<code class="inline">citation</code></td>
+            <td>适合自然语言问答与 agent 工作流</td>
+          </tr>
+          <tr>
+            <td>REST Data API</td>
+            <td><code class="inline">https://api.asksurf.ai/gateway</code></td>
+            <td>Bearer API Key</td>
+            <td>application/json</td>
+            <td>市场、交易所、钱包、社交、搜索、新闻、链上、基金、预测市场等 typed endpoints</td>
+            <td>最适合后端/数据集成</td>
+          </tr>
+          <tr>
+            <td>Onchain SQL</td>
+            <td><code class="inline">POST /gateway/v1/onchain/sql</code></td>
+            <td>Bearer API Key</td>
+            <td>application/json</td>
+            <td>直接跑 SQL 查询链上数据仓</td>
+            <td>最适合分析类产品与内部研究工具</td>
+          </tr>
+          <tr>
+            <td>Data Catalog / ClickHouse</td>
+            <td>文档公开表结构与规则</td>
+            <td>文档显示 readonly account 存在</td>
+            <td>ClickHouse HTTP（8443/TLS）</td>
+            <td>58 analyst-ready tables（但计数存在漂移）</td>
+            <td>适合重分析；连接 host 在本次公开证据里 <strong>unspecified</strong></td>
+          </tr>
+          <tr>
+            <td>CLI</td>
+            <td><code class="inline">curl -fsSL https://agent.asksurf.ai/cli/releases/install.sh | sh</code></td>
+            <td>可免 key 起步；保存 key 后无限访问</td>
+            <td>终端文本 / JSON</td>
+            <td>命令发现、结构化输出、脚本自动化</td>
+            <td>适合工程师与终端工作流</td>
+          </tr>
+          <tr>
+            <td>Skill</td>
+            <td><code class="inline">npx skills add asksurf-ai/surf-skills --skill surf</code></td>
+            <td>依赖 CLI / SURF_API_KEY</td>
+            <td>Skill 协议</td>
+            <td>教 AI coding agents 正确使用 Surf CLI</td>
+            <td>适合 Claude Code / Codex 等</td>
+          </tr>
+          <tr>
+            <td>MCP</td>
+            <td><code class="inline">@surf-ai/surf-mcp</code></td>
+            <td><code class="inline">SURF_API_KEY</code></td>
+            <td>MCP stdio</td>
+            <td>按 tag 自动生成 12 个工具，路由到 REST API</td>
+            <td>适合 Cursor / Claude Desktop / Windsurf 等</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn">
+        <strong>重要的文档漂移 / 规范冲突</strong>
+        <ul>
+          <li>端点数量：有文档写 <strong>83 endpoints</strong>，MCP 页写 <strong>86 endpoints</strong>，Agent 入口又出现 <strong>90+ commands</strong>。这通常意味着 OpenAPI 持续在更新，而文案没有完全同步。</li>
+          <li>Chat API 路径：Chat 端点页的 cURL 样例使用 <code class="inline">https://api.asksurf.ai/gateway/v1/chat/completions</code>；AI Prompts 页写的是 <code class="inline">https://api.asksurf.ai/v1/chat/completions</code>；OpenAI SDK 示例又把 <code class="inline">baseURL</code> 设为 <code class="inline">https://api.asksurf.ai</code>。生产集成前务必以 <strong>当前 OpenAPI</strong> 或最新 endpoint page 为准。</li>
+          <li>认证头：Chat 端点页样例头部有省略 <code class="inline">Bearer</code> 的情况，但 Data API Overview 与 AI Prompts 都明确要求 <code class="inline">Authorization: Bearer &lt;API_KEY&gt;</code>。工程上应统一使用 <strong>Bearer</strong>。</li>
+        </ul>
+      </div>
+
+      <h3>代表性端点一览</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>域</th>
+            <th>方法 / 路径</th>
+            <th>关键参数</th>
+            <th>示例响应字段</th>
+            <th>可能数据源</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chat</td>
+            <td><code class="inline">POST /gateway/v1/chat/completions</code> 或文档中的 <code class="inline">/v1/chat/completions</code></td>
+            <td><code class="inline">model</code>、<code class="inline">messages</code>、<code class="inline">stream</code>、<code class="inline">reasoning_effort</code>、<code class="inline">ability</code>、<code class="inline">citation</code>、<code class="inline">tools</code></td>
+            <td><code class="inline">choices</code>、<code class="inline">usage</code>、SSE</td>
+            <td>Surf 自身编排层；底层模型提供方 unspecified</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+          <tr>
+            <td>Exchange</td>
+            <td><code class="inline">GET /gateway/v1/exchange/depth</code></td>
+            <td><code class="inline">pair</code>、<code class="inline">type</code>、<code class="inline">limit</code>、<code class="inline">exchange</code></td>
+            <td><code class="inline">bids</code>、<code class="inline">asks</code>、<code class="inline">spread_pct</code></td>
+            <td>Binance / OKX / Bybit / Bitget / Coinbase / Kraken …</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+          <tr>
+            <td>Wallet</td>
+            <td><code class="inline">GET /gateway/v1/wallet/detail</code></td>
+            <td><code class="inline">address</code>、<code class="inline">chain</code>、<code class="inline">fields</code></td>
+            <td><code class="inline">evm_balance</code>、<code class="inline">evm_tokens</code>、<code class="inline">labels</code>、<code class="inline">nft</code></td>
+            <td>多链钱包余额、标签、NFT、授权等聚合源</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+          <tr>
+            <td>Social</td>
+            <td><code class="inline">GET /gateway/v1/social/user</code></td>
+            <td><code class="inline">handle</code></td>
+            <td><code class="inline">followers_count</code>、<code class="inline">avatar</code>、<code class="inline">bio</code></td>
+            <td>X/Twitter</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+          <tr>
+            <td>Project</td>
+            <td><code class="inline">GET /gateway/v1/project/defi/ranking</code></td>
+            <td><code class="inline">metric</code>、<code class="inline">limit</code>、<code class="inline">offset</code></td>
+            <td><code class="inline">tvl</code>、<code class="inline">revenue</code>、<code class="inline">fees</code>、<code class="inline">volume</code></td>
+            <td>协议级 TVL / Fees / Revenue 聚合模型</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+          <tr>
+            <td>News</td>
+            <td><code class="inline">GET /gateway/v1/news/feed</code></td>
+            <td>文档截面中未完整展开；至少支持分页</td>
+            <td><code class="inline">title</code>、<code class="inline">summary</code>、<code class="inline">source</code>、<code class="inline">url</code></td>
+            <td>major outlets（具体名单 unspecified）</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+          <tr>
+            <td>Search</td>
+            <td><code class="inline">GET /gateway/v1/search/web</code></td>
+            <td><code class="inline">q</code>、<code class="inline">limit</code>、<code class="inline">offset</code>、<code class="inline">site</code></td>
+            <td><code class="inline">title</code>、<code class="inline">description</code>、<code class="inline">content</code>、<code class="inline">url</code></td>
+            <td>底层 Web Search provider unspecified；可按域名过滤</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+          <tr>
+            <td>Onchain SQL</td>
+            <td><code class="inline">POST /gateway/v1/onchain/sql</code></td>
+            <td><code class="inline">sql</code>、<code class="inline">max_rows</code></td>
+            <td><code class="inline">data[]</code>、<code class="inline">meta.credits_used</code></td>
+            <td>Surf Data Catalog / ClickHouse 仓库</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+          <tr>
+            <td>Onchain Schema</td>
+            <td><code class="inline">GET /gateway/v1/onchain/schema</code></td>
+            <td>分页类参数（文档截面未细展开）</td>
+            <td><code class="inline">database</code>、<code class="inline">table</code>、<code class="inline">columns</code></td>
+            <td>Surf Data Catalog / ClickHouse 仓库</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+          <tr>
+            <td>Prediction</td>
+            <td><code class="inline">GET /gateway/v1/prediction-market/polymarket/open-interest</code></td>
+            <td><code class="inline">condition_id</code>、<code class="inline">time_range</code></td>
+            <td><code class="inline">open_interest_usd</code>、<code class="inline">daily_net_change_usd</code></td>
+            <td>Polymarket / Polygon</td>
+            <td><span class="badge direct">直接证据</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <figure class="capture">
+        <img alt="Chat API 请求样例（data URI）" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='260' viewBox='0 0 1400 260'><rect width='1400' height='260' fill='%230b1224'/><rect x='22' y='20' rx='16' ry='16' width='1356' height='220' fill='%2310182c' stroke='%23243b63'/><text x='48' y='62' font-size='26' fill='%23e8edf7' font-family='monospace'>curl --request POST https://api.asksurf.ai/gateway/v1/chat/completions</text><text x='48' y='102' font-size='20' fill='%239eb0cf' font-family='monospace'>-H 'Authorization: Bearer $SURF_API_KEY'</text><text x='48' y='134' font-size='20' fill='%239eb0cf' font-family='monospace'>-H 'Content-Type: application/json'</text><text x='48' y='172' font-size='20' fill='%236ee7b7' font-family='monospace'>-d '{ &quot;model&quot;:&quot;surf-1.5&quot;, &quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;BTC summary&quot;}] }'</text><text x='48' y='212' font-size='18' fill='%237dd3fc' font-family='Arial'>注：Bearer 头部应显式保留；文档对 chat 基路径有漂移，生产前应核对当前 OpenAPI。</text></svg>" />
+        <figcaption>图 B：根据官方 Chat API cURL 样例重绘的“请求捕获卡片”。这不是浏览器网络面板截图，而是用于工程审阅的证据可视化。</figcaption>
+      </figure>
+
+      <details style="margin-top:16px">
+        <summary>展开：按官方 llms.txt 提取的完整 REST 端点目录</summary>
+        <div class="grid g2" style="margin-top:10px">
+          <div>
+            <h3>Exchange</h3>
+            <p><code class="inline">depth</code>、<code class="inline">funding-history</code>、<code class="inline">klines</code>、<code class="inline">long-short-ratio</code>、<code class="inline">markets</code>、<code class="inline">perp</code>、<code class="inline">price</code></p>
+            <h3>Market</h3>
+            <p><code class="inline">etf</code>、<code class="inline">fear-greed</code>、<code class="inline">futures</code>、<code class="inline">liquidation-chart</code>、<code class="inline">liquidation-exchange-list</code>、<code class="inline">liquidation-order</code>、<code class="inline">onchain-indicator</code>、<code class="inline">options</code>、<code class="inline">price</code>、<code class="inline">price-indicator</code>、<code class="inline">ranking</code></p>
+            <h3>News</h3>
+            <p><code class="inline">detail</code>、<code class="inline">feed</code></p>
+            <h3>Onchain</h3>
+            <p><code class="inline">bridge-ranking</code>、<code class="inline">gas-price</code>、<code class="inline">query</code>、<code class="inline">schema</code>、<code class="inline">sql</code>、<code class="inline">tx</code>、<code class="inline">yield-ranking</code></p>
+            <h3>Prediction Market</h3>
+            <p><code class="inline">category-metrics</code>、<code class="inline">kalshi-events</code>、<code class="inline">kalshi-markets</code>、<code class="inline">kalshi-open-interest</code>、<code class="inline">kalshi-prices</code>、<code class="inline">kalshi-ranking</code>、<code class="inline">kalshi-trades</code>、<code class="inline">kalshi-volumes</code>、<code class="inline">polymarket-activity</code>、<code class="inline">polymarket-events</code>、<code class="inline">polymarket-markets</code>、<code class="inline">polymarket-open-interest</code>、<code class="inline">polymarket-positions</code>、<code class="inline">polymarket-prices</code>、<code class="inline">polymarket-ranking</code>、<code class="inline">polymarket-trades</code>、<code class="inline">polymarket-volumes</code></p>
+          </div>
+          <div>
+            <h3>Project</h3>
+            <p><code class="inline">detail</code>、<code class="inline">defi-metrics</code>、<code class="inline">defi-ranking</code></p>
+            <h3>Search</h3>
+            <p><code class="inline">airdrop</code>、<code class="inline">events</code>、<code class="inline">fund</code>、<code class="inline">kalshi</code>、<code class="inline">news</code>、<code class="inline">polymarket</code>、<code class="inline">project</code>、<code class="inline">social-people</code>、<code class="inline">social-posts</code>、<code class="inline">wallet</code>、<code class="inline">web</code></p>
+            <h3>Social</h3>
+            <p><code class="inline">detail</code>、<code class="inline">mindshare</code>、<code class="inline">ranking</code>、<code class="inline">smart-followers-history</code>、<code class="inline">tweet-replies</code>、<code class="inline">tweets</code>、<code class="inline">user</code>、<code class="inline">user-followers</code>、<code class="inline">user-following</code>、<code class="inline">user-posts</code>、<code class="inline">user-replies</code></p>
+            <h3>Token</h3>
+            <p><code class="inline">dex-trades</code>、<code class="inline">holders</code>、<code class="inline">tokenomics</code>、<code class="inline">transfers</code></p>
+            <h3>Wallet</h3>
+            <p><code class="inline">detail</code>、<code class="inline">history</code>、<code class="inline">labels-batch</code>、<code class="inline">net-worth</code>、<code class="inline">protocols</code>、<code class="inline">transfers</code></p>
+            <h3>Web / Fund</h3>
+            <p><code class="inline">web/fetch</code>；<code class="inline">fund/detail</code>、<code class="inline">fund/portfolio</code>、<code class="inline">fund/ranking</code></p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="panel">
+      <h2 id="sources">数据来源映射与推断</h2>
+
+      <p>这一节只做两件事：一是整理 <strong>官方明确点名</strong> 的外部/内部数据源；二是对“每类 API 可能读取什么源”做有边界的工程推断。凡是官方没明确说、我也无法从公开证据闭环的，一律写 <strong>unspecified</strong>。</p>
+
+      <h3>官方明确点名的数据源 / 数据管线</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>类别</th>
+            <th>官方明确提及的来源</th>
+            <th>对应 API / 数据面</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>现货/衍生 CEX 行情</td>
+            <td>Binance、OKX、Bybit，且 depth 枚举里还出现 Bitget、Coinbase、Kraken、Gate、MEXC、Upbit、Bitstamp、Deribit、BitMEX、Bithumb</td>
+            <td>Exchange API</td>
+            <td>这是显式的交易所级数据来源</td>
+          </tr>
+          <tr>
+            <td>社交数据</td>
+            <td>X / Twitter</td>
+            <td>Social API、Search social</td>
+            <td>平台声称覆盖 100k+ verified crypto voices</td>
+          </tr>
+          <tr>
+            <td>价格</td>
+            <td>CoinGecko hourly snapshots + DEX VWAP</td>
+            <td>Market、Token、Wallet、Project 估值</td>
+            <td>官方明确说明优先 CoinGecko，DEX VWAP 用于补洞</td>
+          </tr>
+          <tr>
+            <td>预测市场</td>
+            <td>Polymarket（Polygon）、Kalshi</td>
+            <td>Prediction Market API、Data Catalog</td>
+            <td>Polymarket 有 on-chain 语义；Kalshi 明确是 centralized exchange data</td>
+          </tr>
+          <tr>
+            <td>Hyperliquid</td>
+            <td>Hyperliquid Info API</td>
+            <td>Data Catalog / Hyperliquid tables</td>
+            <td>官方显式点名</td>
+          </tr>
+          <tr>
+            <td>原始链上数据管线</td>
+            <td>BigQuery、cryo、S3、RPC snapshots、dbt</td>
+            <td>Onchain SQL / Data Catalog</td>
+            <td>不同链的数据刷新周期与滞后各不相同</td>
+          </tr>
+          <tr>
+            <td>协议级 TVL / Fees / Yields</td>
+            <td>DefiLlama 6-field standard、35+ fee models、CoinGecko pricing</td>
+            <td>Project / TVL / Fees / Yields</td>
+            <td>口径与传统 DeFi 横向对比兼容</td>
+          </tr>
+          <tr>
+            <td>桥接数据</td>
+            <td>Across、Polygon、USDT0、Lighter、Mayan 等桥协议 + hourly prices</td>
+            <td>Bridge ranking / bridge_volume_daily</td>
+            <td>属于协议级聚合</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>按 API 面推断的“可能数据来源”</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>API / 接口面</th>
+            <th>最可能的上游来源</th>
+            <th>证据强度</th>
+            <th>判断</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Chat API</td>
+            <td>Surf 自身模型/路由层 + 已接入的 Data API / Search / Onchain SQL 等工具面</td>
+            <td><span class="badge infer">强推断</span></td>
+            <td>OpenAI-compatible 只说明协议兼容，不等于底层一定用 OpenAI 模型；模型提供方 <strong>unspecified</strong></td>
+          </tr>
+          <tr>
+            <td>REST Data API</td>
+            <td>Surf 聚合后的 typed data services（市场、交易所、社交、预测市场、链上分析等）</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>对应最清晰、最稳的程序化入口</td>
+          </tr>
+          <tr>
+            <td>Web Search</td>
+            <td>某个或多个底层 web search provider + Surf 自己的结果标准化层</td>
+            <td><span class="badge infer">强推断</span></td>
+            <td>有域名过滤与结构化返回，但底层 provider 未披露</td>
+          </tr>
+          <tr>
+            <td>Web Fetch</td>
+            <td>网页抓取 + 可读性清洗/Markdown 转换引擎</td>
+            <td><span class="badge infer">强推断</span></td>
+            <td>MCP/文档只说“Fetch any URL as clean markdown”，底层实现未披露</td>
+          </tr>
+          <tr>
+            <td>CLI</td>
+            <td>Surf REST API / OpenAPI</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>CLI 本质是 transport / ergonomics 层</td>
+          </tr>
+          <tr>
+            <td>Skill</td>
+            <td>CLI</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>Skill 不是新数据源，而是 agent instruction 包</td>
+          </tr>
+          <tr>
+            <td>MCP</td>
+            <td>OpenAPI + <code class="inline">@surf-ai/sdk</code> + REST API</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>MCP 也是封装层，不是独立数据源</td>
+          </tr>
+          <tr>
+            <td>Onchain SQL / Data Catalog</td>
+            <td>ClickHouse views（agent / curated）+ BigQuery/cryo/S3/RPC/dbt 等 ingestion pipeline</td>
+            <td><span class="badge direct">直接证据</span></td>
+            <td>这是 AskSurf 最像“内部数据中台”的部分</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="mermaid-box">
+        <h3 style="margin-top:0">数据流流程图</h3>
+        <p class="small">下方同时给出 Mermaid 源码与静态说明。为了保证单文件自包含，本报告不内嵌 Mermaid 运行库；你可把源码复制到本地 Mermaid 渲染器中直接生成图。</p>
+        <pre class="mermaid">flowchart LR
+  subgraph Upstream[外部与原始源]
+    A1[Binance / OKX / Bybit / ...]
+    A2[X / Twitter]
+    A3[Polymarket / Kalshi]
+    A4[CoinGecko + DEX VWAP]
+    A5[BigQuery / cryo / S3 / RPC]
+    A6[Hyperliquid Info API]
+    A7[News outlets]
+    A8[Web pages]
+  end
+
+  subgraph SurfCore[AskSurf 数据与编排层]
+    B1[Ingestion + dbt + ClickHouse]
+    B2[REST Data API]
+    B3[Onchain SQL / Schema]
+    B4[Chat Orchestrator]
+    B5[OpenAPI Spec]
+  end
+
+  subgraph Client[客户端与集成面]
+    C1[Web / Mobile App]
+    C2[CLI]
+    C3[Skill]
+    C4[MCP]
+    C5[Your Backend]
+  end
+
+  A1 --> B2
+  A2 --> B2
+  A3 --> B1
+  A4 --> B1
+  A5 --> B1
+  A6 --> B1
+  A7 --> B2
+  A8 --> B2
+
+  B1 --> B3
+  B1 --> B2
+  B2 --> B4
+  B5 --> C4
+  B2 --> C2
+  C2 --> C3
+  B2 --> C5
+  B4 --> C1
+  B2 --> C1
+  B3 --> C5</pre>
+        <div class="callout" style="margin-top:12px">
+          <strong>静态解释：</strong>预测市场、价格、桥、链上表等看起来更像先入 ClickHouse 再对外暴露；而部分交易所深度、社交、新闻、Web 搜索等更像直接通过 typed API 聚合后提供。MCP 明确写明会读取 <code class="inline">https://api.asksurf.ai/gateway/openapi.json</code>，按 tag 生成工具，再经 <code class="inline">@surf-ai/sdk</code> 转发到 HTTP 层。
+        </div>
+      </div>
+
+      <h3>一些很有价值的细节信号</h3>
+      <ul>
+        <li><strong>Polymarket-Kalshi 匹配表</strong> 的说明中写到：跨平台匹配由 <strong>LLM matching (Grok)</strong> 生成并带 confidence scoring。这意味着 AskSurf 的某些“统一视图”本身就使用了 LLM 做数据对齐，而不只是纯规则 ETL。</li>
+        <li><strong>Kalshi 数据</strong> 被官方明确标注为 centralized exchange data，<strong>不能 on-chain 验证</strong>；而 Polymarket 则有明确的 Polygon / on-chain event 语义。这一点对你做“可追溯性/可信度分层”很重要。</li>
+        <li><strong>价格表</strong> 明确写了 CoinGecko 为稳定参考源，而 DEX VWAP 有 wash trading / 流动性偏斜风险。这意味着 AskSurf 自己也承认“价格不是一条真值流”，而是按优先级合成。</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2 id="specs">调用规范与最佳实践</h2>
+
+      <h3>通用规范</h3>
+      <div class="kv">
+        <div><strong>认证</strong></div>
+        <div>统一使用 <code class="inline">Authorization: Bearer &lt;API_KEY&gt;</code>；不要硬编码到代码仓库里，官方多处明确建议从环境变量读取。</div>
+        <div><strong>分页</strong></div>
+        <div>所有 list endpoints 通常支持 <code class="inline">limit</code> 与 <code class="inline">offset</code>，默认 <code class="inline">limit=20</code>，最大 <code class="inline">100</code>。</div>
+        <div><strong>链名</strong></div>
+        <div>必须用 canonical long-form：<code class="inline">ethereum</code>、<code class="inline">solana</code>、<code class="inline">base</code>、<code class="inline">arbitrum</code> 等；不要用 <code class="inline">eth</code> / <code class="inline">sol</code> / <code class="inline">matic</code>。</div>
+        <div><strong>symbol</strong></div>
+        <div>大写、逗号分隔：<code class="inline">BTC</code>、<code class="inline">ETH,SOL</code>。</div>
+        <div><strong>时间范围</strong></div>
+        <div>常见是 <code class="inline">7d</code> / <code class="inline">30d</code> / <code class="inline">365d</code> / <code class="inline">max</code>。</div>
+        <div><strong>错误码</strong></div>
+        <div>普遍可见 <code class="inline">400</code> / <code class="inline">401</code> / <code class="inline">404</code> / <code class="inline">422</code> / <code class="inline">429</code> / <code class="inline">502</code>；Chat 端点页还出现 <code class="inline">402</code>，但语义未公开详细解释。</div>
+        <div><strong>计费</strong></div>
+        <div>采用 credits；多数响应会带 <code class="inline">meta.credits_used</code>；余额查看有 <code class="inline">GET /v1/me/credit-balance</code> 的文档线索。</div>
+      </div>
+
+      <h3>Chat API 最佳实践</h3>
+      <ul>
+        <li>如果需要 agent-style 行为，优先使用 <code class="inline">surf-1.5</code> / <code class="inline">surf-1.5-thinking</code>；若追求速度，用 <code class="inline">surf-1.5-instant</code>。</li>
+        <li><code class="inline">surf-research</code> 与 <code class="inline">surf-1.5</code> 官方建议把 timeout 设到 <strong>600 秒</strong>。</li>
+        <li>若要控制模型能力边界，可使用 <code class="inline">ability</code>；若要输出引用风格，可使用 <code class="inline">citation</code>。</li>
+        <li>如果你已经有 OpenAI SDK 代码，Surf 的接入成本会很低，因为它走 OpenAI-compatible request shape。</li>
+      </ul>
+
+      <h3>REST Data API 最佳实践</h3>
+      <ul>
+        <li>以“typed endpoint + 标准分页 + 标准 error shape”的方式接入，优于直接从自然语言结果里萃取 JSON。</li>
+        <li>多链钱包类接口建议先从 <code class="inline">wallet/detail</code> 做聚合视图，再按需下钻 <code class="inline">history</code> / <code class="inline">transfers</code> / <code class="inline">protocols</code>。</li>
+        <li>Web 搜索接口已经支持域名过滤 <code class="inline">site</code>；如果你做投研系统，应该从第一天起就把新闻域名、官方域名白名单化。</li>
+      </ul>
+
+      <h3>Onchain SQL / Data Catalog 最佳实践</h3>
+      <ul>
+        <li>官方明确建议：<strong>先 filter <code class="inline">block_date</code></strong>，因为它通常是分区键，是 ClickHouse 性能最关键的杠杆。</li>
+        <li>尽量避免 <code class="inline">SELECT *</code>；大表上显式列投影更稳。</li>
+        <li>ReplacingMergeTree 表需要 <code class="inline">FINAL</code>；并且文档特意提醒 <code class="inline">FINAL</code> 的位置写法。</li>
+        <li>做跨表分析时，各表先在 CTE 中独立过滤，再 JOIN，会比“先 JOIN 后过滤”更合理。</li>
+      </ul>
+
+      <h3>CLI / Skill / MCP 最佳实践</h3>
+      <ul>
+        <li>CLI：首次会话先 <code class="inline">surf sync</code>，后用 <code class="inline">surf list-operations</code> 和 <code class="inline">surf &lt;command&gt; --help</code> 自证参数。</li>
+        <li>CLI 用在脚本里时，始终加 <code class="inline">-o json -f body.data</code>，避免解析人类可读输出。</li>
+        <li>Skill：本质是 instruction layer，不会替你发明新数据能力；它最大的价值是减少 agent 乱用参数。</li>
+        <li>MCP：适合多工具代理统一编排；但因为它受 OpenAPI 漂移影响，最好把“tool signature 变更检测”纳入你的集成测试。</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2 id="howto">逐步使用指南</h2>
+
+      <h3>Chat API</h3>
+      <p><strong>步骤</strong>：获取 API Key → 设置环境变量 → 选模型 → 发 JSON → 处理 JSON 或 SSE → 给深度模型加长超时。</p>
+      <pre><code>curl --request POST \
+  --url https://api.asksurf.ai/gateway/v1/chat/completions \
+  --header "Authorization: Bearer $SURF_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "model":"surf-1.5",
+    "messages":[
+      {"role":"user","content":"总结今天 BTC 市场状态，并列出 3 个主要驱动因素"}
+    ],
+    "reasoning_effort":"medium",
+    "stream":false,
+    "ability":["market_analysis"],
+    "citation":["source"]
+  }'</code></pre>
+
+      <pre><code>async function askSurfChat() {
+  const resp = await fetch("https://api.asksurf.ai/gateway/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.SURF_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "surf-1.5",
+      messages: [
+        { role: "user", content: "总结今天 BTC 市场状态，并列出 3 个主要驱动因素" }
+      ],
+      reasoning_effort: "medium",
+      stream: false,
+      ability: ["market_analysis"],
+      citation: ["source"]
+    })
+  });
+
+  if (!resp.ok) {
+    throw new Error(`HTTP ${resp.status}: ${await resp.text()}`);
+  }
+
+  const data = await resp.json();
+  console.log(data.choices?.[0]?.message?.content);
+}</code></pre>
+
+      <p class="small">如果你是直接改 OpenAI SDK，官方示例的思路是：<code class="inline">baseURL = "https://api.asksurf.ai"</code>，然后照 OpenAI Chat Completions 方式调用；但生产前请核对当前 Chat 路径是否仍维持该兼容映射。</p>
+
+      <h3>REST Data API：以 4 个高价值端点为例</h3>
+
+      <h3>价格查询</h3>
+      <pre><code>curl --request GET \
+  --url "https://api.asksurf.ai/gateway/market/price?symbol=BTC" \
+  --header "Authorization: Bearer $SURF_API_KEY"</code></pre>
+
+      <pre><code>async function getPrice(symbol = "BTC") {
+  const url = new URL("https://api.asksurf.ai/gateway/market/price");
+  url.searchParams.set("symbol", symbol);
+
+  const resp = await fetch(url, {
+    headers: { "Authorization": `Bearer ${process.env.SURF_API_KEY}` }
+  });
+  if (!resp.ok) throw new Error(await resp.text());
+  return resp.json();
+}</code></pre>
+
+      <h3>钱包聚合详情</h3>
+      <pre><code>curl --request GET \
+  --url "https://api.asksurf.ai/gateway/v1/wallet/detail?address=0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045&fields=balance,tokens,labels" \
+  --header "Authorization: Bearer $SURF_API_KEY"</code></pre>
+
+      <pre><code>async function getWalletDetail(address) {
+  const url = new URL("https://api.asksurf.ai/gateway/v1/wallet/detail");
+  url.searchParams.set("address", address);
+  url.searchParams.set("fields", "balance,tokens,labels");
+
+  const resp = await fetch(url, {
+    headers: { "Authorization": `Bearer ${process.env.SURF_API_KEY}` }
+  });
+  if (!resp.ok) throw new Error(await resp.text());
+  return resp.json();
+}</code></pre>
+
+      <h3>Web Search</h3>
+      <pre><code>curl --request GET \
+  --url "https://api.asksurf.ai/gateway/v1/search/web?q=bitcoin%20price%20prediction%202026&site=coindesk.com,cointelegraph.com&limit=10" \
+  --header "Authorization: Bearer $SURF_API_KEY"</code></pre>
+
+      <pre><code>async function webSearch(q) {
+  const url = new URL("https://api.asksurf.ai/gateway/v1/search/web");
+  url.searchParams.set("q", q);
+  url.searchParams.set("site", "coindesk.com,cointelegraph.com");
+  url.searchParams.set("limit", "10");
+
+  const resp = await fetch(url, {
+    headers: { "Authorization": `Bearer ${process.env.SURF_API_KEY}` }
+  });
+  if (!resp.ok) throw new Error(await resp.text());
+  return resp.json();
+}</code></pre>
+
+      <h3>Onchain SQL</h3>
+      <pre><code>curl --request POST \
+  --url https://api.asksurf.ai/gateway/v1/onchain/sql \
+  --header "Authorization: Bearer $SURF_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "sql":"SELECT project, sum(amount_usd) AS volume_usd FROM agent.ethereum_dex_trades WHERE block_date = today() - 1 GROUP BY project ORDER BY volume_usd DESC LIMIT 10",
+    "max_rows":1000
+  }'</code></pre>
+
+      <pre><code>async function runOnchainSql(sql) {
+  const resp = await fetch("https://api.asksurf.ai/gateway/v1/onchain/sql", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.SURF_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ sql, max_rows: 1000 })
+  });
+  if (!resp.ok) throw new Error(await resp.text());
+  return resp.json();
+}</code></pre>
+
+      <figure class="capture">
+        <img alt="Onchain SQL 请求样例（data URI）" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1400' height='250' viewBox='0 0 1400 250'><rect width='1400' height='250' fill='%230b1224'/><rect x='22' y='20' rx='16' ry='16' width='1356' height='210' fill='%2310182c' stroke='%23243b63'/><text x='48' y='62' font-size='26' fill='%23e8edf7' font-family='monospace'>POST /gateway/v1/onchain/sql</text><text x='48' y='102' font-size='20' fill='%239eb0cf' font-family='monospace'>Authorization: Bearer $SURF_API_KEY</text><text x='48' y='138' font-size='20' fill='%236ee7b7' font-family='monospace'>{ &quot;sql&quot;:&quot;SELECT ... FROM agent.ethereum_dex_trades ...&quot;, &quot;max_rows&quot;:1000 }</text><text x='48' y='192' font-size='18' fill='%237dd3fc' font-family='Arial'>注：性能关键点不是只会写 SQL，而是先按 block_date 过滤，再做聚合和关联。</text></svg>" />
+        <figcaption>图 C：根据官方 SQL 端点样例重绘的请求捕获卡片。</figcaption>
+      </figure>
+
+      <h3>CLI</h3>
+      <pre><code># 安装
+curl -fsSL https://agent.asksurf.ai/cli/releases/install.sh | sh
+
+# 免 key 起步（每 IP 30 free credits/day）
+surf market-price --symbol BTC
+
+# 保存 API Key
+surf auth
+# 或
+export SURF_API_KEY=your-api-key
+
+# 发现命令
+surf sync
+surf list-operations -g
+surf market-price --help
+
+# 脚本里请强制结构化输出
+surf market-price --symbol BTC -o json -f body.data</code></pre>
+
+      <h3>Skill</h3>
+      <pre><code># 先装 CLI
+curl -fsSL https://agent.asksurf.ai/cli/releases/install.sh | sh
+
+# 再装 skill
+npx skills add asksurf-ai/surf-skills --skill surf
+
+# 建议先让 agent 跑一次
+surf sync</code></pre>
+      <p>之后让 agent 用自然语言提问，例如：<code class="inline">What’s the price of ETH?</code>、<code class="inline">Show me the top wallets holding AAVE</code>。</p>
+
+      <h3>MCP</h3>
+      <pre><code>{
+  "mcpServers": {
+    "surf": {
+      "command": "npx",
+      "args": ["-y", "@surf-ai/surf-mcp"],
+      "env": {
+        "SURF_API_KEY": "your-api-key"
+      }
+    }
+  }
+}</code></pre>
+
+      <p>关键点有两个：第一，MCP 启动时会抓 OpenAPI 并生成 12 个工具；第二，新增上游端点后，你通常只需要重启 MCP，就能让新工具签名被重新加载。</p>
+
+      <h3>Data Catalog / Schema</h3>
+      <p>如果你要直接做 schema 探查，而不是立刻执行 SQL，可先打 <code class="inline">GET /gateway/v1/onchain/schema</code>；如果你想做真正的表级分析，再进入 <code class="inline">POST /gateway/v1/onchain/sql</code>。当前公开证据已经说明它基于 ClickHouse HTTP interface（8443/TLS），但本次证据没有暴露可直接连接的 host，因此把“直连 ClickHouse”记作 <strong>unspecified</strong>。</p>
+    </section>
+
+    <section class="panel">
+      <h2 id="limits">未披露项、假设与进度脉冲</h2>
+
+      <h3>明确标记为 unspecified 的项</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>项</th>
+            <th>当前状态</th>
+            <th>为什么要标成 unspecified</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>主站前端 JS bundle</td>
+            <td>unspecified</td>
+            <td>当前公开可读证据没有直接暴露主站 bundle 内容，也没有可复核的源码截面</td>
+          </tr>
+          <tr>
+            <td>主站 tracker 清单</td>
+            <td>unspecified</td>
+            <td>没有 enough evidence 支撑 Segment / GA / Sentry / PostHog 等具体命中</td>
+          </tr>
+          <tr>
+            <td>主站 CDN</td>
+            <td>unspecified（仅 docs 可见 Mintlify 线索）</td>
+            <td>文档站确有 Mintlify 证据，但主站 CDN 未直接可见</td>
+          </tr>
+          <tr>
+            <td>Web Search 底层 provider</td>
+            <td>unspecified</td>
+            <td>接口返回已标准化，但官方未披露后端搜索供应商</td>
+          </tr>
+          <tr>
+            <td>Web Fetch 底层抓取/Markdown 引擎</td>
+            <td>unspecified</td>
+            <td>文档只写“Fetch any URL as clean markdown”</td>
+          </tr>
+          <tr>
+            <td>Chat 模型底层提供方</td>
+            <td>unspecified</td>
+            <td>OpenAI-compatible 不等于底层是 OpenAI；官方未公开底层 provider</td>
+          </tr>
+          <tr>
+            <td>精确 rate limit 数值</td>
+            <td>unspecified</td>
+            <td>只能确认有 rate limiting 与 429，不能确认具体阈值</td>
+          </tr>
+          <tr>
+            <td>直连 ClickHouse 的 host / 凭证申请流程</td>
+            <td>unspecified</td>
+            <td>文档节选公开了 protocol / port / db / user，而非可用连接终点</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>本报告的关键假设</h3>
+      <ul>
+        <li>当 marketing 页面与 endpoint 页面冲突时，以 <strong>endpoint 页面 / Data API Overview / MCP How It Works</strong> 作为更高优先级的工程依据。</li>
+        <li>CLI、Skill、MCP 被视为 <strong>现有 REST / OpenAPI 的封装层</strong>，不是新数据源。</li>
+        <li>“相关 API 可能的数据来源”以 <strong>官方显式命名</strong> 的上游源为主；无法显式命名时，只做最小范围推断。</li>
+      </ul>
+
+      <h3>每 1 分钟进度脉冲的建议格式</h3>
+      <pre><code>{
+  "ts": "2026-05-13T14:01:00+08:00",
+  "project": "asksurf-ai-research",
+  "stage": "api-inventory",
+  "progress_pct": 35,
+  "done": [
+    "发现公开域名与 llm/llms 索引",
+    "抓取 Chat/Data/CLI/MCP 顶层文档",
+    "锁定代表性端点样例"
+  ],
+  "next": [
+    "补齐数据来源映射",
+    "整理文档冲突项",
+    "生成 HTML 报告"
+  ],
+  "risks": [
+    "主站 JS/network trace 未直读",
+    "部分文档计数存在漂移"
+  ],
+  "confidence": "medium"
+}</code></pre>
+
+      <h3>建议检查点</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>时间点</th>
+            <th>检查点</th>
+            <th>输出重点</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>T+1m</td>
+            <td>域名与公开面发现</td>
+            <td>主站 / docs / agent / app store / llm 索引是否齐全</td>
+          </tr>
+          <tr>
+            <td>T+2m</td>
+            <td>顶层 API 拆解</td>
+            <td>Chat / REST / SQL / CLI / Skill / MCP 是否各有一手证据</td>
+          </tr>
+          <tr>
+            <td>T+3m</td>
+            <td>代表端点采样</td>
+            <td>至少拿到 6–10 个端点的方法、参数、响应形状</td>
+          </tr>
+          <tr>
+            <td>T+4m</td>
+            <td>数据来源映射</td>
+            <td>显式 provider、隐式 provider、unspecified 项分层</td>
+          </tr>
+          <tr>
+            <td>T+5m</td>
+            <td>规范与冲突审查</td>
+            <td>Bearer、路径漂移、计数漂移、超时要求、链名规范</td>
+          </tr>
+          <tr>
+            <td>T+6m</td>
+            <td>最终 HTML 整理</td>
+            <td>摘要、表格、流程图、代码样例、来源表</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout bad">
+        <strong>最终判断</strong><br/>
+        如果你的目标是“围绕 AskSurf 做二次开发/数据接入”，最可靠的方案是：<strong>先对 REST Data API 和 Onchain SQL 做 PoC</strong>，再决定是否上 Chat API 做自然语言层，以及是否用 MCP/Skill 把它接进 agent 工作流。不要一开始就只盯着首页文案；真正的产品能力边界，绝大多数都写在 <code class="inline">docs.asksurf.ai</code>。
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 id="refs">来源</h2>
+      <p class="foot">以下来源按“官方优先、中文补充、第三方只用于旁证”的原则整理。若你要把本报告继续变成内部合规材料，建议将这些 URL 再做一次归档保存。</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>编号</th>
+            <th>来源</th>
+            <th>用途</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="src-id">O1</span></td>
+            <td>https://docs.asksurf.ai/overview</td>
+            <td>官方开发者总览；40+ blockchains / 200+ data sources / 100k+ voices / 83 REST endpoints</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O2</span></td>
+            <td>https://docs.asksurf.ai/llms.txt</td>
+            <td>完整文档索引；列出全部 Data API / Chat / CLI / MCP / Data Catalog 页面与 openapi.json、hermod-openapi.json</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O3</span></td>
+            <td>https://docs.asksurf.ai/chat-completions</td>
+            <td>Chat API 方法、路径、字段、SSE、模型、reasoning、ability、citation、tools</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O4</span></td>
+            <td>https://docs.asksurf.ai/data-api/overview</td>
+            <td>REST Data API 基址、分页、错误码、canonical chain names、credits 信息</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O5</span></td>
+            <td>https://docs.asksurf.ai/cli/cli</td>
+            <td>CLI 安装、30 free credits/day、命令发现、JSON 输出规范</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O6</span></td>
+            <td>https://docs.asksurf.ai/cli/skills</td>
+            <td>Skill 的安装方式与作用边界</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O7</span></td>
+            <td>https://docs.asksurf.ai/cli/mcp</td>
+            <td>MCP 配置、12 tools / 86 endpoints、OpenAPI 拉取方式、@surf-ai/sdk 路由</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O8</span></td>
+            <td>https://docs.asksurf.ai/cli/ai-prompts</td>
+            <td>OpenAI-compatible 用法、baseURL、model 家族、timeout 建议、REST 规范提示</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O9</span></td>
+            <td>https://docs.asksurf.ai/data-catalog/overview</td>
+            <td>Data Catalog、ClickHouse HTTP 8443/TLS、readonly account、58 tables、freshness/pipeline 信息</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O10</span></td>
+            <td>https://docs.asksurf.ai/data-catalog/prices</td>
+            <td>CoinGecko + DEX VWAP 作为价格合成来源</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O11</span></td>
+            <td>https://docs.asksurf.ai/data-catalog/prediction-markets</td>
+            <td>Polymarket / Kalshi 数据、匹配表、Grok LLM matching、中央化/链上差异</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O12</span></td>
+            <td>https://docs.asksurf.ai/data-catalog/dex-trades</td>
+            <td>DEX trades 表的 enrichment 语义</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O13</span></td>
+            <td>https://docs.asksurf.ai/data-catalog/bridges</td>
+            <td>Bridge volume 表、涉及的桥协议与 hourly prices</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O14</span></td>
+            <td>https://docs.asksurf.ai/data-catalog/tvl-fees-yields</td>
+            <td>TVL / Fees / Revenue、DefiLlama 6-field standard、35+ fee models</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O15</span></td>
+            <td>https://docs.asksurf.ai/data-catalog/hyperliquid</td>
+            <td>Hyperliquid Info API 证据</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O16</span></td>
+            <td>https://docs.asksurf.ai/data-api/wallet/detail</td>
+            <td>Wallet detail 方法、参数、响应结构</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O17</span></td>
+            <td>https://docs.asksurf.ai/data-api/social/user</td>
+            <td>Social user profile；X handle 解析</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O18</span></td>
+            <td>https://docs.asksurf.ai/data-api/project/defi-ranking</td>
+            <td>Protocol ranking 端点</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O19</span></td>
+            <td>https://docs.asksurf.ai/data-api/news/feed</td>
+            <td>News feed 端点</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O20</span></td>
+            <td>https://docs.asksurf.ai/data-api/search/web</td>
+            <td>Web search 接口与参数 <code class="inline">site</code></td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O21</span></td>
+            <td>https://docs.asksurf.ai/data-api/onchain/sql</td>
+            <td>Onchain SQL 请求体与 <code class="inline">max_rows</code> 上限</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O22</span></td>
+            <td>https://docs.asksurf.ai/data-api/onchain/schema</td>
+            <td>Schema 发现接口</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O23</span></td>
+            <td>https://docs.asksurf.ai/data-api/prediction-market/polymarket-open-interest</td>
+            <td>Polymarket OI 端点</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O24</span></td>
+            <td>https://docs.asksurf.ai/data-api/exchange/depth</td>
+            <td>Order book depth 参数与交易所枚举</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O25</span></td>
+            <td>https://asksurf.ai/terms-of-service</td>
+            <td>条款：服务范围、反爬/反逆向、输入输出责任</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O26</span></td>
+            <td>https://asksurf.ai/privacy-policy</td>
+            <td>隐私页入口存在性；详细正文在本次公开证据里未完整拉取</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O27</span></td>
+            <td>https://apps.apple.com/cn/app/surf-ai/id6751790853</td>
+            <td>中文官方上架页；功能描述、Cybertino Inc、语言与隐私类别、版本演进</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O28</span></td>
+            <td>https://play.google.com/store/apps/details?id=co.cyber.surf</td>
+            <td>Android 官方上架页；数据安全、支持删除等</td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O29</span></td>
+            <td>https://asksurf.ai/llm.txt</td>
+            <td>说明 <code class="inline">/llm.txt</code> 只是兼容指针，canonical index 为 <code class="inline">/llms.txt</code></td>
+          </tr>
+          <tr>
+            <td><span class="src-id">O30</span></td>
+            <td>Mintlify 出现在官方文档页 footer 与索引镜像</td>
+            <td>可确认 docs 站使用 Mintlify；主站是否同栈仍需更多证据</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="foot">备注：本报告刻意没有把第三方 SEO 页面、技术评分站、非官方博客当成主要事实来源；它们仅用于旁证，不作为关键结论的基础。</p>
+    </section>
+  </div>
+</body>
+</html>

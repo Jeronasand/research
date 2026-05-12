@@ -1,0 +1,14 @@
+{
+  "id": "dune-research-full-cn",
+  "title": "Dune.com 深度研究报告",
+  "summary": "覆盖 Dune 产品战略、API、DuneSQL、数据目录、定价限制、MCP/CLI/Skills 和供应商评分的完整中文研究包。",
+  "tags": [
+    "Dune",
+    "onchain-data",
+    "data-platform"
+  ],
+  "language": "zh-CN",
+  "version": "2026-05-12",
+  "updatedAt": "2026-05-12",
+  "entry": "index.html"
+}

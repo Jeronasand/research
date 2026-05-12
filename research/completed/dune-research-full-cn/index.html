@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>截至 2026-05-12 的 Dune.com 深度研究报告</title>
+  <meta name="description" content="本报告基于 Dune 官方网站、官方文档、官方博客、官方 GitHub 与权威公开资料，对 Dune 的公司定位、产品能力、技术架构、数据来源与质量、定价、竞争格局、合规隐私、近期新闻与融资动态进行中文深度研究与评估。" />
+  <meta name="keywords" content="Dune,Dune Analytics,链上数据,Web3 数据平台,区块链分析,SQL,Datashare,Sim,dbt Connector,MCP,竞争分析" />
+  <style>
+    :root{
+      --bg:#ffffff;
+      --ink:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --soft:#f8fafc;
+      --brand:#4f46e5;
+      --brand2:#0f766e;
+      --brand3:#b45309;
+      --warn:#7c2d12;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.72 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif}
+    body{padding:32px}
+    main{max-width:1080px;margin:0 auto}
+    h1,h2,h3{line-height:1.28;margin:0 0 14px}
+    h1{font-size:34px;letter-spacing:.2px;margin-bottom:10px}
+    h2{font-size:24px;margin-top:34px;padding-top:10px}
+    h3{font-size:18px;margin-top:20px}
+    p{margin:10px 0}
+    .subtle{color:var(--muted)}
+    .meta-box,.note,.card,.chart-wrap,.mermaid-wrap{
+      background:var(--soft);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px 16px;
+    }
+    .meta-box code{
+      display:block;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:13px;
+      color:#0f172a;
+    }
+    .grid{
+      display:grid;
+      gap:16px;
+    }
+    .grid.two{grid-template-columns:1fr 1fr}
+    .grid.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin:12px 0 8px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    th,td{
+      border-bottom:1px solid var(--line);
+      padding:12px 12px;
+      text-align:left;
+      vertical-align:top;
+      font-size:14px;
+    }
+    thead th{
+      background:#f3f4f6;
+      font-weight:700;
+    }
+    tbody tr:last-child td{border-bottom:none}
+    ul{margin:8px 0 8px 20px;padding:0}
+    li{margin:4px 0}
+    .lead{
+      font-size:17px;
+      color:#111827;
+    }
+    .kpi{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin:14px 0 8px;
+    }
+    .kpi .item{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      background:#fff;
+    }
+    .kpi .num{
+      font-size:26px;
+      font-weight:800;
+      color:var(--brand);
+      display:block;
+      line-height:1.1;
+      margin-bottom:6px;
+    }
+    .small{font-size:13px;color:var(--muted)}
+    .badge{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      background:#eef2ff;
+      color:#3730a3;
+      font-size:12px;
+      margin-left:6px;
+      vertical-align:middle;
+    }
+    sup a{
+      color:var(--brand);
+      text-decoration:none;
+      font-weight:600;
+    }
+    a{color:#1d4ed8}
+    .tip{
+      position:fixed;
+      pointer-events:none;
+      background:#111827;
+      color:#fff;
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:8px;
+      box-shadow:0 6px 18px rgba(0,0,0,.18);
+      opacity:0;
+      transform:translate(-9999px,-9999px);
+      transition:opacity .12s ease;
+      max-width:260px;
+      z-index:20;
+    }
+    .legend{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-top:10px;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .legend span::before{
+      content:"";
+      display:inline-block;
+      width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle;
+    }
+    .legend .l1::before{background:var(--brand)}
+    .legend .l2::before{background:var(--brand2)}
+    .legend .l3::before{background:var(--brand3)}
+    .mermaid{
+      background:#fff;
+      border-radius:10px;
+      padding:12px;
+      overflow:auto;
+    }
+    .callout{
+      border-left:4px solid var(--brand);
+      padding:10px 12px;
+      background:#eef2ff;
+      border-radius:8px;
+      margin:12px 0;
+    }
+    .warning{
+      border-left-color:#b45309;
+      background:#fff7ed;
+      color:var(--warn);
+    }
+    ol.refs{
+      padding-left:22px;
+      margin-top:10px;
+    }
+    ol.refs li{
+      margin:7px 0;
+      font-size:14px;
+      color:#1f2937;
+      word-break:break-word;
+    }
+    .foot{
+      color:var(--muted);
+      font-size:13px;
+    }
+    @media (max-width:900px){
+      body{padding:18px}
+      .grid.two,.grid.cards,.kpi{grid-template-columns:1fr}
+      th,td{font-size:13px}
+      h1{font-size:28px}
+      h2{font-size:22px}
+    }
+    @media print{
+      body{padding:0}
+      main{max-width:none}
+      a{color:inherit;text-decoration:none}
+      .chart-wrap,.mermaid-wrap,.card,.meta-box,.note{break-inside:avoid}
+      table{break-inside:auto}
+      tr{break-inside:avoid}
+      .tip{display:none!important}
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Dune.com 深度研究报告</h1>
+  <p class="subtle">时间范围：截至 2026-05-12｜语言：中文｜文档类型：可直接保存并打开的完整 HTML</p>
+
+  <div class="meta-box" aria-label="可复制元数据">
+    <code>标题：截至 2026-05-12 的 Dune.com 深度研究报告
+描述：基于 Dune 官方网站、官方文档、官方博客、官方 GitHub 与权威公开资料，对 Dune 的公司定位、产品能力、技术架构、数据来源与质量、定价、竞争格局、合规隐私、近期新闻与融资动态进行中文深度研究与评估。
+关键词：Dune, Dune Analytics, 链上数据, Web3 数据平台, SQL, Datashare, Sim, dbt Connector, MCP, 区块链分析, 竞争分析</code>
+  </div>
+
+  <h2>执行摘要</h2>
+  <p class="lead">
+    Dune 已不再只是“做链上看板的社区工具”，而是演化为覆盖 <strong>Data Hub、Data API、Trino/BI Connector、Datashare、Sim、dbt Connector 与 AI Agents</strong> 的全栈链上数据平台。官方文档与官网当前口径显示，Dune 已索引 <strong>100+ 区块链</strong>、沉淀 <strong>3+ PB 数据</strong>、拥有 <strong>1.5M+ 数据集、6.5M+ 查询、200K+ 仪表盘</strong>，并被 <strong>1,500+ 付费客户</strong> 与 <strong>1M+ 用户</strong> 使用。<sup><a href="#r2">[2]</a></sup><sup><a href="#r3">[3]</a></sup>
+  </p>
+  <p>
+    从产品战略看，Dune 的核心优势不是某个单点功能，而是“<strong>一份多层链上数据仓 + 多种消费接口</strong>”：分析师可以在 Web 端写 SQL、做图表与公开分发；工程团队可通过 API、Trino、dbt 或 Datashare 把同一套数据接入生产环境；开发者则可用 Sim 做近实时钱包与 DeFi 场景；AI 工作流可通过 MCP、CLI 与 Skills 调用 Dune 数据。<sup><a href="#r4">[4]</a></sup><sup><a href="#r5">[5]</a></sup><sup><a href="#r11">[11]</a></sup><sup><a href="#r12">[12]</a></sup><sup><a href="#r17">[17]</a></sup><sup><a href="#r18">[18]</a></sup>
+  </p>
+  <p>
+    结论上，Dune 最适合三类需求：其一，<strong>跨链自定义研究与对外发布</strong>；其二，<strong>协议/交易平台/基金的历史数据仓与分析工程</strong>；其三，<strong>把链上数据嵌入产品与 AI 工作流</strong>。但若场景要求严格的毫秒级确定性、强标签交易信号或高度标准化的“财务可比指标”，Dune 往往需要与自建节点、Nansen、Token Terminal 等工具组合使用，而不应被视为单一万能解。<sup><a href="#r4">[4]</a></sup><sup><a href="#r16">[16]</a></sup><sup><a href="#r32">[32]</a></sup><sup><a href="#r36">[36]</a></sup>
+  </p>
+
+  <div class="kpi" aria-label="关键指标">
+    <div class="item"><span class="num">100+</span><div>区块链覆盖</div><div class="small">官方 docs/home 口径<sup><a href="#r2">[2]</a></sup><sup><a href="#r3">[3]</a></sup></div></div>
+    <div class="item"><span class="num">3+ PB</span><div>数据规模</div><div class="small">Docs 首页披露<sup><a href="#r2">[2]</a></sup></div></div>
+    <div class="item"><span class="num">1,500+</span><div>付费客户</div><div class="small">Docs 首页披露<sup><a href="#r2">[2]</a></sup></div></div>
+    <div class="item"><span class="num">1M+</span><div>用户</div><div class="small">官网首页披露<sup><a href="#r3">[3]</a></sup></div></div>
+  </div>
+
+  <h2>公司与产品</h2>
+  <p>
+    Dune Analytics AS 成立于 2018 年，起源于挪威奥斯陆，由 Fredrik Haga 与 Mats Olsen 创立。About 页面在 2026 年显示公司已有 <strong>50+ 员工</strong>、累计融资约 <strong>8000 万美元</strong>；其使命表述为“让加密数据可访问”。<sup><a href="#r1">[1]</a></sup> 官方叙事也清楚显示其路线变化：从早期面向分析师的社区化 SQL/仪表盘产品，逐步扩展为涵盖 <strong>企业数据仓、实时 API、AI 原生接口与链集成工具</strong> 的 onchain data platform。<sup><a href="#r1">[1]</a></sup><sup><a href="#r25">[25]</a></sup>
+  </p>
+
+  <h3>产品能力矩阵</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>产品/接口</th>
+        <th>定位</th>
+        <th>关键能力</th>
+        <th>适用对象</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Data Hub</strong></td>
+        <td>Web 端主工作区</td>
+        <td>SQL 查询、可视化、仪表盘、分享、自动运行与监控。<sup><a href="#r5">[5]</a></sup></td>
+        <td>研究员、增长/运营、媒体、协议分析团队</td>
+      </tr>
+      <tr>
+        <td><strong>Data API / SDK</strong></td>
+        <td>程序化接入</td>
+        <td>将查询转成 API；官方 SDK 支持执行、轮询、分页、错误处理。<sup><a href="#r13">[13]</a></sup><sup><a href="#r17">[17]</a></sup></td>
+        <td>后端、自动化、数据产品团队</td>
+      </tr>
+      <tr>
+        <td><strong>Trino Connector</strong></td>
+        <td>外部 BI 读接口</td>
+        <td>可从 Hex、Metabase、DBeaver 等直接读 DuneSQL。<sup><a href="#r11">[11]</a></sup></td>
+        <td>BI 与分析工程团队</td>
+      </tr>
+      <tr>
+        <td><strong>dbt Connector</strong><span class="badge">Enterprise</span></td>
+        <td>在 Dune 内做数据转化</td>
+        <td>基于 dbt-trino，支持增量模型、测试、CI/CD，并在私有 namespace 写表。<sup><a href="#r12">[12]</a></sup></td>
+        <td>数据工程、Analytics Engineering</td>
+      </tr>
+      <tr>
+        <td><strong>Datashare</strong></td>
+        <td>把 Dune 数据送到客户仓库</td>
+        <td>向 Snowflake、BigQuery、Databricks 同步处理后的链上数据；客户在自有仓库中使用原生安全控制，官方称 Dune 不查看客户查询和结果。<sup><a href="#r16">[16]</a></sup></td>
+        <td>金融机构、合规团队、企业数据平台</td>
+      </tr>
+      <tr>
+        <td><strong>Sim</strong></td>
+        <td>近实时多链 API</td>
+        <td>文档口径为 <strong>60+ 链</strong>、<strong>&lt;1 秒</strong> 响应，面向余额、活动、交易与 DeFi positions 等实时场景。<sup><a href="#r4">[4]</a></sup><sup><a href="#r26">[26]</a></sup></td>
+        <td>钱包、投资组合、DeFi 应用开发者</td>
+      </tr>
+      <tr>
+        <td><strong>AI Agents</strong></td>
+        <td>AI 原生访问层</td>
+        <td>MCP、CLI、Skills 接入；官方页面强调一体访问 raw / decoded / curated 数据。<sup><a href="#r18">[18]</a></sup><sup><a href="#r29">[29]</a></sup><sup><a href="#r30">[30]</a></sup></td>
+        <td>Agent 工作流、开发工具、研究自动化</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>目标用户与使用场景</h3>
+  <p>
+    官方 use cases 将 Dune 明确分为 <strong>Analytics、Engineering、Accounting/Audit/AML</strong> 三大场景：分析团队用于跟踪生态、协议增长与市场趋势；工程团队用于构建数据管道、应用后端与机器学习/AI 派生分析；财务与合规团队则用于交易监控、账户对账、财务报告与市场操纵识别。<sup><a href="#r42">[42]</a></sup><sup><a href="#r43">[43]</a></sup><sup><a href="#r44">[44]</a></sup>
+  </p>
+  <div class="callout">
+    简化判断：如果你的目标是“<strong>自己定义链上问题并把答案分发出去</strong>”，Dune 的产品-社区组合价值很高；如果你的目标是“<strong>把链上数据稳定嵌入产品或企业仓库</strong>”，Datashare、dbt Connector 与 Sim 才是更关键的购买理由。<sup><a href="#r4">[4]</a></sup><sup><a href="#r16">[16]</a></sup>
+  </div>
+
+  <h2>核心功能与技术架构</h2>
+  <p>
+    Dune 的底层查询能力来自 <strong>DuneSQL</strong>：官方文档说明其基于 <strong>Trino</strong>，以 <strong>Parquet</strong> 为底层列式存储，并通过 <strong>Delta Lake</strong> 管理版本与数据能力；产品比较页则将 Data Hub 架构标注为 <strong>OLAP, Delta parquet</strong>，典型查询速度约 <strong>3 秒</strong>。<sup><a href="#r4">[4]</a></sup><sup><a href="#r10">[10]</a></sup>
+  </p>
+  <p>
+    从体验上看，Dune 把同一份链上数据仓拆成多种消费接口：分析师走 Web SQL 和图表；BI 工具走 Trino；工程团队通过 API、dbt、Datashare；开发者通过 Sim；AI 通过 MCP/CLI/Skills。这种“<strong>一仓多口</strong>”设计，是其区别于单纯看板工具或单纯 API 供应商的核心。<sup><a href="#r4">[4]</a></sup><sup><a href="#r11">[11]</a></sup><sup><a href="#r12">[12]</a></sup><sup><a href="#r17">[17]</a></sup><sup><a href="#r18">[18]</a></sup>
+  </p>
+
+  <div class="mermaid-wrap">
+    <h3>技术架构图</h3>
+    <pre class="mermaid">
+flowchart LR
+  A[链节点 RPC / 合作方数据 / Catalyst] --> B[接入与索引]
+  B --> C[Raw 层<br/>blocks / tx / logs / traces]
+  C --> D[Decoded 层<br/>ABI 解析后的 events / calls]
+  D --> E[Curated 层<br/>Spellbook / 规范化模型]
+  E --> F[DuneSQL / Trino / OLAP]
+  F --> G1[Data Hub<br/>SQL / 图表 / 仪表盘]
+  F --> G2[Data API / SDK]
+  F --> G3[Trino Connector<br/>Hex / Metabase / DBeaver]
+  E --> G4[Datashare<br/>Snowflake / BigQuery / Databricks]
+  F --> G5[dbt Connector<br/>私有 namespace 写表]
+  B --> G6[Sim<br/>实时 API]
+  F --> G7[AI Agents<br/>MCP / CLI / Skills]
+    </pre>
+    <p class="foot">注：Mermaid 如未自动渲染，源码仍可直接复制到支持 Mermaid 的环境中使用。依据官方产品与架构文档整理。<sup><a href="#r4">[4]</a></sup><sup><a href="#r10">[10]</a></sup><sup><a href="#r11">[11]</a></sup><sup><a href="#r12">[12]</a></sup><sup><a href="#r16">[16]</a></sup><sup><a href="#r18">[18]</a></sup></p>
+  </div>
+
+  <h2>数据来源、质量与合规</h2>
+
+  <h3>数据来源与数据质量评估</h3>
+  <p>
+    官方数据目录把 Dune 数据分为三层：<strong>Raw</strong>（直接从节点索引的 block/transaction/log/trace）、<strong>Decoded</strong>（基于 ABI 解析后的合约事件与函数调用）、<strong>Curated</strong>（由 Dune 数据团队维护的跨链规范化数据集）；此外还有 <strong>Community / Partner Data</strong>，其更新节奏不受 Dune 控制。<sup><a href="#r6">[6]</a></sup><sup><a href="#r7">[7]</a></sup><sup><a href="#r8">[8]</a></sup>
+  </p>
+  <p>
+    就刷新特征而言，官方文档显示：raw 层受出块频率与链重组影响；decoded 通常在 raw 入库后 <strong>15–60 秒</strong> 完成；curated 通常按 <strong>1 小时</strong> 刷新，部分 Solana 策展表为 <strong>6–7 小时</strong>；product comparison 页给出的更宏观口径为 <strong>EVM ~1–15 分钟、Solana ~1–5 分钟、Curated ~1 小时</strong>，而 Sim 则面向 <strong>&lt;1 秒</strong> 的实时读接口。<sup><a href="#r4">[4]</a></sup><sup><a href="#r7">[7]</a></sup>
+  </p>
+  <p>
+    质量方面，Dune 的优势是：官方称 curated 数据经过自动质量检查，且方法学与限制对外文档化；Curated 层所依赖的开源转换仓 <strong>Spellbook</strong> 公开可见，可提升可审计性与可复核性。局限在于：raw 天生受链重组与节点稳定性影响；decoded 质量依赖 ABI、解析与覆盖；partner/community 数据不受 Dune 直接控制。学术综述也普遍指出，区块链数据系统存在标准化、存储引擎、可扩展性、完整性与可用性等系统性挑战。<sup><a href="#r8">[8]</a></sup><sup><a href="#r9">[9]</a></sup><sup><a href="#r31">[31]</a></sup><sup><a href="#r40">[40]</a></sup><sup><a href="#r41">[41]</a></sup>
+  </p>
+
+  <div class="chart-wrap">
+    <h3>数据层质量示例评分图</h3>
+    <p class="small">评分说明：5 = 更优。该图是基于公开文档做的分析性示例，并非 Dune 官方 SLA 评分；用于帮助理解不同层级在“及时性 / 标准化 / 透明度”上的取舍。<sup><a href="#r7">[7]</a></sup><sup><a href="#r8">[8]</a></sup><sup><a href="#r9">[9]</a></sup><sup><a href="#r31">[31]</a></sup><sup><a href="#r40">[40]</a></sup></p>
+    <svg id="qualityChart" viewBox="0 0 860 320" width="100%" height="320" aria-label="数据质量评分图"></svg>
+    <div class="legend">
+      <span class="l1">及时性</span>
+      <span class="l2">标准化</span>
+      <span class="l3">透明度</span>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>数据层</th>
+        <th>来源</th>
+        <th>典型优点</th>
+        <th>主要风险</th>
+        <th>结论</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Raw</td>
+        <td>链节点 / 区块数据<sup><a href="#r6">[6]</a></sup><sup><a href="#r7">[7]</a></sup></td>
+        <td>最原始、最灵活、最接近链事实</td>
+        <td>查询门槛高；受 reorg 与链差异影响</td>
+        <td>适合自定义研究与底层核验</td>
+      </tr>
+      <tr>
+        <td>Decoded</td>
+        <td>ABI 解析<sup><a href="#r9">[9]</a></sup></td>
+        <td>比 raw 更可读；协议行为可直接分析</td>
+        <td>覆盖依赖 ABI 与解码质量</td>
+        <td>适合协议事件级分析</td>
+      </tr>
+      <tr>
+        <td>Curated</td>
+        <td>Dune 数据团队 / Spellbook<sup><a href="#r8">[8]</a></sup><sup><a href="#r31">[31]</a></sup></td>
+        <td>跨链标准化，生产可用，方法较透明</td>
+        <td>更新通常慢于 raw；抽象会丢失部分细节</td>
+        <td>适合常规 BI、监控与产品数据管道</td>
+      </tr>
+      <tr>
+        <td>Community / Partner</td>
+        <td>第三方上传<sup><a href="#r7">[7]</a></sup></td>
+        <td>能补充链上之外的语义数据</td>
+        <td>更新和治理不受 Dune 控制</td>
+        <td>适合补充视角，不宜单独当作强 SLA 源</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>隐私与合规</h3>
+  <p>
+    Dune 位于挪威，并在条款中明确受 <strong>GDPR</strong> 约束。隐私政策显示，平台会处理姓名、用户名、邮箱、IP、浏览器及站内导航信息等个人数据；同时明确提示：由于 Dune 产品具有社交属性，<strong>免费服务中创建的内容会公开可见</strong>。<sup><a href="#r19">[19]</a></sup><sup><a href="#r21">[21]</a></sup>
+  </p>
+  <p>
+    对于客户上传到 Data Hub 的个人数据，DPA 将客户界定为 <strong>Data Controller</strong>、Dune 为 <strong>Data Processor</strong>；并特别强调如果涉及个人数据，应只在 <strong>非公开版本/私有仪表盘</strong> 中使用，公开暴露责任由客户与同团队用户承担。DPA 还披露了若干最低安全措施，包括 <strong>AWS 运行环境、MFA、环境隔离、集中日志、事件通知与审计配合</strong>。<sup><a href="#r20">[20]</a></sup>
+  </p>
+  <p>
+    这意味着：若你的业务涉及 KYC、客户交易明细、员工或用户标识等敏感或可识别数据，Dune 更适合采用 <strong>Enterprise + 私有空间 / Datashare</strong> 方案，而不是直接把数据上传到公共内容流。另一个现实问题是，Trust Center 公开页只说明可自助申请下载合规材料和安全报告，<strong>并未在公开页面列出具体认证清单</strong>，因此若采购决策依赖某项特定认证，仍需销售或法务阶段逐项核验。<sup><a href="#r16">[16]</a></sup><sup><a href="#r22">[22]</a></sup>
+  </p>
+
+  <h2>定价、商业模式与竞争</h2>
+
+  <h3>定价与商业模式</h3>
+  <p>
+    Dune 的商业模式本质上是“<strong>免费入口 + 信用计费的数据计算平台 + 企业销售</strong>”。Data Hub 的公开套餐以 credits 为核心计费单位：Free 提供 2,500 credits；Analyst 为 <strong>$75/月</strong>（或年付折合 <strong>$65/月</strong>）并含 4,000 credits；Plus 为 <strong>$399/月</strong>（或年付折合 <strong>$349/月</strong>）并含 25,000 credits；Enterprise 为定制。官方文档强调 extra credits 与套餐内 credits 同价，且查询实际消耗取决于引擎、复杂度与实时资源用量。<sup><a href="#r13">[13]</a></sup>
+  </p>
+  <p>
+    另一个价格信号是“<strong>导出与写入</strong>”：Billing 页显示 API/CSV 导出按数据量计费，Free / Analyst / Plus 分别为 <strong>20 / 10 / 2 credits 每 MB</strong>；写入操作会消耗 credits，Plus 存储上限为 <strong>15 GB</strong>，Queries Endpoint 仅在 Plus 与 Enterprise 开放。对 dbt Connector，官方写明它是 <strong>Enterprise-only</strong> 的使用量计费功能，而且“无单独平台费，只按 credits 付费”。<sup><a href="#r14">[14]</a></sup><sup><a href="#r12">[12]</a></sup>
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>层级/产品</th>
+        <th>公开价格</th>
+        <th>计费逻辑</th>
+        <th>关键信号</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Free</td>
+        <td>$0</td>
+        <td>2,500 credits / 月<sup><a href="#r13">[13]</a></sup></td>
+        <td>适合探索；免费引擎仅支持手动查询，自动化受限。<sup><a href="#r39a">[39a]</a></sup></td>
+      </tr>
+      <tr>
+        <td>Analyst</td>
+        <td>$75/月；年付折合 $65/月</td>
+        <td>4,000 credits / 月<sup><a href="#r13">[13]</a></sup></td>
+        <td>面向重度个人分析者</td>
+      </tr>
+      <tr>
+        <td>Plus</td>
+        <td>$399/月；年付折合 $349/月</td>
+        <td>25,000 credits / 月<sup><a href="#r13">[13]</a></sup></td>
+        <td>团队协作、API 导出更划算；Enterprise 文档对 Plus 给出 15GB 存储、200 API calls/min 等上限。<sup><a href="#r15">[15]</a></sup></td>
+      </tr>
+      <tr>
+        <td>Enterprise</td>
+        <td>未说明（定制）</td>
+        <td>credits + 定制支持<sup><a href="#r15">[15]</a></sup></td>
+        <td>SSO、私有数据、权限、Datashare、dbt Connector、专属支持</td>
+      </tr>
+      <tr>
+        <td>Datashare</td>
+        <td>未说明（官方 docs 写 flat subscription fees）</td>
+        <td>订阅制<sup><a href="#r4">[4]</a></sup></td>
+        <td>适合把 Dune 数据送入客户仓库</td>
+      </tr>
+      <tr>
+        <td>Sim</td>
+        <td>未说明（官方 docs 写 API Call Volume / CUs）</td>
+        <td>调用量计费<sup><a href="#r4">[4]</a></sup></td>
+        <td>适合实时产品后端</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>竞争对手比较</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>平台</th>
+        <th>核心定位</th>
+        <th>公开能力口径</th>
+        <th>更适合谁</th>
+        <th>相对 Dune 的差异</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Dune</strong></td>
+        <td>开放式链上数据平台</td>
+        <td>100+ 链、SQL、API、Datashare、Sim、AI Agents。<sup><a href="#r2">[2]</a></sup><sup><a href="#r3">[3]</a></sup><sup><a href="#r4">[4]</a></sup></td>
+        <td>分析师、协议、工程、媒体、AI 工作流</td>
+        <td>社区分发与自定义查询能力最强，适合作为“主数据工作台”</td>
+      </tr>
+      <tr>
+        <td><strong>Nansen</strong></td>
+        <td>面向投资/交易的链上情报与标签</td>
+        <td>官网强调钱包流向、关键指标与交易决策；API 支持 x402 与按调用分层，文档给出订阅 Pro 为 $49/$69，API 页面展示 $0.01 与 $0.05 per call 层级。<sup><a href="#r32">[32]</a></sup><sup><a href="#r33">[33]</a></sup></td>
+        <td>交易员、投研、钱包追踪用户</td>
+        <td>强在 Smart Money 与标签情报；弱于 Dune 的开放 SQL、自定义建模与公开社区网络</td>
+      </tr>
+      <tr>
+        <td><strong>Flipside</strong></td>
+        <td>企业级策展数据 + AI agents + Snowflake</td>
+        <td>官网与 docs 口径为 20+ 链、700M 钱包、SQL/Snowflake/API/agents；定价公开度较低，主打 demo / enterprise 购买。<sup><a href="#r34">[34]</a></sup><sup><a href="#r35">[35]</a></sup></td>
+        <td>协议方、基金、合规、机构情报团队</td>
+        <td>企业交付和代理工作流更强；公开社区发现、内容分发与自助生态感弱于 Dune</td>
+      </tr>
+      <tr>
+        <td><strong>Token Terminal</strong></td>
+        <td>标准化链上基本面与可比指标</td>
+        <td>100+ 链、1,200+ 应用、3,000+ 资产；Free/Pro/API/Data Room，其中 Pro 为 $350/月，API/Data Room 为 custom。<sup><a href="#r36">[36]</a></sup><sup><a href="#r37">[37]</a></sup></td>
+        <td>机构投研、IR、财务比较分析</td>
+        <td>强在统一指标、可比口径与研究效率；弱于 Dune 的原始查询灵活性与社区看板生态</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>优劣势分析</h3>
+  <div class="grid two">
+    <div class="card">
+      <h3>优势</h3>
+      <p><strong>平台完整度高。</strong> 从探索、图表、公开分发，到 API、BI、dbt、Datashare、实时 API 与 AI 接口，几乎覆盖了链上数据消费全生命周期。<sup><a href="#r4">[4]</a></sup><sup><a href="#r17">[17]</a></sup></p>
+      <p><strong>社区网络效应强。</strong> 200K+ 仪表盘、1.5M+ 数据集、6.5M+ 查询意味着内容发现与“先看别人怎么做”极具价值。<sup><a href="#r3">[3]</a></sup></p>
+      <p><strong>透明度较好。</strong> Curated 文档强调方法与限制公开，Spellbook 开源降低黑箱感。<sup><a href="#r8">[8]</a></sup><sup><a href="#r31">[31]</a></sup></p>
+      <p><strong>企业闭环明确。</strong> Datashare 与私有空间满足“数据在你自己的仓库和安全边界里用”的需求。<sup><a href="#r16">[16]</a></sup></p>
+    </div>
+    <div class="card">
+      <h3>不足</h3>
+      <p><strong>信用计费的可预测性一般。</strong> 查询、导出、写入都会消耗 credits，且失败执行也计费，新团队需要建立成本守卫。<sup><a href="#r13">[13]</a></sup><sup><a href="#r14">[14]</a></sup></p>
+      <p><strong>“实时”是分层的。</strong> Data Hub/Curated 并非全部秒级，真正近实时主要靠 Sim；历史分析与产品后端不能混为一谈。<sup><a href="#r4">[4]</a></sup><sup><a href="#r7">[7]</a></sup></p>
+      <p><strong>覆盖与口径不完全均一。</strong> 不同链、ABI、partner 数据、策展表的成熟度存在差异。<sup><a href="#r7">[7]</a></sup><sup><a href="#r9">[9]</a></sup></p>
+      <p><strong>部分企业信息公开度有限。</strong> 具体认证清单、Datashare/Sim 明确报价等公开页未完整披露。<sup><a href="#r22">[22]</a></sup></p>
+    </div>
+  </div>
+
+  <h2>近期新闻、融资与结论</h2>
+
+  <h3>近期新闻与融资动态</h3>
+  <p>
+    近两年 Dune 的主线非常清晰：从“分析工具”走向“数据基础设施”。<strong>2024-11</strong>，Dune 收购实时链上仿真与分析公司 <strong>smlXL</strong>，强化实时能力；<strong>2025-05</strong>，Echo 正式更名为 <strong>Sim</strong>；<strong>2025-11</strong>，官方在 DuneCon25 宣布“成为 onchain data platform”，重点推出 <strong>dbt Connector</strong>、扩大 <strong>Datashare</strong> 到 BigQuery / Databricks，并强化 Sim；<strong>2026-03 至 2026-04</strong>，连续上线 <strong>MCP、CLI、Skills、OAuth、Visualization Management、Machine Payments Protocol</strong>，明显押注 AI/Agent 接口。<sup><a href="#r27">[27]</a></sup><sup><a href="#r26">[26]</a></sup><sup><a href="#r25">[25]</a></sup><sup><a href="#r28">[28]</a></sup><sup><a href="#r29">[29]</a></sup><sup><a href="#r30">[30]</a></sup>
+  </p>
+  <p>
+    融资方面，官方博客显示 Dune 于 <strong>2020-09</strong> 完成 <strong>$2M</strong> seed，<strong>2022-02</strong> 完成 <strong>$69.42M Series B</strong>；About 页面当前写法为累计融资约 <strong>$80M</strong>。截至 2026 年可见公开资料，未见官方披露新的后续融资轮次；第三方数据库 Tracxn 在 2026-04 的条目仍将最近一轮列为 <strong>2022-02-02 的 Series B</strong>。<sup><a href="#r23">[23]</a></sup><sup><a href="#r24">[24]</a></sup><sup><a href="#r1">[1]</a></sup><sup><a href="#r39">[39]</a></sup>
+  </p>
+
+  <h3>结论与建议</h3>
+  <p>
+    综合来看，Dune 当前最有竞争力的不是单一数据表，也不是单一 SQL 编辑器，而是“<strong>跨链数据仓 + 多接口消费 + 社区分发 + 企业闭环</strong>”的组合。对于需要自己定义指标、跨链验证假设、快速做仪表盘并公开或半公开传播的团队，Dune 仍是优先级很高的平台。<sup><a href="#r3">[3]</a></sup><sup><a href="#r4">[4]</a></sup>
+  </p>
+  <p>
+    如果你的目标是生产系统，建议按场景拆分采购：<strong>研究与增长分析</strong> 用 Data Hub / API；<strong>企业仓库集成</strong> 用 Datashare；<strong>链上产品后端</strong> 用 Sim；<strong>内部转化与私有模型</strong> 用 Enterprise + dbt Connector；<strong>AI 助手/自动化研究</strong> 则应优先验证 MCP / CLI / Skills。若你关注的是聪明钱标签与交易信号，可把 Dune 与 Nansen 组合；若关注财务可比与机构研究效率，可把 Dune 与 Token Terminal 组合。<sup><a href="#r12">[12]</a></sup><sup><a href="#r16">[16]</a></sup><sup><a href="#r18">[18]</a></sup><sup><a href="#r32">[32]</a></sup><sup><a href="#r36">[36]</a></sup>
+  </p>
+  <div class="note warning">
+    <strong>采购/落地建议：</strong>
+    <ul>
+      <li>先把问题分类：探索分析、生产报表、实时后端、私有数据治理，不要用同一套餐硬覆盖全部需求。</li>
+      <li>如果涉及 PII、客户账户或内部经营数据，优先评估 Enterprise、私有空间与 Datashare，并在上传前完成数据分级。</li>
+      <li>建立 credit guardrail：为查询与月度 extra credits 设置上限，并为失败执行、导出与物化写入单独做预算。</li>
+      <li>对关键指标保留“双轨校验”：Dune Curated 负责效率，自建核验或 raw 查询负责追责与审计。</li>
+    </ul>
+  </div>
+
+  <h3>开放问题与限制</h3>
+  <p>
+    本报告使用公开页面与文档进行整理，仍有三点需要注意：其一，Dune 部分价格页为动态渲染，公开抓取结果与 docs 个别字段存在轻微差异，本文优先采用官方 docs 的保守口径；其二，官网不同页面对链覆盖有“100+”与博客中“130+”等不同说法，本文统一采用更稳妥的“100+”；其三，Trust Center 未在公开页点名具体认证，因此相关合规要求应在采购尽调阶段二次核验。<sup><a href="#r2">[2]</a></sup><sup><a href="#r3">[3]</a></sup><sup><a href="#r22">[22]</a></sup><sup><a href="#r30">[30]</a></sup>
+  </p>
+
+  <h2>参考资料</h2>
+  <ol class="refs">
+    <li id="r1"><a href="https://dune.com/about" target="_blank" rel="noopener">Dune｜About</a></li>
+    <li id="r2"><a href="https://docs.dune.com/" target="_blank" rel="noopener">Dune Docs｜首页</a></li>
+    <li id="r3"><a href="https://dune.com/" target="_blank" rel="noopener">Dune｜官网首页</a></li>
+    <li id="r4"><a href="https://docs.dune.com/docs/product-comparison" target="_blank" rel="noopener">Dune Docs｜Products Overview</a></li>
+    <li id="r5"><a href="https://docs.dune.com/web-app/overview" target="_blank" rel="noopener">Dune Docs｜Data Hub Overview</a></li>
+    <li id="r6"><a href="https://docs.dune.com/data-catalog/overview" target="_blank" rel="noopener">Dune Docs｜Data Catalog</a></li>
+    <li id="r7"><a href="https://docs.dune.com/data-catalog/data-freshness" target="_blank" rel="noopener">Dune Docs｜Data Freshness</a></li>
+    <li id="r8"><a href="https://docs.dune.com/data-catalog/curated/overview" target="_blank" rel="noopener">Dune Docs｜Curated Data Overview</a></li>
+    <li id="r9"><a href="https://docs.dune.com/web-app/decoding/decoding-contracts" target="_blank" rel="noopener">Dune Docs｜How Contract Decoding Works</a></li>
+    <li id="r10"><a href="https://docs.dune.com/query-engine/dunesql-architecture" target="_blank" rel="noopener">Dune Docs｜DuneSQL Architecture</a></li>
+    <li id="r11"><a href="https://docs.dune.com/api-reference/connectors/trino/overview" target="_blank" rel="noopener">Dune Docs｜Trino Connector Overview</a></li>
+    <li id="r12"><a href="https://docs.dune.com/api-reference/connectors/dbt/overview" target="_blank" rel="noopener">Dune Docs｜dbt Connector Overview</a></li>
+    <li id="r13"><a href="https://docs.dune.com/learning/how-tos/credit-system" target="_blank" rel="noopener">Dune Docs｜Credit System</a></li>
+    <li id="r14"><a href="https://docs.dune.com/api-reference/overview/billing" target="_blank" rel="noopener">Dune Docs｜Billing</a></li>
+    <li id="r15"><a href="https://docs.dune.com/enterprise/data-hub/overview" target="_blank" rel="noopener">Dune Docs｜Enterprise Plan</a></li>
+    <li id="r16"><a href="https://docs.dune.com/datashare/datashare" target="_blank" rel="noopener">Dune Docs｜Datashare Overview</a></li>
+    <li id="r17"><a href="https://dune.com/apis-and-connectors" target="_blank" rel="noopener">Dune｜APIs &amp; Connectors</a></li>
+    <li id="r18"><a href="https://dune.com/agents" target="_blank" rel="noopener">Dune｜AI Agents</a></li>
+    <li id="r19"><a href="https://dune.com/privacy" target="_blank" rel="noopener">Dune｜Privacy Policy</a></li>
+    <li id="r20"><a href="https://dune.com/data-processing-agreement" target="_blank" rel="noopener">Dune｜Data Processing Agreement</a></li>
+    <li id="r21"><a href="https://dune.com/terms" target="_blank" rel="noopener">Dune｜Terms of Service</a></li>
+    <li id="r22"><a href="https://trust.dune.com/" target="_blank" rel="noopener">Dune｜Trust Center</a></li>
+    <li id="r23"><a href="https://dune.com/blog/seed-round" target="_blank" rel="noopener">Dune Blog｜Seed Round</a></li>
+    <li id="r24"><a href="https://dune.com/blog/series-b" target="_blank" rel="noopener">Dune Blog｜Series B</a></li>
+    <li id="r25"><a href="https://dune.com/blog/dunecon25-becoming-the-onchain-data-platform" target="_blank" rel="noopener">Dune Blog｜DuneCon25: Becoming The Onchain Data Platform</a></li>
+    <li id="r26"><a href="https://dune.com/blog/introducing-sim" target="_blank" rel="noopener">Dune Blog｜Introducing Sim</a></li>
+    <li id="r27"><a href="https://dune.com/blog/dune-acquires-smlxl-to-strengthen-real-time-blockchain-data-capabilities" target="_blank" rel="noopener">Dune Blog｜Dune Acquires smlXL</a></li>
+    <li id="r28"><a href="https://docs.dune.com/docs/changelog" target="_blank" rel="noopener">Dune Docs｜Changelog</a></li>
+    <li id="r29"><a href="https://dune.com/blog/dune-mcp" target="_blank" rel="noopener">Dune Blog｜Introducing the Dune MCP Server</a></li>
+    <li id="r30"><a href="https://dune.com/blog/dune-agent-live" target="_blank" rel="noopener">Dune Blog｜Dune Is Now Agent-Native: CLI and Skills are now live</a></li>
+    <li id="r31"><a href="https://github.com/duneanalytics/spellbook" target="_blank" rel="noopener">GitHub｜duneanalytics/spellbook</a></li>
+    <li id="r32"><a href="https://nansen.ai/" target="_blank" rel="noopener">Nansen｜官网</a></li>
+    <li id="r33"><a href="https://docs.nansen.ai/getting-started/credits" target="_blank" rel="noopener">Nansen Docs｜Credits &amp; Pricing Guide</a>；<a href="https://nansen.ai/api" target="_blank" rel="noopener">Nansen｜API</a></li>
+    <li id="r34"><a href="https://flipsidecrypto.xyz/" target="_blank" rel="noopener">Flipside｜官网</a></li>
+    <li id="r35"><a href="https://docs.flipsidecrypto.com/" target="_blank" rel="noopener">Flipside Docs｜首页</a></li>
+    <li id="r36"><a href="https://tokenterminal.com/" target="_blank" rel="noopener">Token Terminal｜官网</a></li>
+    <li id="r37"><a href="https://tokenterminal.com/pricing" target="_blank" rel="noopener">Token Terminal｜Pricing</a></li>
+    <li id="r38"><a href="https://tokenterminal.com/resources/engineering/2026-04-07-why-we-built-our-in-house-onchain-price-feed" target="_blank" rel="noopener">Token Terminal Engineering｜Why we built our in-house onchain price feed</a></li>
+    <li id="r39"><a href="https://tracxn.com/d/companies/duneanalytics/__XskUZos4lkfEOnTJIbC-1n9WdooVINLFPRtWW9pdZC4/funding-and-investors" target="_blank" rel="noopener">Tracxn｜Dune Analytics Funding and Investors</a></li>
+    <li id="r39a"><a href="https://docs.dune.com/learning/how-tos/pricing-faqs" target="_blank" rel="noopener">Dune Docs｜Pricing FAQs</a></li>
+    <li id="r40"><a href="https://arxiv.org/abs/2111.13683" target="_blank" rel="noopener">arXiv｜A Survey of Blockchain Data Management Systems</a></li>
+    <li id="r41"><a href="https://arxiv.org/abs/1812.02009" target="_blank" rel="noopener">arXiv｜Research on the Security of Blockchain Data: A Survey</a></li>
+    <li id="r42"><a href="https://docs.dune.com/docs/use-cases/analytics" target="_blank" rel="noopener">Dune Docs｜Analytics Use Cases</a></li>
+    <li id="r43"><a href="https://docs.dune.com/docs/use-cases/engineering" target="_blank" rel="noopener">Dune Docs｜Engineering Use Cases</a></li>
+    <li id="r44"><a href="https://docs.dune.com/docs/use-cases/accounting-audit-aml" target="_blank" rel="noopener">Dune Docs｜Accounting, Audit &amp; AML Use Cases</a></li>
+  </ol>
+
+  <p class="foot">出处说明：本报告优先使用 Dune 官方页面、官方博客、官方文档与官方 GitHub；竞争对手部分优先使用其官网/官方文档；“开放问题与限制”中已明确标出未公开或存在口径差异之处。</p>
+</main>
+
+<div id="tip" class="tip" role="tooltip" aria-hidden="true"></div>
+
+<script>
+(function(){
+  const svg = document.getElementById('qualityChart');
+  const tip = document.getElementById('tip');
+  if(!svg) return;
+
+  const W = 860, H = 320;
+  const margin = {top: 28, right: 30, bottom: 36, left: 140};
+  const usableW = W - margin.left - margin.right;
+  const rowGap = 58;
+  const barH = 12;
+  const max = 5;
+
+  const colors = ['#4f46e5','#0f766e','#b45309'];
+  const metrics = ['及时性','标准化','透明度'];
+
+  const data = [
+    {name:'原始层', values:[4.2,2.0,4.5], note:'直接链上索引；最灵活，但受链重组与链差异影响。'},
+    {name:'解码层', values:[4.0,3.2,3.5], note:'通过 ABI 解析；通常在 raw 入库后 15–60 秒完成。'},
+    {name:'策展层', values:[3.0,4.8,4.8], note:'跨链规范化与自动质量检查；最适合生产分析。'},
+    {name:'社区/合作方', values:[2.3,2.4,2.0], note:'补充语义能力强，但更新与治理不由 Dune 直接控制。'}
+  ];
+
+  function el(tag, attrs={}, parent){
+    const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.keys(attrs).forEach(k => n.setAttribute(k, attrs[k]));
+    if(parent) parent.appendChild(n);
+    return n;
+  }
+
+  svg.innerHTML = '';
+  el('rect',{x:0,y:0,width:W,height:H,fill:'#ffffff',rx:12},svg);
+
+  // grid
+  for(let i=0;i<=max;i++){
+    const x = margin.left + usableW * (i/max);
+    el('line',{x1:x,y1:margin.top-8,x2:x,y2:H-margin.bottom,stroke:'#e5e7eb','stroke-width':1},svg);
+    const t = el('text',{x:x,y:H-12,'text-anchor':'middle',fill:'#6b7280','font-size':12},svg);
+    t.textContent = i;
+  }
+
+  const title = el('text',{x:margin.left,y:16,fill:'#111827','font-size':13,'font-weight':700},svg);
+  title.textContent = '示例评分（0–5）';
+
+  data.forEach((row, rowIdx) => {
+    const baseY = margin.top + rowIdx * rowGap + 12;
+    const label = el('text',{x:margin.left-12,y:baseY+10,'text-anchor':'end',fill:'#111827','font-size':13,'font-weight':700},svg);
+    label.textContent = row.name;
+
+    row.values.forEach((v, i) => {
+      const y = baseY + i*(barH+6);
+      const w = usableW * (v/max);
+      const rect = el('rect',{x:margin.left,y:y,width:w,height:barH,fill:colors[i],rx:4,cursor:'pointer'},svg);
+      rect.dataset.label = row.name + '｜' + metrics[i] + '：' + v.toFixed(1) + ' / 5';
+      rect.dataset.note = row.note;
+      rect.addEventListener('mousemove', (e) => {
+        tip.style.opacity = '1';
+        tip.style.transform = 'translate(' + (e.clientX + 14) + 'px,' + (e.clientY + 14) + 'px)';
+        tip.innerHTML = '<strong>' + rect.dataset.label + '</strong><br>' + rect.dataset.note;
+        tip.setAttribute('aria-hidden','false');
+      });
+      rect.addEventListener('mouseleave', () => {
+        tip.style.opacity = '0';
+        tip.style.transform = 'translate(-9999px,-9999px)';
+        tip.setAttribute('aria-hidden','true');
+      });
+
+      const vt = el('text',{x:margin.left + w + 8,y:y+10,fill:'#374151','font-size':11},svg);
+      vt.textContent = v.toFixed(1);
+    });
+  });
+})();
+</script>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+</script>
+</body>
+</html>
