@@ -3,518 +3,544 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dune 调研文档｜黑白线条版</title>
-  <style>
-:root {
-  --bg: #ffffff;
-  --paper: #ffffff;
-  --ink: #0a0a0a;
-  --muted: #555555;
-  --soft: #f7f7f7;
-  --line: #111111;
-  --line-soft: #cfcfcf;
-  --ok: #0a0a0a;
-  --warn: #0a0a0a;
-  --bad: #0a0a0a;
-  --radius: 0px;
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-  line-height: 1.68;
-  letter-spacing: 0.01em;
-}
-a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.container { max-width: 1180px; margin: 0 auto; padding: 42px 22px 96px; }
-.topline { border-top: 3px solid var(--line); padding-top: 18px; }
-.header { display: grid; grid-template-columns: 1.3fr .7fr; gap: 28px; align-items: stretch; margin-bottom: 24px; }
-.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .16em; border-bottom: 1px solid var(--line); padding-bottom: 8px; color: var(--muted); }
-h1 { font-size: clamp(32px, 6vw, 64px); line-height: .98; margin: 18px 0 18px; letter-spacing: -.04em; font-weight: 780; }
-h2 { font-size: 28px; line-height: 1.16; margin: 34px 0 16px; letter-spacing: -.02em; border-top: 2px solid var(--line); padding-top: 16px; }
-h3 { font-size: 18px; margin: 24px 0 10px; }
-p { margin: 8px 0 14px; }
-.small, .muted { color: var(--muted); }
-.small { font-size: 13px; }
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.card { border: 1px solid var(--line); padding: 18px; background: var(--paper); }
-.card.soft { background: var(--soft); }
-.card h3:first-child { margin-top: 0; }
-.rule { border-top: 1px solid var(--line); margin: 28px 0; }
-.kpi { display: flex; align-items: baseline; gap: 8px; border: 1px solid var(--line); padding: 18px; }
-.kpi b { font-size: 40px; letter-spacing: -.05em; }
-.badge, .tag { display: inline-block; border: 1px solid var(--line); padding: 2px 8px; margin: 3px 4px 3px 0; font-size: 12px; background: #fff; }
-table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; font-size: 14px; }
-th, td { border: 1px solid var(--line); padding: 9px 10px; vertical-align: top; text-align: left; }
-th { background: var(--soft); font-weight: 700; }
-pre { white-space: pre-wrap; overflow: auto; border: 1px solid var(--line); padding: 14px; background: #fff; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 13px; line-height: 1.55; }
-code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: .94em; }
-.callout { border-left: 6px solid var(--line); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); padding: 16px 18px; margin: 18px 0; background: #fff; }
-.nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 28px; }
-.nav a { text-decoration: none; border: 1px solid var(--line); padding: 8px 10px; display: inline-block; }
-.nav a:hover { background: var(--ink); color: #fff; }
-.layout { display: grid; grid-template-columns: 250px 1fr; gap: 24px; }
-aside { border: 1px solid var(--line); padding: 16px; position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; background: #fff; }
-aside ol { padding-left: 20px; margin: 0; }
-aside li { margin: 8px 0; }
-.flow { border: 1px solid var(--line); padding: 16px; margin: 14px 0 24px; }
-.flowgrid { display: grid; grid-template-columns: 1fr 38px 1fr 38px 1fr; gap: 10px; align-items: center; }
-.box { border: 1px solid var(--line); padding: 14px; min-height: 96px; background: #fff; }
-.arrow { text-align: center; font-size: 26px; }
-.score { font-size: 56px; line-height: 1; font-weight: 800; letter-spacing: -.05em; }
-.footer { border-top: 2px solid var(--line); margin-top: 42px; padding-top: 18px; color: var(--muted); font-size: 13px; }
-.page-break { page-break-before: always; }
-ul, ol { padding-left: 1.3em; }
-li { margin: 6px 0; }
-@media (max-width: 900px) {
-  .header, .layout, .grid, .grid2, .grid4, .flowgrid { grid-template-columns: 1fr; }
-  aside { position: static; max-height: none; }
-  .arrow { transform: rotate(90deg); }
-}
-@media print {
-  body { background: white; }
-  .container { max-width: none; padding: 22mm 16mm; }
-  .nav, aside { display: none; }
-  .layout { display: block; }
-  a { text-decoration: none; }
-}
-</style>
+  <title>Dune 数据源与 API 调研报告</title>
+  <meta name="description" content="Dune 数据源、API、Sim、Datashare、Connector、MCP 与 Agent Skills 的单页调研报告。" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <main class="container topline">
-    <header class="header">
-      <div>
-        <div class="eyebrow">Research Document / Black & White Line System / 2026-05-12</div>
-        <h1>Dune 数据源与 Agent 接入调研</h1>
-        <p class="muted">基于已有 Dune 调研 HTML 优化：扩展为完整调研文档、工程接入方案、风险成本控制与可拆分 HTML 页面。</p>
+  <div class="page-grid">
+    <aside class="sidebar" aria-label="页面目录">
+      <div class="brand">
+        <span class="brand-mark">D</span>
         <div>
-          <span class="tag">Dune Analytics</span><span class="tag">Onchain Data</span><span class="tag">DuneSQL</span><span class="tag">Data API</span><span class="tag">MCP</span><span class="tag">Sim API</span><span class="tag">Black / White / Lines</span>
+          <strong>Dune Research</strong>
+          <small>Web3 数据源 / API 调研</small>
         </div>
       </div>
-      <div class="card">
-        <div class="small">综合结论</div>
-        <div class="score">推荐</div>
-        <p>作为链上分析源与 AI Agent 数据源接入；不要作为传统金融、新闻或 CEX tick/orderbook 主源。</p>
-      </div>
-    </header>
-    <nav class="nav"><a href="01-summary.html">01. 执行摘要与最终判断</a>
-<a href="02-product-data.html">02. 产品结构、数据覆盖与数据来源</a>
-<a href="03-api-mcp.html">03. API、MCP 与 Agent 调用规范</a>
-<a href="04-integration.html">04. 接入架构与落地方案</a>
-<a href="05-risk-cost.html">05. 风险、成本与控制策略</a>
-<a href="06-poc.html">06. POC 任务拆分与验收标准</a>
-<a href="07-html-split.html">07. HTML 拆分方案与编辑说明</a></nav>
-    <section id="summary">
-  <h2>1. 执行摘要与最终判断</h2>
-  <div class="grid">
-    <div class="card"><h3>产品定位</h3><p>Dune 是面向 Web3 / onchain analytics 的数据平台，不是传统金融行情商。核心能力是把链上原始数据、合约解码数据、curated datasets、SQL 查询、Dashboard、API、Datashare、MCP 与实时 Sim API 组合成一套链上数据工作台。</p></div>
-    <div class="card"><h3>最适合的场景</h3><p>链上研究、协议分析、钱包/地址监控、资金流向、DEX/NFT/stablecoin/bridge/lending 指标、AI Agent 数据查询、周期性报告、Dashboard 和数据管道。</p></div>
-    <div class="card"><h3>不应误用的场景</h3><p>不要把 Dune Data Hub / Data API 当作 CEX tick、订单簿、毫秒级交易行情、股票/宏观/新闻舆情主数据源。实时钱包/余额/活动应用应单独评估 Sim API。</p></div>
-  </div>
+      <label class="search-box">
+        <span>搜索</span>
+        <input id="globalSearch" type="search" placeholder="搜索 API、数据源、场景..." />
+      </label>
+      <nav class="toc" id="toc">
+        <a href="#summary">概要</a>
+        <a href="#product-map">产品地图</a>
+        <a href="#data-source">数据源整理</a>
+        <a href="#api">API 能力</a>
+        <a href="#sim">Sim 实时 API</a>
+        <a href="#connectors">连接器与 Datashare</a>
+        <a href="#agent">MCP / CLI / Skills</a>
+        <a href="#usage">使用规范</a>
+        <a href="#architecture">集成架构</a>
+        <a href="#decision">选型建议</a>
+        <a href="#risks">风险与限制</a>
+        <a href="#sources">信息源</a>
+      </nav>
+      <button class="back-top" id="backTop" type="button">返回顶部</button>
+    </aside>
 
-  <div class="grid4">
-    <div class="kpi"><b>4.6</b><span>/5<br>链上分析与 AI 数据源</span></div>
-    <div class="kpi"><b>4.2</b><span>/5<br>钱包/应用实时链上 API，基于 Sim</span></div>
-    <div class="kpi"><b>3.5</b><span>/5<br>交易策略辅助信号</span></div>
-    <div class="kpi"><b>1.5</b><span>/5<br>传统金融/新闻主数据源</span></div>
-  </div>
+    <main class="content">
+      <section class="hero panel searchable" id="top">
+        <div class="eyebrow">Single Page Research</div>
+        <h1>Dune 数据源与 API 调研报告</h1>
+        <p class="lead">面向数据抓取、链上数据分析、AI Agent 查询、Web3 钱包 / Portfolio / DeFi 应用的数据源集成调研。</p>
+        <div class="hero-meta">
+          <span>版本：2026-05</span>
+          <span>形态：HTML + CSS + JS</span>
+          <span>风格：黑白线条</span>
+        </div>
+      </section>
 
-  <div class="callout">
-    <strong>最终建议：</strong>推荐接入，但定位应是“链上结构化分析源 + AI Agent 可消费的数据仓库”。生产接入时不要让 Agent 高频自由生成 SQL；应优先沉淀 saved queries / materialized views / 缓存层，并与 Binance/OKX/CoinGecko/新闻/RSS/股票 API 等源组合。
-  </div>
+      <section class="panel searchable" id="summary">
+        <div class="section-head">
+          <span class="number">01</span>
+          <h2>概要结论</h2>
+        </div>
+        <div class="grid two">
+          <article class="card strong">
+            <h3>Dune 的核心定位</h3>
+            <p>Dune 是链上数据仓库与分析平台。它把多链原始数据、解码数据、社区查询、仪表盘、API、企业连接器与实时 API 组合成一套 Web3 数据基础设施。</p>
+          </article>
+          <article class="card">
+            <h3>适合你的使用方式</h3>
+            <p>如果目标是“多数据源并行抓取 + 统一入库 + AI 记忆”，Dune 更适合作为链上结构化数据源和链上分析结果源，而不是完全替代自建事件监听器。</p>
+          </article>
+        </div>
+        <div class="key-points">
+          <div><b>Data API</b><span>执行 SQL、读取查询结果、管理 Query、上传数据、Pipeline、Webhook。</span></div>
+          <div><b>Sim API</b><span>面向实时应用，提供钱包余额、交易、NFT、DeFi Position、Token Holder 等接口。</span></div>
+          <div><b>Datashare</b><span>企业级数据流向 Snowflake、BigQuery、Databricks。</span></div>
+          <div><b>Trino / dbt</b><span>通过 Trino endpoint 接入 BI、SQL Client、dbt 转换流程。</span></div>
+          <div><b>MCP / Skills</b><span>面向 AI Agent，让 Agent 可查询数据集、执行查询、调用 Sim。</span></div>
+        </div>
+      </section>
 
-  <h3>相对原有内容的核心优化</h3>
-  <table>
-    <thead><tr><th>原有表达</th><th>优化后表达</th><th>原因</th></tr></thead>
-    <tbody>
-      <tr><td>Dune 不适合低延迟行情源</td><td>Dune Data Hub / Data API 不适合作为 CEX tick/orderbook 主源；但 Dune Sim 是面向 wallet/app 的实时链上 API，应作为独立产品评估。</td><td>避免把 Dune 的查询分析产品与 Sim 实时 API 混为一谈。</td></tr>
-      <tr><td>覆盖 100+ blockchains</td><td>保留，但拆分为 Data Catalog 100+ chains、Sim 60+ chains、价格数据 70+ chains 等不同口径。</td><td>不同产品线覆盖口径不同。</td></tr>
-      <tr><td>API/MCP 支持</td><td>拆成 REST Data API、SQL Execute、saved query、execution status/result、result filtering、webhooks、materialized views、MCP、Skills。</td><td>更适合工程接入和拆分开发任务。</td></tr>
-      <tr><td>成本不可控</td><td>拆成计算 credits、失败执行计费、导出计费、写入/存储 quota、Sim CU、Agent 重复查询风险。</td><td>方便做预算、缓存和限流策略。</td></tr>
-    </tbody>
-  </table>
-</section>
-<section id="product-data">
-  <h2>2. 产品结构、数据覆盖与数据来源</h2>
+      <section class="panel searchable" id="product-map">
+        <div class="section-head">
+          <span class="number">02</span>
+          <h2>产品地图</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>模块</th>
+                <th>能力</th>
+                <th>适用对象</th>
+                <th>集成优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Data Hub</td>
+                <td>Web SQL 编辑器、Dashboard、可视化、分享嵌入、数据发现</td>
+                <td>分析师、研究员、运营、协议团队</td>
+                <td>高：先用它验证查询逻辑</td>
+              </tr>
+              <tr>
+                <td>Data API</td>
+                <td>程序化执行 Query / SQL，读取结果，管理查询与数据集</td>
+                <td>后端服务、数据管道、自动化报告</td>
+                <td>高：适合接入你的抓取服务</td>
+              </tr>
+              <tr>
+                <td>Sim</td>
+                <td>低延迟实时钱包、Token、NFT、交易、DeFi Position API</td>
+                <td>钱包、Portfolio、交易/风控产品</td>
+                <td>高：实时业务优先用 Sim</td>
+              </tr>
+              <tr>
+                <td>Datashare</td>
+                <td>把 Dune 数据直接同步/共享到企业数仓</td>
+                <td>企业数据团队、BI、风控、合规</td>
+                <td>中：企业级后再接</td>
+              </tr>
+              <tr>
+                <td>Trino Connector</td>
+                <td>只读连接 Dune 数据仓库，BI / SQL Client 查询</td>
+                <td>数据分析、BI、Notebook</td>
+                <td>中：适合内部分析工具</td>
+              </tr>
+              <tr>
+                <td>dbt Connector</td>
+                <td>基于 Dune 数据做 dbt 转换、增量模型、CI/CD</td>
+                <td>数据工程团队</td>
+                <td>中：需要企业权限</td>
+              </tr>
+              <tr>
+                <td>MCP / CLI / Skills</td>
+                <td>给 AI Agent 查询表、执行 SQL、管理查询、调用 Sim</td>
+                <td>Codex、Cursor、Claude Code、OpenClaw 等 Agent</td>
+                <td>高：适合 AI 工作流</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-  <h3>2.1 产品结构</h3>
-  <table>
-    <thead><tr><th>产品/能力</th><th>定位</th><th>适合做什么</th><th>不适合做什么</th></tr></thead>
-    <tbody>
-      <tr><td>Data Hub</td><td>SQL 查询 + 可视化 + Dashboard</td><td>交互式链上分析、团队研究、公开 Dashboard</td><td>毫秒级交易行情、外部新闻/股票数据</td></tr>
-      <tr><td>Data API</td><td>程序化执行 query、获取结果、管理数据</td><td>自动化报告、后端拉取指标、定时任务、Agent 工具调用</td><td>未缓存的高频自由 SQL</td></tr>
-      <tr><td>Datashare</td><td>把 Dune 数据流入 Snowflake / BigQuery / Databricks 等</td><td>企业级数据仓库集成、稳定数据管道</td><td>小团队快速试错阶段的第一优先</td></tr>
-      <tr><td>DuneSQL</td><td>基于 Trino 的链上 SQL 引擎</td><td>跨链查询、varbinary / uint256 / int256、materialized views</td><td>没有 SQL 能力的完全无代码场景，除非配合 MCP/Agent</td></tr>
-      <tr><td>MCP</td><td>AI Agent 远程工具入口</td><td>表发现、SQL 生成、执行、结果读取、可视化、Dashboard 管理</td><td>无人监管的高成本生产执行</td></tr>
-      <tr><td>Sim API</td><td>面向应用的实时链上 API</td><td>钱包、portfolio、balances、transactions、NFTs、DeFi positions、activity</td><td>CEX orderbook、股票/新闻、传统宏观数据</td></tr>
-      <tr><td>Catalyst</td><td>链/协议接入 Dune 的集成工具包</td><td>链、协议、生态方让数据进入 Dune</td><td>普通用户直接查询数据的主入口</td></tr>
-      <tr><td>Agent Skills</td><td>面向 Claude/Cursor/Codex/OpenCode 等的技能包</td><td>让 Agent 学会 Dune CLI / Sim API 的上下文、参数与调用约束</td><td>替代生产后端权限控制</td></tr>
-    </tbody>
-  </table>
+      <section class="panel searchable" id="data-source">
+        <div class="section-head">
+          <span class="number">03</span>
+          <h2>数据源整理</h2>
+        </div>
+        <div class="grid three">
+          <article class="card">
+            <h3>链上基础数据</h3>
+            <p>交易、区块、事件日志、调用轨迹、地址活动、Token 转账、合约交互等。适合协议分析、资金流、交易量、用户留存、风险行为识别。</p>
+          </article>
+          <article class="card">
+            <h3>解码与标准化数据</h3>
+            <p>将 ABI、合约事件、DEX/NFT/DeFi 等领域数据做结构化整理。适合减少自建 indexer 成本。</p>
+          </article>
+          <article class="card">
+            <h3>社区与公共查询</h3>
+            <p>Dune 上已有大量公开 Query 与 Dashboard，可作为业务指标模板，也可通过 API 获取最新或历史执行结果。</p>
+          </article>
+          <article class="card">
+            <h3>自定义上传数据</h3>
+            <p>通过 Data Uploads 创建表、插入数据、上传 CSV、清理或删除表。适合把内部标签、地址清单、映射表接入 DuneSQL。</p>
+          </article>
+          <article class="card">
+            <h3>实时钱包数据</h3>
+            <p>Sim 提供余额、交易、活动、NFT、DeFi Position、Token Holder、Token Metadata 等实时接口，更偏应用后端。</p>
+          </article>
+          <article class="card">
+            <h3>企业数仓数据</h3>
+            <p>通过 Datashare 或 Connector 把 Dune 数据带入 Snowflake、BigQuery、Databricks、PowerBI、Metabase、DBeaver 等环境。</p>
+          </article>
+        </div>
+      </section>
 
-  <h3>2.2 数据组织方式</h3>
-  <div class="flow">
-    <div class="flowgrid">
-      <div class="box"><strong>Raw</strong><br>Block、transaction、log、trace 等节点索引数据。适合自定义分析和深度链上取数。</div>
-      <div class="arrow">→</div>
-      <div class="box"><strong>Decoded</strong><br>基于 ABI / IDL 解析的合约事件与函数调用。适合协议行为与事件分析。</div>
-      <div class="arrow">→</div>
-      <div class="box"><strong>Curated</strong><br>Dune 维护的标准化跨链数据集。适合生产报表、跨链指标、快速 POC。</div>
-    </div>
-  </div>
+      <section class="panel searchable" id="api">
+        <div class="section-head">
+          <span class="number">04</span>
+          <h2>Data API 能力表</h2>
+        </div>
+        <div class="filter-bar">
+          <button class="chip active" data-filter="all">全部</button>
+          <button class="chip" data-filter="execution">Execution</button>
+          <button class="chip" data-filter="query">Query</button>
+          <button class="chip" data-filter="data">Data</button>
+          <button class="chip" data-filter="ops">Ops</button>
+        </div>
+        <div class="table-wrap">
+          <table id="apiTable">
+            <thead>
+              <tr>
+                <th>分类</th>
+                <th>能力</th>
+                <th>典型端点 / 动作</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-category="execution">
+                <td>Execution</td>
+                <td>执行任意 SQL</td>
+                <td><code>POST /api/v1/sql/execute</code></td>
+                <td>无需先创建 Query，适合动态分析和自动化工作流。</td>
+              </tr>
+              <tr data-category="execution">
+                <td>Execution</td>
+                <td>执行已保存 Query</td>
+                <td><code>POST /api/v1/query/{query_id}/execute</code></td>
+                <td>可传参数与 performance tier，返回 <code>execution_id</code>。</td>
+              </tr>
+              <tr data-category="execution">
+                <td>Execution</td>
+                <td>查询执行状态</td>
+                <td><code>GET /api/v1/execution/{execution_id}/status</code></td>
+                <td>用于轮询 pending / executing / completed / failed 等状态。</td>
+              </tr>
+              <tr data-category="execution">
+                <td>Execution</td>
+                <td>获取执行结果</td>
+                <td><code>GET /api/v1/execution/{execution_id}/results</code></td>
+                <td>JSON 结果，可配合分页、过滤、排序、采样。</td>
+              </tr>
+              <tr data-category="execution">
+                <td>Execution</td>
+                <td>获取 CSV 结果</td>
+                <td><code>GET /api/v1/execution/{execution_id}/results/csv</code></td>
+                <td>适合导出、离线处理、简单 ETL。</td>
+              </tr>
+              <tr data-category="execution">
+                <td>Execution</td>
+                <td>获取最新 Query 结果</td>
+                <td><code>GET /api/v1/query/{query_id}/results</code></td>
+                <td>不触发新执行，适合 Dashboard 缓存读取。</td>
+              </tr>
+              <tr data-category="query">
+                <td>Query</td>
+                <td>创建 / 更新 / 读取 Query</td>
+                <td><code>POST /query</code>、<code>PATCH /query</code></td>
+                <td>后端可程序化维护 Dune 查询资产。</td>
+              </tr>
+              <tr data-category="query">
+                <td>Query</td>
+                <td>私有化 / 归档 Query</td>
+                <td>Private、Archive、Unarchive</td>
+                <td>适合团队权限治理和查询生命周期管理。</td>
+              </tr>
+              <tr data-category="data">
+                <td>Data</td>
+                <td>上传自定义表</td>
+                <td>Create Table、Insert Data、Upload CSV</td>
+                <td>把内部地址标签、项目映射、黑名单等加入 DuneSQL。</td>
+              </tr>
+              <tr data-category="data">
+                <td>Data</td>
+                <td>Dataset 搜索</td>
+                <td>List / Get / Search Datasets</td>
+                <td>让系统或 Agent 自动发现可查询数据表。</td>
+              </tr>
+              <tr data-category="data">
+                <td>Data</td>
+                <td>Materialized View</td>
+                <td>Upsert、Refresh、List、Delete</td>
+                <td>对高成本查询做预计算，提高读取性能。</td>
+              </tr>
+              <tr data-category="ops">
+                <td>Ops</td>
+                <td>Pipeline</td>
+                <td>Execute Pipeline、Get Pipeline Status</td>
+                <td>用于多步骤查询或有依赖关系的数据任务。</td>
+              </tr>
+              <tr data-category="ops">
+                <td>Ops</td>
+                <td>Usage / Billing</td>
+                <td>Get Usage</td>
+                <td>监控 API 消耗，避免 Agent 或自动任务滥用额度。</td>
+              </tr>
+              <tr data-category="ops">
+                <td>Ops</td>
+                <td>Webhook</td>
+                <td>Create Webhook</td>
+                <td>适合任务完成通知、结果更新通知和自动触发下游处理。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-  <h3>2.3 主要数据集与使用价值</h3>
-  <table>
-    <thead><tr><th>数据域</th><th>代表数据</th><th>对项目价值</th><th>建议优先级</th></tr></thead>
-    <tbody>
-      <tr><td>DEX / Trading</td><td>dex.trades、交易量、项目、token pair、amount_usd</td><td>市场活跃度、协议份额、交易路径、异常交易</td><td>高</td></tr>
-      <tr><td>Token / Prices</td><td>token transfers、minute/hour/day prices、metadata</td><td>资金流、资产估值、钱包持仓、token universe</td><td>高</td></tr>
-      <tr><td>NFT</td><td>NFT trades、mints、metadata</td><td>NFT 市场、收藏品热度、钱包行为</td><td>中</td></tr>
-      <tr><td>Stablecoin</td><td>stablecoin transfers、balances、activity classification</td><td>流动性、链间迁移、资金避险/入场信号</td><td>高</td></tr>
-      <tr><td>Bridge / CEX Flows</td><td>跨链转账、CEX 流入流出、entity labels</td><td>资金迁移、链上风险监控、交易所资金变化</td><td>高</td></tr>
-      <tr><td>Lending / DeFi</td><td>supply、borrow、flash loans、liquidations</td><td>协议风险、清算压力、资金成本</td><td>高</td></tr>
-      <tr><td>Prediction Markets</td><td>Polymarket / Kalshi activity、positions、pricing</td><td>事件交易、预测市场研究、叙事追踪</td><td>中高</td></tr>
-      <tr><td>Labels / Identity</td><td>地址标签、entity、协议/交易所标识</td><td>钱包归因、AML、资金流解释</td><td>高</td></tr>
-    </tbody>
-  </table>
+      <section class="panel searchable" id="sim">
+        <div class="section-head">
+          <span class="number">05</span>
+          <h2>Sim 实时 API</h2>
+        </div>
+        <p class="section-intro">Sim 是 Dune 的实时链上应用 API，更适合钱包、Portfolio、交易监控、风控、DeFi 聚合展示，而不是离线分析。</p>
+        <div class="grid two">
+          <article class="card">
+            <h3>核心接口能力</h3>
+            <ul class="compact-list">
+              <li>Balances：地址的多链 Token 余额与 USD 价值。</li>
+              <li>Transactions：地址相关交易记录。</li>
+              <li>Activity：从交易中派生的转账、Swap、Approve 等活动。</li>
+              <li>Collectibles：ERC721 / ERC1155 NFT 持仓与基础元数据。</li>
+              <li>DeFi Positions：借贷、LP、收益策略、Vault 等 DeFi 持仓。</li>
+              <li>Token Holders：ERC20 Holder 列表与余额排序。</li>
+              <li>Token Info：Token 元数据、价格、供应量、Logo 等。</li>
+              <li>Stablecoins：稳定币与收益型稳定币余额。</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>适用判断</h3>
+            <p>如果你要做“用户输入钱包地址后立即返回资产 / NFT / 活动 / DeFi 仓位”，优先使用 Sim。如果你要做“某协议过去 180 天交易量、用户画像、跨协议对比”，优先使用 Data API + DuneSQL。</p>
+          </article>
+        </div>
+      </section>
 
-  <h3>2.4 数据来源与证据强度</h3>
-  <table>
-    <thead><tr><th>来源类型</th><th>说明</th><th>证据强度</th><th>接入含义</th></tr></thead>
-    <tbody>
-      <tr><td>链上节点 / indexer</td><td>raw blocks、transactions、logs、traces 来自链上索引。</td><td>强</td><td>适合高可信链上事实，但需要处理链重组、链延迟、字段差异。</td></tr>
-      <tr><td>ABI / IDL / 合约解码</td><td>decoded events/calls 基于 verified ABI / IDL 与 Dune 解码管线。</td><td>强</td><td>比 raw logs 更易用，但合约覆盖和 ABI 完整性会影响解析质量。</td></tr>
-      <tr><td>Dune curated datasets</td><td>Dune 团队清洗、标准化、维护的跨链数据集。</td><td>强</td><td>生产查询优先使用，减少重复清洗和扫描成本。</td></tr>
-      <tr><td>Partner / community data</td><td>Flashbots、Farcaster、Lens、Reservoir、Snapshot 等 partner/community 数据。</td><td>中高</td><td>适合扩展分析，但要保留来源标记。</td></tr>
-      <tr><td>外部市场数据 + 链上交易</td><td>价格系统结合外部市场数据与链上交易活动。</td><td>中高</td><td>适合估值和报表；交易执行仍应使用专业行情源。</td></tr>
-      <tr><td>非 Dune 数据源</td><td>新闻、Twitter/X、股票、宏观、CEX tick/orderbook。</td><td>不属于 Dune 主覆盖</td><td>需要组合其他 provider。</td></tr>
-    </tbody>
-  </table>
-</section>
-<section id="api-mcp">
-  <h2>3. API、MCP 与 Agent 调用规范</h2>
+      <section class="panel searchable" id="connectors">
+        <div class="section-head">
+          <span class="number">06</span>
+          <h2>连接器与 Datashare</h2>
+        </div>
+        <div class="flow-line">
+          <div>Dune Data Warehouse</div>
+          <span></span>
+          <div>Trino Endpoint<br><code>trino.api.dune.com</code></div>
+          <span></span>
+          <div>BI / dbt / Data Warehouse</div>
+        </div>
+        <div class="grid three">
+          <article class="card">
+            <h3>Trino Connector</h3>
+            <p>只读访问 Dune 数据仓库，适合 PowerBI、Tableau、Metabase、DBeaver、Hex、Notebook、内部 SQL 分析环境。</p>
+          </article>
+          <article class="card">
+            <h3>dbt Connector</h3>
+            <p>通过 dbt-trino 在 Dune 上跑生产级转换流程，支持增量模型、测试、CI/CD。通常需要企业权限与 Data Transformations。</p>
+          </article>
+          <article class="card">
+            <h3>Datashare</h3>
+            <p>把 Dune 数据流入 Snowflake、BigQuery、Databricks。适合企业已有数仓体系，不希望通过 API 分页反复拉取大规模数据。</p>
+          </article>
+        </div>
+      </section>
 
-  <h3>3.1 API 能力矩阵</h3>
-  <table>
-    <thead><tr><th>能力</th><th>典型端点/入口</th><th>用途</th><th>生产建议</th></tr></thead>
-    <tbody>
-      <tr><td>Execute saved query</td><td><code>POST /v1/query/{query_id}/execute</code></td><td>执行已保存 query，可带参数</td><td>生产优先；SQL 可审计、可复用。</td></tr>
-      <tr><td>Execute raw SQL</td><td><code>POST /v1/sql/execute</code></td><td>直接提交任意 SQL</td><td>适合 ad hoc / POC；生产要加白名单和 scan guard。</td></tr>
-      <tr><td>Status</td><td><code>GET /v1/execution/{execution_id}/status</code></td><td>轮询执行状态</td><td>不消耗查询结果拉取成本，先 status 再 results。</td></tr>
-      <tr><td>Results JSON / CSV</td><td><code>GET /v1/execution/{execution_id}/results</code><br><code>/results/csv</code></td><td>获取执行结果</td><td>配合 pagination / filtering / sorting。</td></tr>
-      <tr><td>Latest query result</td><td><code>GET /v1/query/{query_id}/results</code></td><td>拿最近一次结果</td><td>适合缓存型展示，配合 schedule 保鲜。</td></tr>
-      <tr><td>Result filtering</td><td><code>filters</code> / <code>columns</code> / <code>sort_by</code></td><td>服务端筛选结果</td><td>减少带宽和客户端处理。</td></tr>
-      <tr><td>Materialized Views</td><td><code>/v1/materialized-views/*</code></td><td>创建、刷新、删除、列出物化视图</td><td>高频复杂指标优先沉淀。</td></tr>
-      <tr><td>Webhooks</td><td>Webhooks / Alerts</td><td>执行完成、监控通知</td><td>适合异步工作流和告警。</td></tr>
-      <tr><td>Account usage</td><td>Usage / API key endpoints</td><td>用量监控</td><td>必须接入成本仪表盘。</td></tr>
-      <tr><td>Sim API</td><td>Sim dashboard / docs.sim.dune.com</td><td>钱包/余额/活动/交易/NFT/DeFi positions</td><td>作为独立实时 onchain API 评估。</td></tr>
-    </tbody>
-  </table>
+      <section class="panel searchable" id="agent">
+        <div class="section-head">
+          <span class="number">07</span>
+          <h2>MCP / CLI / Agent Skills</h2>
+        </div>
+        <div class="grid two">
+          <article class="card">
+            <h3>Dune MCP</h3>
+            <p>MCP 让 Claude、Cursor、Codex、OpenClaw 等兼容 Agent 可以直接搜索表、执行查询、生成可视化或读取结果。适合把 Dune 接成“链上数据工具”。</p>
+          </article>
+          <article class="card">
+            <h3>Dune Skills</h3>
+            <p>Dune 官方提供 Agent Skills 仓库，包含 <code>dune</code> 和 <code>sim</code> 两类 Skill：前者偏 Dune CLI、数据集、Query、Usage；后者偏实时钱包和 Token 查询。</p>
+          </article>
+        </div>
+        <div class="code-block" data-copy>
+          <div class="code-title">安装 Skills 示例</div>
+<pre><code>npx skills add duneanalytics/skills
 
-  <h3>3.2 推荐调用流程</h3>
-  <div class="flow">
-    <div class="flowgrid">
-      <div class="box"><strong>Agent / Backend</strong><br>用户问题、定时任务、策略任务。</div>
-      <div class="arrow">→</div>
-      <div class="box"><strong>Query Registry</strong><br>saved query、参数、owner、成本预算、缓存 TTL。</div>
-      <div class="arrow">→</div>
-      <div class="box"><strong>Dune API</strong><br>execute → status → results/filtering → local cache。</div>
-    </div>
-  </div>
+# Cursor Remote Rule
+# duneanalytics/skills
 
-  <h3>3.3 cURL：raw SQL 执行</h3>
-  <pre><code>curl -X POST "https://api.dune.com/api/v1/sql/execute" \
+# 手动安装目录示例
+~/.codex/skills/
+~/.cursor/skills/
+~/.claude/skills/</code></pre>
+        </div>
+      </section>
+
+      <section class="panel searchable" id="usage">
+        <div class="section-head">
+          <span class="number">08</span>
+          <h2>API 使用规范</h2>
+        </div>
+        <div class="grid two">
+          <article class="card">
+            <h3>认证</h3>
+            <ul class="compact-list">
+              <li>Dune Data API：使用 <code>X-Dune-API-Key</code> 或文档中对应 header。</li>
+              <li>Sim API：使用 <code>X-Sim-Api-Key</code>。</li>
+              <li>不要把 API Key 放在前端；必须经由你的后端代理。</li>
+              <li>按服务商、环境、任务类型拆 Key，方便额度与权限控制。</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>调度建议</h3>
+            <ul class="compact-list">
+              <li>低频指标：用定时任务获取 latest query result。</li>
+              <li>高频实时：用 Sim，设置后端缓存与降级。</li>
+              <li>大结果集：分页拉取，落到自己的数据库。</li>
+              <li>AI Agent：加用量阈值、白名单 Query、只读默认权限。</li>
+            </ul>
+          </article>
+        </div>
+        <div class="code-block" data-copy>
+          <div class="code-title">Data API：执行任意 SQL</div>
+<pre><code>curl -X POST "https://api.dune.com/api/v1/sql/execute" \
   -H "Content-Type: application/json" \
-  -H "X-Dune-Api-Key: $DUNE_API_KEY" \
+  -H "X-Dune-Api-Key: YOUR_DUNE_API_KEY" \
   -d '{
-    "sql": "SELECT blockchain, project, sum(amount_usd) AS volume_usd FROM dex.trades WHERE block_time &gt; now() - interval '\''1'\'' day GROUP BY 1,2 ORDER BY volume_usd DESC LIMIT 20",
+    "sql": "SELECT * FROM dex.trades WHERE block_time > now() - interval '\''1'\'' day LIMIT 10",
     "performance": "medium"
   }'</code></pre>
-
-  <h3>3.4 cURL：saved query 执行 + 结果读取</h3>
-  <pre><code># 1. 执行 saved query
-curl -X POST "https://api.dune.com/api/v1/query/$QUERY_ID/execute" \
-  -H "X-Dune-Api-Key: $DUNE_API_KEY" \
+        </div>
+        <div class="code-block" data-copy>
+          <div class="code-title">Data API：执行已保存 Query</div>
+<pre><code>curl -X POST "https://api.dune.com/api/v1/query/YOUR_QUERY_ID/execute" \
+  -H "X-Dune-API-Key: YOUR_DUNE_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"query_parameters":{"chain":"ethereum"},"performance":"medium"}'
+  -d '{
+    "query_parameters": {"address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"},
+    "performance": "large"
+  }'</code></pre>
+        </div>
+        <div class="code-block" data-copy>
+          <div class="code-title">Sim API：读取 NFT Collectibles</div>
+<pre><code>curl --request GET \
+  --url https://api.sim.dune.com/v1/evm/collectibles/0xd8da6bf26964af9d7eed9e03e53415d37aa96045 \
+  --header 'X-Sim-Api-Key: YOUR_SIM_API_KEY'</code></pre>
+        </div>
+      </section>
 
-# 2. 查询状态
-curl "https://api.dune.com/api/v1/execution/$EXECUTION_ID/status" \
-  -H "X-Dune-Api-Key: $DUNE_API_KEY"
+      <section class="panel searchable" id="architecture">
+        <div class="section-head">
+          <span class="number">09</span>
+          <h2>建议集成架构</h2>
+        </div>
+        <div class="architecture-box">
+<pre>┌──────────────────────────┐
+│  Scheduler / Agent Task  │
+└─────────────┬────────────┘
+              │
+┌─────────────▼────────────┐
+│  Go Provider Adapter     │  DuneAdapter / SimAdapter
+│  - rate limit            │  - retry / timeout
+│  - auth injection        │  - normalized response
+└───────┬───────────┬──────┘
+        │           │
+┌───────▼──────┐ ┌──▼────────────────┐
+│ Dune Data API│ │ Sim Realtime API   │
+│ SQL / Query  │ │ wallet / token API │
+└───────┬──────┘ └──┬────────────────┘
+        │           │
+┌───────▼───────────▼──────┐
+│ Normalizer + Schema Layer │
+│ source / entity / metric  │
+│ timestamp / confidence    │
+└─────────────┬────────────┘
+              │
+┌─────────────▼────────────┐
+│ DB + AI Memory Index      │
+│ Postgres / Vector / Logs  │
+└──────────────────────────┘</pre>
+        </div>
+        <div class="grid two">
+          <article class="card">
+            <h3>Provider 接口建议</h3>
+            <p>把 Dune 作为一个 Provider。Go 内部定义统一接口：<code>Fetch(ctx, task) ([]NormalizedRecord, error)</code>。Data API 和 Sim API 分别实现不同 Adapter。</p>
+          </article>
+          <article class="card">
+            <h3>AI 记忆建议</h3>
+            <p>不要直接把原始 API 响应塞入记忆。先转成统一结构：来源、链、地址、指标、时间、查询 SQL、置信度、过期时间、原始链接。</p>
+          </article>
+        </div>
+      </section>
 
-# 3. 获取结果，建议结合 limit/offset/filtering
-curl "https://api.dune.com/api/v1/execution/$EXECUTION_ID/results?limit=1000" \
-  -H "X-Dune-Api-Key: $DUNE_API_KEY"</code></pre>
+      <section class="panel searchable" id="decision">
+        <div class="section-head">
+          <span class="number">10</span>
+          <h2>选型建议</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>需求</th>
+                <th>推荐模块</th>
+                <th>原因</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>协议指标、交易量、留存、链上报表</td>
+                <td>Data Hub + Data API</td>
+                <td>先写 Query 验证，再用 API 自动化读取。</td>
+              </tr>
+              <tr>
+                <td>钱包资产、NFT、DeFi 仓位实时展示</td>
+                <td>Sim</td>
+                <td>接口语义更贴近应用，避免自己建索引器。</td>
+              </tr>
+              <tr>
+                <td>企业级 BI / 数仓融合</td>
+                <td>Datashare / Trino Connector</td>
+                <td>减少 API 分页拉取和重复数据搬运。</td>
+              </tr>
+              <tr>
+                <td>生产级数据建模和转换</td>
+                <td>dbt Connector</td>
+                <td>适合团队维护模型、测试、增量、CI/CD。</td>
+              </tr>
+              <tr>
+                <td>AI Agent 自动查链上数据</td>
+                <td>MCP + Skills + 白名单 Query</td>
+                <td>让 Agent 使用工具，不直接暴露任意高成本查询。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-  <h3>3.5 Codex MCP 配置</h3>
-  <pre><code># OAuth 方式
-codex mcp add dune --url "https://api.dune.com/mcp/v1"
-codex mcp login dune
+      <section class="panel searchable" id="risks">
+        <div class="section-head">
+          <span class="number">11</span>
+          <h2>风险与限制</h2>
+        </div>
+        <div class="risk-list">
+          <div><b>费用与额度</b><span>执行查询、读取结果、Sim 实时调用都可能产生费用或额度消耗。必须在后端做限流和缓存。</span></div>
+          <div><b>结果大小</b><span>大结果集要分页。Dune 文档提到超大结果可能被截断，需要显式允许 partial results。</span></div>
+          <div><b>结果保留</b><span>执行结果存在过期时间；长期数据应落库到自己的数据库。</span></div>
+          <div><b>权限隔离</b><span>Agent 不应拿全权限 API Key。按只读、执行、上传、企业连接器做隔离。</span></div>
+          <div><b>实时 vs 分析</b><span>Data API 不适合直接承担高并发实时钱包接口；Sim 更适合这个场景。</span></div>
+          <div><b>企业功能门槛</b><span>Datashare、dbt Connector、部分高阶能力可能需要 Enterprise 或额外开通。</span></div>
+        </div>
+      </section>
 
-# API key 方式
-codex mcp add dune_prod --url "https://api.dune.com/mcp/v1?api_key=&lt;dune_api_key&gt;"</code></pre>
-
-  <h3>3.6 Agent 使用原则</h3>
-  <table>
-    <thead><tr><th>原则</th><th>说明</th><th>落地方式</th></tr></thead>
-    <tbody>
-      <tr><td>先发现，再执行</td><td>先用 catalog/table search 确认 schema，再生成 SQL。</td><td>MCP searchTables / listBlockchains，或人工维护 query registry。</td></tr>
-      <tr><td>生产优先 saved query</td><td>减少自由 SQL 的成本和安全风险。</td><td>每个业务指标绑定 query_id、参数 schema、owner。</td></tr>
-      <tr><td>大查询物化</td><td>Query View 没有性能收益；复杂指标用 Materialized View。</td><td>按天/小时 refresh，设置 cron 和 TTL。</td></tr>
-      <tr><td>缓存优先</td><td>Agent 多轮对话会重复查询，容易浪费 credits。</td><td>Redis / Postgres 缓存结果，按 query_id + params + time bucket 生成 cache key。</td></tr>
-      <tr><td>限制扫描范围</td><td>链上表巨大，必须限制时间、chain、protocol、字段。</td><td>默认加 <code>block_time</code> / <code>block_date</code> 条件，禁止 <code>SELECT *</code> 进入生产。</td></tr>
-      <tr><td>成本可观测</td><td>Dune 按 compute / export / write 等维度消耗 credits。</td><td>保存 execution_id、SQL hash、credits、row_count、latency、cache_hit。</td></tr>
-    </tbody>
-  </table>
-</section>
-<section id="integration">
-  <h2>4. 接入架构与落地方案</h2>
-
-  <h3>4.1 推荐总体架构</h3>
-  <pre><code>用户问题 / 定时任务 / 策略任务
-  ↓
-Agent Router / Backend Scheduler
-  ├─ Dune MCP：探索数据表、临时分析、生成图表、人工辅助研究
-  ├─ Dune Data API：执行已审计 saved query / materialized view / results endpoint
-  ├─ Dune Sim API：实时钱包、余额、交易、NFT、DeFi positions
-  ├─ Market APIs：Binance / OKX / CoinGecko / CMC，用于价格与交易所行情
-  └─ News / Social APIs：RSS / X / News API，用于舆情和新闻
-  ↓
-Local Cache + Event Store
-  ├─ query_result_cache(query_id, params_hash, ttl)
-  ├─ wallet_events(source=dune_sim)
-  ├─ onchain_metrics(source=dune_data_api)
-  └─ cost_log(execution_id, latency, credits, rows)
-  ↓
-AI Pulse / Dashboard / Alert / Research Report / Trading Signal</code></pre>
-
-  <h3>4.2 数据模型建议</h3>
-  <pre><code>{
-  "source": "dune",
-  "product": "data_api | mcp | sim | datashare",
-  "domain": "dex | stablecoin | bridge | lending | wallet | nft | prediction | label | price",
-  "operation": "execute_query | execute_sql | latest_result | sim_balances | sim_activity",
-  "query": {
-    "query_id": 123456,
-    "sql_hash": "sha256:...",
-    "params": {"chain": "ethereum", "window": "24h"}
-  },
-  "data": {},
-  "meta": {
-    "execution_id": "01HZ...",
-    "fetched_at": "2026-05-12T00:00:00+08:00",
-    "row_count": 1000,
-    "cache_hit": false,
-    "credit_estimate": null,
-    "provider_url": "https://api.dune.com/api"
-  },
-  "error": null
-}</code></pre>
-
-  <h3>4.3 按业务场景的接入方式</h3>
-  <table>
-    <thead><tr><th>场景</th><th>推荐 Dune 能力</th><th>组合数据源</th><th>落地建议</th></tr></thead>
-    <tbody>
-      <tr><td>链上日报 / 周报</td><td>saved query + latest result + materialized views</td><td>CoinGecko/CMC 价格、新闻/RSS</td><td>Query 固化，结果入库，LLM 只负责解释。</td></tr>
-      <tr><td>钱包/地址监控</td><td>Sim API + Data API labels / transfers</td><td>自有地址库、风控规则</td><td>Sim 做实时事件，Dune SQL 做深度背景。</td></tr>
-      <tr><td>DEX / 协议分析</td><td>dex.trades、lending、bridge、stablecoin curated datasets</td><td>协议 TVL 源、价格源</td><td>先用 curated 表；复杂指标用 materialized views。</td></tr>
-      <tr><td>AI Agent 问答</td><td>MCP + curated tables + query registry</td><td>搜索/新闻/行情</td><td>Agent 可探索，但生产执行要走白名单。</td></tr>
-      <tr><td>Trading Bot 信号</td><td>链上大额转账、CEX flows、stablecoin、bridge、liquidations</td><td>Binance/OKX orderbook、实时行情、交易所 WebSocket</td><td>Dune 只做辅助信号，不能替代实时行情。</td></tr>
-      <tr><td>企业数据仓库</td><td>Datashare / Trino connector / dbt connector</td><td>Snowflake/BigQuery/Databricks</td><td>从 API POC 过渡到 warehouse pipeline。</td></tr>
-    </tbody>
-  </table>
-
-  <h3>4.4 POC 到生产的路线</h3>
-  <ol>
-    <li><strong>第 1 阶段：验证数据可得性。</strong> 找 5 个核心指标，确认 Dune 是否有对应 curated 表或可行 SQL。</li>
-    <li><strong>第 2 阶段：固化 query。</strong> 把 POC SQL 变成 saved query，定义参数、owner、用途、刷新频率。</li>
-    <li><strong>第 3 阶段：接 API。</strong> 后端执行 query，轮询 status，拉 results，写入缓存和成本日志。</li>
-    <li><strong>第 4 阶段：优化成本。</strong> 对大查询改用 materialized views / scheduled refresh / result filtering / pagination。</li>
-    <li><strong>第 5 阶段：接 Agent。</strong> MCP 只用于探索、调研、生成临时分析；生产任务只调用 registry 中的 approved query。</li>
-    <li><strong>第 6 阶段：组合数据源。</strong> 为行情、新闻、股票、宏观、交易所 orderbook 接入专门 provider。</li>
-  </ol>
-</section>
-<section id="risk-cost">
-  <h2>5. 风险、成本与控制策略</h2>
-
-  <h3>5.1 风险矩阵</h3>
-  <table>
-    <thead><tr><th>风险</th><th>等级</th><th>表现</th><th>控制策略</th></tr></thead>
-    <tbody>
-      <tr><td>Agent 自由 SQL 成本失控</td><td>高</td><td>重复查询、跨大表扫描、无时间过滤。</td><td>query registry、SQL lint、时间范围默认限制、cache、rate limit。</td></tr>
-      <tr><td>失败执行也消耗 credits</td><td>中高</td><td>错误 SQL / 超时 / 资源不足仍造成成本。</td><td>先本地 lint；小范围 preview；复杂查询用 medium/large 策略；记录失败原因。</td></tr>
-      <tr><td>结果过大</td><td>中</td><td>导出成本、网络延迟、32GB 结果上限、分页复杂。</td><td>服务端 filtering、columns、limit、pagination，必要时汇总而非拉明细。</td></tr>
-      <tr><td>数据新鲜度误解</td><td>中</td><td>用户把 latest result 当实时数据。</td><td>在结果里显示 execution_time / expires_at / query schedule。</td></tr>
-      <tr><td>Sim 与 Data API 混用</td><td>中</td><td>实时钱包 endpoint 与分析 SQL 的 SLA/成本/覆盖不同。</td><td>产品线分层：Sim 负责实时 app，Data API 负责分析和报表。</td></tr>
-      <tr><td>权限与 API key 泄露</td><td>高</td><td>MCP URL query api_key、日志泄露、团队 key 滥用。</td><td>优先 header/OAuth；env/vault 存储；日志脱敏；team key 分环境。</td></tr>
-      <tr><td>传统金融覆盖缺失</td><td>高</td><td>用户要求股票/宏观/新闻，Dune 无法主覆盖。</td><td>从架构层组合其他 provider。</td></tr>
-      <tr><td>SQL 维护成本</td><td>中</td><td>schema 变化、query owner 不明确、dashboard 无人维护。</td><td>Query Registry + owner + test query + changelog。</td></tr>
-    </tbody>
-  </table>
-
-  <h3>5.2 成本控制清单</h3>
-  <ol>
-    <li>所有生产 query 必须有 <code>block_date</code> 或 <code>block_time</code> 过滤。</li>
-    <li>默认禁止 <code>SELECT *</code>，必须指定 columns。</li>
-    <li>对外服务结果必须经过缓存，缓存 key = <code>query_id + params_hash + time_bucket</code>。</li>
-    <li>复杂跨链指标优先写入 materialized view，并设置 refresh schedule。</li>
-    <li>结果端点优先使用 server-side filtering / pagination。</li>
-    <li>记录 <code>execution_id</code>、SQL hash、params、latency、row_count、cache_hit、credits。</li>
-    <li>设置每日/每小时用量阈值，超过阈值时降级为 latest cached result。</li>
-    <li>Agent 只能调用 approved query；临时 SQL 需要人工确认或低额度 sandbox key。</li>
-  </ol>
-
-  <h3>5.3 建议的 Query Registry 表</h3>
-  <pre><code>CREATE TABLE query_registry (
-  id TEXT PRIMARY KEY,
-  provider TEXT DEFAULT 'dune',
-  product TEXT,                    -- data_api | mcp | sim
-  business_name TEXT,
-  query_id BIGINT,
-  sql_hash TEXT,
-  owner TEXT,
-  params_schema JSONB,
-  approved_for_agent BOOLEAN DEFAULT FALSE,
-  cache_ttl_seconds INT,
-  max_expected_rows INT,
-  max_time_window_days INT,
-  refresh_type TEXT,                -- manual | schedule | materialized_view
-  risk_level TEXT,                  -- low | medium | high
-  created_at TIMESTAMPTZ,
-  updated_at TIMESTAMPTZ
-);</code></pre>
-
-  <h3>5.4 数据新鲜度标注模板</h3>
-  <pre><code>{
-  "metric": "ethereum_dex_volume_24h",
-  "value": 123456789.12,
-  "source": "dune",
-  "query_id": 123456,
-  "execution_id": "01HZ...",
-  "executed_at": "2026-05-12T08:00:00Z",
-  "result_expires_at": "2026-08-10T08:00:00Z",
-  "data_window": {
-    "from": "2026-05-11T08:00:00Z",
-    "to": "2026-05-12T08:00:00Z"
-  },
-  "freshness_label": "fresh_query | latest_cached | materialized_view | stale"
-}</code></pre>
-</section>
-<section id="poc">
-  <h2>6. POC 任务拆分与验收标准</h2>
-
-  <h3>6.1 最小 POC 指标清单</h3>
-  <table>
-    <thead><tr><th>#</th><th>指标</th><th>推荐数据源</th><th>验收标准</th></tr></thead>
-    <tbody>
-      <tr><td>1</td><td>24h DEX volume by chain/project</td><td><code>dex.trades</code></td><td>可返回 Top 20，含 chain、project、volume_usd。</td></tr>
-      <tr><td>2</td><td>Stablecoin net flow by chain</td><td>stablecoin curated datasets</td><td>可按日聚合 inflow/outflow/netflow。</td></tr>
-      <tr><td>3</td><td>CEX inflow/outflow</td><td>CEX flows + labels</td><td>可识别交易所 entity 和 token 流向。</td></tr>
-      <tr><td>4</td><td>Bridge volume</td><td>bridges curated datasets</td><td>可按 source/destination chain 聚合。</td></tr>
-      <tr><td>5</td><td>Wallet balances / activity</td><td>Sim API + balances / activity</td><td>单地址可查余额、交易、活动，延迟满足应用需求。</td></tr>
-      <tr><td>6</td><td>Lending liquidations</td><td>lending curated datasets</td><td>可返回协议、链、金额、时间、清算事件。</td></tr>
-      <tr><td>7</td><td>Prediction market activity</td><td>Polymarket / Kalshi datasets</td><td>可输出 market、volume、positions 或 price 变化。</td></tr>
-    </tbody>
-  </table>
-
-  <h3>6.2 两周 POC 排期</h3>
-  <table>
-    <thead><tr><th>周期</th><th>任务</th><th>产出</th></tr></thead>
-    <tbody>
-      <tr><td>Day 1-2</td><td>注册 Dune、获取 API Key、确认 plan/credits、跑通 SQL Execute 和 saved query。</td><td>API connectivity report。</td></tr>
-      <tr><td>Day 3-4</td><td>选择 5 个核心指标，确定 Dune tables，写 POC SQL。</td><td>SQL notebook / Dune queries。</td></tr>
-      <tr><td>Day 5</td><td>接入 execution status/result、pagination/filtering。</td><td>后端拉取脚本。</td></tr>
-      <tr><td>Day 6-7</td><td>缓存、成本日志、错误处理。</td><td>query cache + cost log。</td></tr>
-      <tr><td>Day 8-9</td><td>复杂指标改 materialized views 或 scheduled saved query。</td><td>物化/定时刷新策略。</td></tr>
-      <tr><td>Day 10</td><td>接 MCP 到 Codex/Claude/Cursor，用于研究探索。</td><td>Agent 调研工作流。</td></tr>
-      <tr><td>Day 11-12</td><td>测试 Sim API 的 wallet / balances / activity / DeFi positions。</td><td>Sim endpoint 测试表。</td></tr>
-      <tr><td>Day 13-14</td><td>形成生产接入建议：保留/放弃/组合数据源。</td><td>POC conclusion + backlog。</td></tr>
-    </tbody>
-  </table>
-
-  <h3>6.3 验收标准</h3>
-  <ul>
-    <li>每个指标都能追溯到 table、query_id、execution_id、data_window。</li>
-    <li>所有生产候选 query 都有时间过滤、参数 schema、缓存 TTL、owner。</li>
-    <li>API 拉取结果具备 pagination、retry、timeout、error logging。</li>
-    <li>可区分 Dune Data API 与 Sim API 的数据新鲜度和适用场景。</li>
-    <li>能输出至少 3 个可进入产品的事件卡片：DEX volume spike、stablecoin netflow、wallet activity。</li>
-  </ul>
-
-  <h3>6.4 后续 Backlog</h3>
-  <table>
-    <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
-    <tbody>
-      <tr><td>P0</td><td>Query Registry</td><td>没有 registry 不建议让 Agent 进生产。</td></tr>
-      <tr><td>P0</td><td>Cost Dashboard</td><td>按 execution_id 汇总成本、失败率、cache hit。</td></tr>
-      <tr><td>P1</td><td>Dune MCP Research Workspace</td><td>给研究员和 Agent 探索，不直接连生产 key。</td></tr>
-      <tr><td>P1</td><td>Materialized View Pipeline</td><td>复杂指标先物化，再由后端读结果。</td></tr>
-      <tr><td>P1</td><td>Sim API Wallet Module</td><td>如果产品需要地址实时画像，单独 POC。</td></tr>
-      <tr><td>P2</td><td>Datashare / Trino / dbt</td><td>数据规模扩大后再评估。</td></tr>
-    </tbody>
-  </table>
-</section>
-<section id="html-split">
-  <h2>7. HTML 拆分方案与编辑说明</h2>
-
-  <h3>7.1 文件拆分</h3>
-  <table>
-    <thead><tr><th>文件</th><th>用途</th><th>适合谁编辑</th></tr></thead>
-    <tbody>
-      <tr><td><code>index.html</code></td><td>总览入口，导航到所有章节。</td><td>产品/研究负责人。</td></tr>
-      <tr><td><code>01-summary.html</code></td><td>执行摘要、评分、最终建议。</td><td>决策层、投研负责人。</td></tr>
-      <tr><td><code>02-product-data.html</code></td><td>产品结构、数据覆盖、数据来源。</td><td>研究员、数据分析师。</td></tr>
-      <tr><td><code>03-api-mcp.html</code></td><td>API、MCP、Agent 调用规范和代码。</td><td>后端工程、Agent 工程。</td></tr>
-      <tr><td><code>04-integration.html</code></td><td>接入架构、数据模型、业务场景。</td><td>架构师、产品工程。</td></tr>
-      <tr><td><code>05-risk-cost.html</code></td><td>风险、成本、权限、缓存和可观测性。</td><td>平台/安全/财务。</td></tr>
-      <tr><td><code>06-poc.html</code></td><td>POC 清单、排期、验收标准。</td><td>项目经理、工程团队。</td></tr>
-      <tr><td><code>07-html-split.html</code></td><td>本文件，说明如何继续拆分和改版。</td><td>前端/设计。</td></tr>
-      <tr><td><code>assets/style.css</code></td><td>全局黑白线框风格。</td><td>前端/设计。</td></tr>
-    </tbody>
-  </table>
-
-  <h3>7.2 黑白线条视觉规范</h3>
-  <ul>
-    <li><strong>色彩：</strong>只使用黑、白、灰；不使用渐变和强调色。</li>
-    <li><strong>结构：</strong>以细线边框、表格线、分割线、流程箭头为主要视觉语言。</li>
-    <li><strong>信息层级：</strong>大标题 + 线条分割 + 表格/卡片，不依赖颜色表达优先级。</li>
-    <li><strong>可打印：</strong>CSS 已包含 print 样式，适合转 PDF 或直接打印。</li>
-    <li><strong>可拆分：</strong>每个章节可独立打开；所有页面共享 <code>assets/style.css</code>。</li>
-  </ul>
-
-  <h3>7.3 后续可细化方向</h3>
-  <ol>
-    <li>把 <code>03-api-mcp.html</code> 拆成 API Reference、MCP Setup、Agent Policy 三页。</li>
-    <li>把 <code>06-poc.html</code> 拆成 Sprint Backlog、SQL Library、Acceptance Tests 三页。</li>
-    <li>给每个指标补真实 query_id、Dune URL、执行截图、返回样例。</li>
-    <li>建立 <code>queries/</code> 目录，单独保存 SQL 文件，HTML 中只引用摘要。</li>
-    <li>建立 <code>data/</code> 目录，保存 POC 输出 CSV/JSON，便于复盘。</li>
-  </ol>
-</section>
-    <section id="sources">
-      <h2>8. 信息来源</h2>
-      <table><thead><tr><th>来源</th><th>URL</th><th>用途</th></tr></thead><tbody><tr><td>Dune Data Catalog</td><td><a href="https://docs.dune.com/data-catalog/overview">https://docs.dune.com/data-catalog/overview</a></td><td>官方说明 raw / decoded / curated 三层数据、100+ blockchains、主要 curated datasets 与覆盖范围。</td></tr>
-<tr><td>Dune API Overview</td><td><a href="https://docs.dune.com/api-reference/overview/introduction">https://docs.dune.com/api-reference/overview/introduction</a></td><td>官方 API 概览：saved query 执行、结果获取、Data API、Trino/BI、Sim、dbt 等入口。</td></tr>
-<tr><td>Dune Execute SQL API</td><td><a href="https://docs.dune.com/api-reference/executions/endpoint/execute-sql">https://docs.dune.com/api-reference/executions/endpoint/execute-sql</a></td><td>任意 SQL 执行端点、Header、performance tier、usage-based credits。</td></tr>
-<tr><td>Dune Execution Object / Results</td><td><a href="https://docs.dune.com/api-reference/executions/execution-object">https://docs.dune.com/api-reference/executions/execution-object</a></td><td>执行 query、获取 latest result、execution_id、status/result 工作流。</td></tr>
-<tr><td>Dune Execution Result</td><td><a href="https://docs.dune.com/api-reference/executions/endpoint/get-execution-result">https://docs.dune.com/api-reference/executions/endpoint/get-execution-result</a></td><td>execution result JSON、90 天结果保存、32GB 查询结果上限、分页/过滤。</td></tr>
-<tr><td>Dune Result Filtering</td><td><a href="https://docs.dune.com/api-reference/executions/filtering">https://docs.dune.com/api-reference/executions/filtering</a></td><td>结果端点支持服务端 filtering、pagination、sorting，减少带宽与成本。</td></tr>
-<tr><td>Dune MCP Docs</td><td><a href="https://docs.dune.com/api-reference/agents/mcp">https://docs.dune.com/api-reference/agents/mcp</a></td><td>官方 Remote MCP：OAuth / API Key 鉴权、Codex / Claude / Cursor 等客户端配置。</td></tr>
-<tr><td>Dune MCP Blog</td><td><a href="https://dune.com/blog/dune-mcp">https://dune.com/blog/dune-mcp</a></td><td>MCP 上线说明：100+ chains、12 tools、Agent 从自然语言到 SQL / result / visualization。</td></tr>
-<tr><td>Dune Billing</td><td><a href="https://docs.dune.com/api-reference/overview/billing">https://docs.dune.com/api-reference/overview/billing</a></td><td>API billing：failed executions charged、compute credits、export/write/storage/webhooks。</td></tr>
-<tr><td>Dune Query Engine</td><td><a href="https://docs.dune.com/query-engine/overview">https://docs.dune.com/query-engine/overview</a></td><td>DuneSQL：Trino fork、varbinary、uint256/int256、columnar、query views、materialized views。</td></tr>
-<tr><td>Dune Materialized Views</td><td><a href="https://docs.dune.com/api-reference/materialized-views/overview">https://docs.dune.com/api-reference/materialized-views/overview</a></td><td>Materialized Views API、命名规范、refresh、performance tiers、cron schedule。</td></tr>
-<tr><td>Dune Sim API</td><td><a href="https://sim.dune.com/api">https://sim.dune.com/api</a></td><td>Sim：60+ chains、real-time synchronous access、balances、DeFi positions、NFTs、transactions、activity 等。</td></tr>
-<tr><td>Dune Prices Overview</td><td><a href="https://docs.dune.com/data-catalog/curated/prices/overview">https://docs.dune.com/data-catalog/curated/prices/overview</a></td><td>价格系统：跨 70+ chains 的 token prices，结合外部市场数据与链上交易活动。</td></tr>
-<tr><td>Dune Agent Skills GitHub</td><td><a href="https://github.com/duneanalytics/skills">https://github.com/duneanalytics/skills</a></td><td>Agent skills：dune skill 用于查询/表发现/usage；sim skill 用于实时 wallet/token lookup。</td></tr></tbody></table>
-      <p class="small">说明：具体价格、plan 权限、rate limit 可能随时间变化；生产接入前应以 Dune 官方最新文档与账户后台为准。</p>
-    </section>
-    <footer class="footer">Generated on 2026-05-12. Standalone HTML, no external CSS/JS dependency.</footer>
-  </main>
+      <section class="panel searchable" id="sources">
+        <div class="section-head">
+          <span class="number">12</span>
+          <h2>信息源</h2>
+        </div>
+        <div class="source-list">
+          <a href="https://docs.dune.com/" target="_blank" rel="noreferrer">Dune Docs 首页</a>
+          <a href="https://docs.dune.com/api-reference/overview/introduction" target="_blank" rel="noreferrer">Dune API Overview</a>
+          <a href="https://docs.dune.com/api-reference/api-overview" target="_blank" rel="noreferrer">Dune Data API Overview</a>
+          <a href="https://docs.dune.com/api-reference/executions/endpoint/execute-sql" target="_blank" rel="noreferrer">Execute SQL</a>
+          <a href="https://docs.dune.com/api-reference/executions/endpoint/execute-query" target="_blank" rel="noreferrer">Execute Query</a>
+          <a href="https://docs.dune.com/api-reference/connectors/overview" target="_blank" rel="noreferrer">Connectors Overview</a>
+          <a href="https://docs.sim.dune.com/" target="_blank" rel="noreferrer">Sim by Dune Docs</a>
+          <a href="https://github.com/duneanalytics/skills" target="_blank" rel="noreferrer">Dune Agent Skills</a>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="./app.js"></script>
 </body>
 </html>
