@@ -14,8 +14,18 @@
       "children": [
         {
           "type": "package",
+          "name": "DefiLlama",
+          "path": "TradingBot数据源/DefiLlama"
+        },
+        {
+          "type": "package",
           "name": "Dune",
           "path": "TradingBot数据源/Dune"
+        },
+        {
+          "type": "package",
+          "name": "Kaito",
+          "path": "TradingBot数据源/Kaito"
         },
         {
           "type": "folder",

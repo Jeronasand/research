@@ -60,7 +60,7 @@
             "Pro API"
           ],
           "risk": "SLA 和商用边界需确认",
-          "status": "待调研"
+          "status": "调研中"
         },
         {
           "priority": "P0",
@@ -330,7 +330,7 @@
             "Webhooks"
           ],
           "risk": "不是金融指标源，偏底层设施",
-          "status": "待调研"
+          "status": "调研中"
         },
         {
           "priority": "P1",
@@ -347,7 +347,7 @@
             "Add-ons"
           ],
           "risk": "数据能力依赖插件",
-          "status": "待调研"
+          "status": "调研中"
         }
       ]
     },

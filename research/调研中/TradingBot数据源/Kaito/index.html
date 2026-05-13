@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kaito 调研报告｜API、定价、使用方式</title>
+  <meta name="description" content="Kaito / Kaito Pro / Kaito API 的调研展示页，覆盖 API、定价、如何使用、风险与来源。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <div class="logo-mark">K</div>
+        <div>
+          <p class="eyebrow">Research Web Pack</p>
+          <h1>Kaito 调研</h1>
+        </div>
+      </div>
+      <nav class="side-nav" aria-label="页面导航">
+        <a href="#summary" class="active">总览</a>
+        <a href="#api">API</a>
+        <a href="#pricing">定价</a>
+        <a href="#usage">如何使用</a>
+        <a href="#decision">接入判断</a>
+        <a href="#sources">来源</a>
+      </nav>
+      <div class="meta-card">
+        <span>调研日期</span>
+        <strong>2026-05-13</strong>
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero" id="summary">
+        <div class="hero-content">
+          <p class="eyebrow">Kaito / Kaito Pro / Kaito API</p>
+          <h2>面向 Web3 信息检索、注意力指标、情绪与叙事数据的企业级情报平台</h2>
+          <p class="hero-copy">
+            本页把调研结果整合为一个可直接打开的 Web 页面，重点覆盖 API 类型、公开/商业接口、价格信息、接入流程与落地风险。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#api">查看 API</a>
+            <a class="button secondary" href="#pricing">查看定价</a>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="metric-grid">
+            <div>
+              <span>核心定位</span>
+              <strong>Web3 AI 情报平台</strong>
+            </div>
+            <div>
+              <span>覆盖范围</span>
+              <strong>2000+ tokens</strong>
+            </div>
+            <div>
+              <span>公开 Yaps 限额</span>
+              <strong>100 calls / 5 min</strong>
+            </div>
+            <div>
+              <span>企业单席</span>
+              <strong>$833/mo*</strong>
+            </div>
+          </div>
+          <small>*官网显示为按年计费的月均价格；API 独立报价需联系销售。</small>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">结论摘要</p>
+          <h2>最重要的调研结论</h2>
+        </div>
+        <div class="cards four" id="summaryCards"></div>
+      </section>
+
+      <section class="section" id="api">
+        <div class="section-head with-tools">
+          <div>
+            <p class="eyebrow">API</p>
+            <h2>API 类型与可用信息</h2>
+          </div>
+          <div class="toolbar">
+            <button class="filter-pill active" data-filter="all">全部</button>
+            <button class="filter-pill" data-filter="official">官方</button>
+            <button class="filter-pill" data-filter="public">公开接口</button>
+            <button class="filter-pill" data-filter="payg">PAYG / x402</button>
+          </div>
+        </div>
+        <div class="api-grid" id="apiCards"></div>
+      </section>
+
+      <section class="section code-section">
+        <div class="section-head">
+          <p class="eyebrow">API 示例</p>
+          <h2>可复用的调用样例</h2>
+        </div>
+        <div class="tabs" id="codeTabs"></div>
+        <div class="code-wrap">
+          <button class="copy-btn" id="copyCodeBtn">复制代码</button>
+          <pre><code id="codeBlock"></code></pre>
+        </div>
+      </section>
+
+      <section class="section" id="pricing">
+        <div class="section-head">
+          <p class="eyebrow">Pricing</p>
+          <h2>定价与商业模式</h2>
+          <p class="section-desc">Kaito Pro 的公开订阅价与 API 价格不是同一套体系；企业 API 仍以 Contact Sales 为主。</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>项目</th>
+                <th>价格 / 计费</th>
+                <th>包含内容</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody id="pricingRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="usage">
+        <div class="section-head">
+          <p class="eyebrow">How to Use</p>
+          <h2>如何使用 / 接入路径</h2>
+        </div>
+        <div class="timeline" id="usageSteps"></div>
+      </section>
+
+      <section class="section" id="decision">
+        <div class="section-head">
+          <p class="eyebrow">Decision</p>
+          <h2>是否适合接入</h2>
+        </div>
+        <div class="decision-grid">
+          <div class="decision-card positive">
+            <h3>适合接入的场景</h3>
+            <ul id="goodFit"></ul>
+          </div>
+          <div class="decision-card warning">
+            <h3>接入前必须确认</h3>
+            <ul id="checks"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="sources">
+        <div class="section-head">
+          <p class="eyebrow">Sources</p>
+          <h2>来源与可信度</h2>
+          <p class="section-desc">优先使用 Kaito 官方页面与官方文档；第三方来源只用于补充公开页面未披露的信息，并在页面中标明。</p>
+        </div>
+        <div class="sources-list" id="sourceList"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">已复制</div>
+  <script src="script.js"></script>
+</body>
+</html>

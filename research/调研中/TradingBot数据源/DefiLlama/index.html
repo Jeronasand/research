@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DefiLlama 调研预览｜黑白线条主题</title>
+  <meta name="description" content="DefiLlama API、定价、使用方式、LlamaAI 与 Web 端产品能力调研展示，黑白线条主题。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="页面目录">
+      <a class="brand" href="#top" aria-label="回到顶部">
+        <span class="brand-icon">DL</span>
+        <span>
+          <strong>DefiLlama</strong>
+          <small>Research Preview</small>
+        </span>
+      </a>
+
+      <nav class="toc" id="toc">
+        <a href="#summary" class="active">01｜结论总览</a>
+        <a href="#api-map">02｜API 地图</a>
+        <a href="#usage">03｜如何使用</a>
+        <a href="#pricing">04｜定价与权限</a>
+        <a href="#web-product">05｜Web 端产品</a>
+        <a href="#llamaai">06｜LlamaAI / Alert</a>
+        <a href="#architecture">07｜产品与 API 关系</a>
+        <a href="#risks">08｜接入建议</a>
+        <a href="#sources">09｜来源</a>
+      </nav>
+
+      <div class="side-card">
+        <span class="dot"></span>
+        <span>调研日期：2026-05-13</span>
+      </div>
+    </aside>
+
+    <main class="content" id="top">
+      <section class="hero" id="summary">
+        <div class="hero-copy">
+          <div class="eyebrow">Black & White Line Theme · API · Pricing · LlamaAI · MCP</div>
+          <h1>DefiLlama 调研展示</h1>
+          <p class="lead">
+            本页面将 DefiLlama 的 API 能力、定价口径、使用方式、Web 端产品结构、LlamaAI 试用体验与 Schedule Alert 能力整合为一个可预览的前端页面。
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#api-map">查看 API</a>
+            <a class="btn" href="#web-product">查看截图分析</a>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="metric-card accent">
+            <span>产品定位</span>
+            <strong>DeFi 数据聚合 + 研究终端</strong>
+            <small>TVL、链、协议、收益、稳定币、RWA、费用、价格与 AI 分析</small>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-card">
+              <span>API 入口</span>
+              <strong>Public + Pro/API</strong>
+              <small>核心公开端点免 key；高级端点和更高限额走 API 计划</small>
+            </div>
+            <div class="metric-card">
+              <span>Web 入口</span>
+              <strong>Dashboard + LlamaAI</strong>
+              <small>查询、图表、CSV/PNG、数据来源、定时提醒</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <span class="section-index">01</span>
+          <div>
+            <h2>核心结论</h2>
+            <p>适合用作 DeFi 数据源、链上指标看板、研究自动化、AI Agent 数据工具和内部监控。</p>
+          </div>
+        </div>
+        <div class="cards four">
+          <article class="card">
+            <h3>API 能力</h3>
+            <p>核心公开 API 覆盖协议 TVL、链 TVL、价格、收益池、稳定币、费用/收入等常用数据；Pro/API 计划提供更高限额和更多高级数据类型。</p>
+          </article>
+          <article class="card">
+            <h3>定价结构</h3>
+            <p>当前可拆成 Free、Pro、API、Enterprise。Pro 偏研究产品能力；API 计划偏开发者、高频调用、MCP 和高级端点。</p>
+          </article>
+          <article class="card">
+            <h3>Web 产品</h3>
+            <p>Web 端不仅是数据看板，还包含 LlamaAI、CSV Downloads、Custom Dashboards、Sheets、LlamaFeed、Alert 等研究工作流。</p>
+          </article>
+          <article class="card">
+            <h3>接入重点</h3>
+            <p>前端可直连公开端点做 Demo；生产环境建议后端代理、缓存、限流重试、API Key 隔离和数据快照。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="api-map">
+        <div class="section-head">
+          <span class="section-index">02</span>
+          <div>
+            <h2>API 地图</h2>
+            <p>DefiLlama 的数据接口按业务域拆成多个 base URL。实际可用端点应以官方 API Docs / Pro API Spec 为准。</p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <label class="input-label" for="endpointSearch">筛选端点</label>
+          <input id="endpointSearch" type="search" placeholder="输入 TVL / price / yields / stablecoin / fees..." />
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="endpointTable">
+            <thead>
+              <tr>
+                <th>模块</th>
+                <th>Base URL</th>
+                <th>典型端点</th>
+                <th>用途</th>
+                <th>鉴权</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-endpoint="tvl protocols chains historicalChainTvl">
+                <td>TVL / Protocols</td>
+                <td><code>https://api.llama.fi</code></td>
+                <td><code>/protocols</code><br><code>/protocol/{slug}</code><br><code>/tvl/{slug}</code><br><code>/v2/chains</code><br><code>/v2/historicalChainTvl/{chain}</code></td>
+                <td>协议列表、协议详情、当前 TVL、链 TVL、链历史 TVL</td>
+                <td>公开核心端点通常免 key</td>
+              </tr>
+              <tr data-endpoint="prices coins current historical chart">
+                <td>Coin Prices</td>
+                <td><code>https://coins.llama.fi</code></td>
+                <td><code>/prices/current/{coins}</code><br><code>/prices/historical/{timestamp}/{coins}</code><br><code>/chart/{coins}</code></td>
+                <td>按 chain:address 或 coingecko:id 获取当前价、历史价、价格曲线</td>
+                <td>公开 / 高级能力按计划区分</td>
+              </tr>
+              <tr data-endpoint="yields pools apy tvl risk borrow">
+                <td>Yields</td>
+                <td><code>https://yields.llama.fi</code></td>
+                <td><code>/pools</code><br><code>/chart/{pool}</code><br><code>/poolsBorrow</code></td>
+                <td>收益池、APY、TVL、风险标签、借贷池</td>
+                <td>以端点实际权限为准</td>
+              </tr>
+              <tr data-endpoint="stablecoins market cap supply peg chain">
+                <td>Stablecoins</td>
+                <td><code>https://stablecoins.llama.fi</code></td>
+                <td><code>/stablecoins</code><br><code>/stablecoin/{id}</code><br><code>/stablecoincharts/all</code></td>
+                <td>稳定币流通量、价格、链分布、历史市值</td>
+                <td>公开核心端点通常免 key</td>
+              </tr>
+              <tr data-endpoint="fees revenue volume dexs options aggregators">
+                <td>Fees / Revenue / Volume</td>
+                <td><code>https://api.llama.fi</code></td>
+                <td><code>/overview/fees</code><br><code>/summary/fees/{protocol}</code><br><code>/overview/dexs</code><br><code>/summary/dexs/{protocol}</code></td>
+                <td>协议费用、收入、DEX 交易量、聚合器和衍生品指标</td>
+                <td>公开 + 高级端点混合</td>
+              </tr>
+              <tr data-endpoint="pro api key unlocks active users token liquidity mcp">
+                <td>Pro / API</td>
+                <td><code>https://pro-api.llama.fi</code></td>
+                <td>以 Pro API Spec 为准</td>
+                <td>高级数据、提高限额、MCP、AI Agent 数据接入</td>
+                <td>需要 API 计划与 API Key</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note-box">
+          <strong>注意：</strong>DefiLlama 官方页面存在“公开 API / Pro API / API 订阅”多个入口。公开端点适合 Demo 与低频调用；商业化或高频系统应按 API 计划接入，并以支付页、API 文档和下载的 OpenAPI Spec 为准。
+        </div>
+      </section>
+
+      <section class="section" id="usage">
+        <div class="section-head">
+          <span class="section-index">03</span>
+          <div>
+            <h2>如何使用</h2>
+            <p>前端可直接 fetch 公开端点；生产环境建议后端代理，避免把 API Key 暴露给浏览器。</p>
+          </div>
+        </div>
+
+        <div class="workflow">
+          <div class="step">
+            <span>1</span>
+            <strong>确定数据域</strong>
+            <p>TVL、价格、收益池、稳定币、费用/收入、RWA 或下载数据集。</p>
+          </div>
+          <div class="step">
+            <span>2</span>
+            <strong>选择端点</strong>
+            <p>从公开 API 开始；需要高级数据或高频调用时切换 API 计划。</p>
+          </div>
+          <div class="step">
+            <span>3</span>
+            <strong>缓存与归档</strong>
+            <p>按分钟/小时缓存，保存快照，减少重复请求和限流风险。</p>
+          </div>
+          <div class="step">
+            <span>4</span>
+            <strong>业务展示</strong>
+            <p>将 JSON 转为表格、趋势图、告警规则或 AI Agent 上下文。</p>
+          </div>
+        </div>
+
+        <div class="accordion-list">
+          <details class="code-card" open>
+            <summary>示例 A：获取全部协议并筛选 Aave</summary>
+            <pre><code>async function getAaveProtocol() {
+  const res = await fetch('https://api.llama.fi/protocols');
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const protocols = await res.json();
+
+  return protocols.find((item) =&gt; item.slug === 'aave');
+}</code></pre>
+          </details>
+
+          <details class="code-card">
+            <summary>示例 B：获取协议详情与历史 TVL</summary>
+            <pre><code>async function getProtocolDetail(slug = 'aave') {
+  const url = `https://api.llama.fi/protocol/${encodeURIComponent(slug)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}</code></pre>
+          </details>
+
+          <details class="code-card">
+            <summary>示例 C：获取 USDC 当前价格</summary>
+            <pre><code>async function getUsdcPrice() {
+  const coin = 'ethereum:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+  const res = await fetch(`https://coins.llama.fi/prices/current/${coin}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}</code></pre>
+          </details>
+
+          <details class="code-card">
+            <summary>示例 D：带退避的请求封装</summary>
+            <pre><code>async function llamaFetch(url, retries = 2) {
+  for (let i = 0; i &lt;= retries; i += 1) {
+    const res = await fetch(url);
+    if (res.ok) return res.json();
+    if (res.status !== 429 || i === retries) throw new Error(`HTTP ${res.status}`);
+    await new Promise((resolve) =&gt; setTimeout(resolve, 600 * 2 ** i));
+  }
+}</code></pre>
+          </details>
+        </div>
+
+        <div class="playground">
+          <div class="playground-head">
+            <div>
+              <h3>公开端点试跑区</h3>
+              <p>在可联网浏览器中打开时，可尝试请求 DefiLlama 公开端点。若本地网络或 CORS 不允许，请用后端代理。</p>
+            </div>
+            <button class="btn small" id="clearOutput" type="button">清空结果</button>
+          </div>
+          <div class="playground-controls">
+            <select id="exampleSelect" aria-label="选择 API 示例">
+              <option value="protocols">全部协议 /protocols</option>
+              <option value="aave">Aave 详情 /protocol/aave</option>
+              <option value="chains">链 TVL /v2/chains</option>
+              <option value="historicalEth">Ethereum 历史 TVL</option>
+              <option value="usdcPrice">USDC 当前价格</option>
+              <option value="yields">收益池 /pools</option>
+              <option value="stablecoins">稳定币 /stablecoins</option>
+            </select>
+            <input id="apiUrl" type="text" aria-label="API URL" />
+            <button class="btn primary small" id="runFetch" type="button">运行 fetch</button>
+          </div>
+          <pre class="output" id="apiOutput">选择示例后点击“运行 fetch”。</pre>
+        </div>
+      </section>
+
+      <section class="section" id="pricing">
+        <div class="section-head">
+          <span class="section-index">04</span>
+          <div>
+            <h2>定价与权限</h2>
+            <p>Pro 偏研究套件，API 偏开发者接入与高频/高级端点。官方文档与订阅页的月付口径存在差异，应以结账页为准。</p>
+          </div>
+        </div>
+
+        <div class="pricing-grid">
+          <article class="price-card">
+            <div class="plan-name">Free</div>
+            <div class="price">$0 <span>/ month</span></div>
+            <ul>
+              <li>核心 Dashboard</li>
+              <li>TVL、Volume、Yields、Stablecoins 等基础浏览</li>
+              <li>Free API endpoints</li>
+              <li>LlamaAI 限量试用</li>
+            </ul>
+          </article>
+          <article class="price-card featured">
+            <div class="plan-name">Pro</div>
+            <div class="price">$490 <span>/ year</span></div>
+            <ul>
+              <li>LlamaAI Conversational Analytics</li>
+              <li>Deep Research：通常 5 次/日，试用期 3 次/日</li>
+              <li>Custom Dashboards / Custom Columns</li>
+              <li>CSV Downloads、Sheets、LlamaFeed</li>
+              <li>官方文档注明：Pro 不包含 API Access</li>
+            </ul>
+          </article>
+          <article class="price-card">
+            <div class="plan-name">API</div>
+            <div class="price">$3,000 <span>/ year</span></div>
+            <ul>
+              <li>包含 Pro 能力</li>
+              <li>Premium endpoints：prices、inflows、unlocks 等</li>
+              <li>1,000 requests / minute</li>
+              <li>1M calls / month</li>
+              <li>超额：$0.60 / 1,000 calls</li>
+              <li>MCP Server 使用同一 API credits</li>
+            </ul>
+          </article>
+          <article class="price-card">
+            <div class="plan-name">Enterprise</div>
+            <div class="price">Custom</div>
+            <ul>
+              <li>数据库原始访问</li>
+              <li>非公开数据</li>
+              <li>Hourly data</li>
+              <li>自定义数据授权与 bespoke solution</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="note-box warning">
+          <strong>口径说明：</strong>官方 docs.llama.fi/pro-api 写有 API $300/month 或 $3,000/year；当前订阅页展示 API $3,000/year，并标注 $250/month 年付折算。页面中按“最新订阅页优先，结账页最终确认”的方式处理。
+        </div>
+      </section>
+
+      <section class="section" id="web-product">
+        <div class="section-head">
+          <span class="section-index">05</span>
+          <div>
+            <h2>Web 端产品试用分析</h2>
+            <p>基于登录后的 LlamaAI 试用截图，对导航结构、AI 分析流、导出、来源标注和定时提醒做产品拆解。</p>
+          </div>
+        </div>
+
+        <div class="gallery">
+          <figure class="shot-card">
+            <button type="button" class="shot-button" data-img="assets/screenshots/llamaai-thinking.png" data-title="LlamaAI 任务执行中">
+              <img src="assets/screenshots/llamaai-thinking.png" alt="LlamaAI 正在执行 TVL 分析任务" loading="lazy" />
+            </button>
+            <figcaption>
+              <strong>LlamaAI 执行中</strong>
+              <span>可见 reasoning、Resolving entity、Querying database、Loading knowledge、Searching web 等步骤。</span>
+            </figcaption>
+          </figure>
+
+          <figure class="shot-card">
+            <button type="button" class="shot-button" data-img="assets/screenshots/llamaai-chart-analysis.png" data-title="LlamaAI 图表与数据表">
+              <img src="assets/screenshots/llamaai-chart-analysis.png" alt="LlamaAI 输出 TVL 趋势图与当前状态表" loading="lazy" />
+            </button>
+            <figcaption>
+              <strong>图表与导出</strong>
+              <span>输出 TVL 趋势图、当前状态表，支持 PNG/CSV 导出和图表 tooltip。</span>
+            </figcaption>
+          </figure>
+
+          <figure class="shot-card">
+            <button type="button" class="shot-button" data-img="assets/screenshots/llamaai-sources-analysis.png" data-title="LlamaAI 来源标注与研究结论">
+              <img src="assets/screenshots/llamaai-sources-analysis.png" alt="LlamaAI 输出来源引用、研究总结与后续建议按钮" loading="lazy" />
+            </button>
+            <figcaption>
+              <strong>来源标注</strong>
+              <span>回答中列出来源链接，支持继续追问，例如“谁存入了 5000 万美元”。</span>
+            </figcaption>
+          </figure>
+
+          <figure class="shot-card">
+            <button type="button" class="shot-button" data-img="assets/screenshots/llamaai-schedule-alert.png" data-title="LlamaAI Schedule Alert">
+              <img src="assets/screenshots/llamaai-schedule-alert.png" alt="LlamaAI 创建 TVL 变化告警计划" loading="lazy" />
+            </button>
+            <figcaption>
+              <strong>Schedule Alert</strong>
+              <span>可将自然语言请求转成告警配置：触发条件、频率、时间、时区与投递方式。</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="analysis-grid">
+          <article class="analysis-card">
+            <h3>导航结构</h3>
+            <p>左侧主导航将产品拆成 Home、Metrics、Tools、Chains、Yields、Stablecoins、RWA、API &amp; MCP 等数据入口；Premium 区域放置 Pricing、LlamaAI、Downloads、Custom Dashboards、Sheets、LlamaFeed。</p>
+          </article>
+          <article class="analysis-card">
+            <h3>账号与余额</h3>
+            <p>截图底部显示 My Account / No Subscription 和 External Data Balance $0.50，说明 Web 端把订阅身份、外部数据额度和高级功能入口放在同一工作台内。</p>
+          </article>
+          <article class="analysis-card">
+            <h3>研究工作流</h3>
+            <p>LlamaAI 不只是聊天框，而是“实体解析 → 数据库查询 → 知识加载 → Web 搜索 → 可视化生成 → 来源输出”的研究链路。</p>
+          </article>
+          <article class="analysis-card">
+            <h3>导出与复用</h3>
+            <p>图表和表格区域出现 CSV / PNG 控件，适合把 LlamaAI 的结果直接进入报告、投研材料或内部看板。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="llamaai">
+        <div class="section-head">
+          <span class="section-index">06</span>
+          <div>
+            <h2>LlamaAI 与 Schedule Alert</h2>
+            <p>截图显示 LlamaAI 能将自然语言转成研究图表、解释、来源引用和可保存的告警任务。</p>
+          </div>
+        </div>
+
+        <div class="feature-split">
+          <article class="feature-box">
+            <h3>LlamaAI 能力拆解</h3>
+            <ul class="check-list">
+              <li><strong>自然语言查询：</strong>例如“计算 R25 协议 TVL 变化与流入趋势”。</li>
+              <li><strong>数据计算：</strong>读取协议 TVL、变动百分比、时间窗口和链/分类上下文。</li>
+              <li><strong>可视化：</strong>生成趋势图和状态表，并提供 PNG/CSV。</li>
+              <li><strong>来源归因：</strong>回答中列出 DefiLlama 数据和外部来源链接。</li>
+              <li><strong>后续行动：</strong>自动给出 follow-up 按钮，例如同类对比、链上追踪、增长排行。</li>
+            </ul>
+          </article>
+
+          <article class="feature-box">
+            <h3>Schedule Alert 能力拆解</h3>
+            <ul class="check-list">
+              <li><strong>触发条件：</strong>R25 TVL 在 24 小时内变化超过 ±10%。</li>
+              <li><strong>调度频率：</strong>Daily，截图中配置为 UTC+8 11:00。</li>
+              <li><strong>投递方式：</strong>Email 到注册邮箱；支持将 LlamaAI 账号关联 Telegram Bot。</li>
+              <li><strong>保存动作：</strong>生成配置后仍需用户点击 Save Alert 确认。</li>
+              <li><strong>权限边界：</strong>截图证明可生成配置页，但是否长期可用、是否收费，需以账号权限和保存结果为准。</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="architecture">
+        <div class="section-head">
+          <span class="section-index">07</span>
+          <div>
+            <h2>Web 产品与 API 的关系</h2>
+            <p>Web 端是研究工作台；API 是数据接口；MCP 是给 AI Agent 使用的数据工具层。</p>
+          </div>
+        </div>
+
+        <div class="architecture">
+          <div class="arch-node source">DefiLlama 数据层<br><small>Adapters / DB / Market datasets</small></div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-node api">API / Pro API / MCP<br><small>JSON、OpenAPI、Agent Tools</small></div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-node app">Web Dashboard / LlamaAI<br><small>图表、研究、导出、提醒</small></div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-node user">用户工作流<br><small>投研、监控、报表、自动化</small></div>
+        </div>
+
+        <div class="cards three">
+          <article class="card">
+            <h3>公开 API</h3>
+            <p>适合快速拉取协议、链、TVL、价格等数据，构建 MVP、内部看板或低频监控。</p>
+          </article>
+          <article class="card">
+            <h3>API 订阅</h3>
+            <p>适合商业化产品、AI Agent、数据密集型后台、需要更高限额或高级端点的场景。</p>
+          </article>
+          <article class="card">
+            <h3>LlamaAI</h3>
+            <p>适合研究员直接提问，快速得到计算、图表、来源和可保存的告警配置。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="risks">
+        <div class="section-head">
+          <span class="section-index">08</span>
+          <div>
+            <h2>接入建议</h2>
+            <p>面向全栈 / Web3 项目接入 DefiLlama 时，建议优先处理以下问题。</p>
+          </div>
+        </div>
+
+        <div class="checklist-grid">
+          <label><input type="checkbox"> 后端代理 API Key，不在前端暴露 Pro/API Key</label>
+          <label><input type="checkbox"> 对高频端点加 Redis / KV 缓存</label>
+          <label><input type="checkbox"> 统一处理 429、5xx、超时与重试退避</label>
+          <label><input type="checkbox"> 对 TVL、价格、收益数据做时间戳归档</label>
+          <label><input type="checkbox"> 给业务指标保留“数据源更新时间”字段</label>
+          <label><input type="checkbox"> 不将收益率/TVL 数据直接解释为投资建议</label>
+          <label><input type="checkbox"> 生产环境根据端点权限核对 API 计划</label>
+          <label><input type="checkbox"> 若要接入 Agent，评估 MCP credits 与成本</label>
+        </div>
+      </section>
+
+      <section class="section sources" id="sources">
+        <div class="section-head">
+          <span class="section-index">09</span>
+          <div>
+            <h2>调研来源与页面素材</h2>
+            <p>本预览页内嵌了用户提供的 4 张登录试用截图，并结合公开官方页面整理。</p>
+          </div>
+        </div>
+
+        <div class="source-list">
+          <a href="https://defillama.com/" target="_blank" rel="noreferrer">DefiLlama 官网</a>
+          <a href="https://defillama.com/docs/api" target="_blank" rel="noreferrer">DefiLlama API Docs</a>
+          <a href="https://defillama.com/pro-api/docs" target="_blank" rel="noreferrer">DefiLlama Pro API Docs</a>
+          <a href="https://docs.llama.fi/pro-api" target="_blank" rel="noreferrer">DefiLlama Pricing Docs</a>
+          <a href="https://defillama.com/subscription" target="_blank" rel="noreferrer">DefiLlama Subscription</a>
+          <a href="https://docs.llama.fi/" target="_blank" rel="noreferrer">DefiLlama Methodology</a>
+          <a href="https://defillama.com/mcp" target="_blank" rel="noreferrer">DefiLlama MCP</a>
+          <a href="https://docs.llama.fi/spreadsheet-functions/spreadsheet-functions" target="_blank" rel="noreferrer">DefiLlama Sheets Docs</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="image-modal" id="imageModal" aria-hidden="true" role="dialog" aria-label="截图预览">
+    <button class="modal-close" id="modalClose" type="button" aria-label="关闭预览">×</button>
+    <div class="modal-inner">
+      <h3 id="modalTitle"></h3>
+      <img id="modalImage" src="" alt="截图放大预览" />
+    </div>
+  </div>
+
+  <button class="back-top" id="backTop" type="button" aria-label="回到顶部">↑</button>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
