@@ -233,6 +233,11 @@
         };
       }
 
+      function normalizeObjectKey(rawKey) {
+        const [rawPath] = String(rawKey || "").split("#", 1);
+        return rawPath.trim().replace(/^\/+/, "");
+      }
+
       function signedUrl(key) {
         return ossClient.signatureUrl(key, { expires: 1800 });
       }
@@ -392,6 +397,53 @@ document.addEventListener("click", function(event) {
         return injectPreviewRuntime(withSignedFetch, entryKey);
       }
 
+      function escapeCssToken(value) {
+        if (typeof CSS !== "undefined" && CSS.escape) {
+          return CSS.escape(value);
+        }
+
+        return value.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, "\\$1");
+      }
+
+      async function restoreScrollByHash(hash) {
+        const target = String(hash || "").trim().replace(/^#/, "");
+        if (!target) return;
+
+        const decodedTarget = decodeURIComponent(target);
+        const candidates = [target, decodedTarget];
+        const tryScroll = () => {
+          const doc = viewer.contentWindow?.document;
+          if (!doc) return false;
+
+          for (const candidate of candidates) {
+            const escaped = escapeCssToken(candidate);
+            const byId = doc.getElementById(candidate) || doc.getElementById(decodedTarget);
+            if (byId) {
+              byId.scrollIntoView();
+              return true;
+            }
+
+            const byAnchorName = doc.querySelector(`a[name="${escaped}"]`) || doc.querySelector(`a[name="${escapeCssToken(decodedTarget)}"]`);
+            if (byAnchorName) {
+              byAnchorName.scrollIntoView();
+              return true;
+            }
+          }
+
+          return false;
+        };
+
+        let attempts = 0;
+        const loop = () => {
+          if (tryScroll()) return;
+          if (attempts >= 10) return;
+          attempts += 1;
+          setTimeout(loop, 60 * attempts);
+        };
+
+        loop();
+      }
+
       async function loadTree() {
         try {
           const response = await ossClient.get("tree.json");
@@ -498,14 +550,23 @@ document.addEventListener("click", function(event) {
         }
       }
 
-      async function openObjectKey(entryKey) {
+      async function openObjectKey(entryKey, hash = "") {
         try {
-          const response = await ossClient.get(entryKey);
+          const normalizedKey = normalizeObjectKey(entryKey);
+          if (!normalizedKey) {
+            throw new Error("无效的资源路径");
+          }
+
+          const response = await ossClient.get(normalizedKey);
           const html = await contentToText(response.content);
-          viewer.srcdoc = await rewriteHtml(html, entryKey);
+          viewer.srcdoc = await rewriteHtml(html, normalizedKey);
           listArea.style.display = "none";
           viewer.style.display = "block";
           backBtn.style.display = "inline-block";
+
+          if (hash) {
+            await restoreScrollByHash(hash);
+          }
         } catch (error) {
           alert(`无法打开项目：${error && error.message ? error.message : "未知错误"}`);
         }
@@ -531,7 +592,9 @@ document.addEventListener("click", function(event) {
       logoutBtn.addEventListener("click", logout);
       window.addEventListener("message", (event) => {
         if (event.source === viewer.contentWindow && event.data && event.data.type === "research-open" && event.data.key) {
-          openObjectKey(event.data.key);
+          const key = event.data.key;
+          const hash = (event.data.hash || "").trim();
+          openObjectKey(key, hash);
         }
       });
       loadTree();
